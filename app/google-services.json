@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "206905899205",
+    "firebase_url": "https://gst-probill-default-rtdb.firebaseio.com",
+    "project_id": "gst-probill",
+    "storage_bucket": "gst-probill.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206905899205:android:9cfd7cff265dbabda398ac",
+        "android_client_info": {
+          "package_name": "com.example.gstprobill"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASV6RF6-SoTdNq1Q2LjoytYWa_yU6n3XI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206905899205:android:da70277d67d7309aa398ac",
+        "android_client_info": {
+          "package_name": "com.sandhyasofttech.gstbillingpro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASV6RF6-SoTdNq1Q2LjoytYWa_yU6n3XI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206905899205:android:fc91972bf89dc932a398ac",
+        "android_client_info": {
+          "package_name": "com.sandhyasofttechh.mykhatapro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASV6RF6-SoTdNq1Q2LjoytYWa_yU6n3XI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

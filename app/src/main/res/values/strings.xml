@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">MyKhataPro</string>
+
+    <string name="dashboard">Dashboard</string>
+    <string name="customers">Customers</string>
+    <string name="reports">Reports</string>
+    <string name="settings">Settings</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="profile">Profile</string>
+    <string name="share_app">Share App</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="about">About</string>
+    <string name="user_photo">User Profile Photo</string>
+
+    <string name="total_balance">Total Balance</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="no_transactions_yet">No transactions yet</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
