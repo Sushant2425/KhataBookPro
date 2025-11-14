@@ -1,6 +1,7 @@
 package com.sandhyasofttechh.mykhatapro.activities;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -9,15 +10,16 @@ import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -31,8 +33,6 @@ import com.sandhyasofttechh.mykhatapro.model.Customer;
 import com.sandhyasofttechh.mykhatapro.model.Transaction;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 
-import android.app.DatePickerDialog;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,12 +42,12 @@ import java.util.Locale;
 public class AddTransactionActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_SEND_SMS = 555;
-    private Transaction pendingTransactionForSms;  // Single declaration here
+    private Transaction pendingTransactionForSms;
 
     private TextInputEditText etDate, etAmount, etNote;
     private AutoCompleteTextView autoCustomer;
     private TextInputLayout layoutCustomer;
-    private RadioGroup rgType;
+    private MaterialButtonToggleGroup toggleButtonGroup; // **FIXED**
     private MaterialButton btnSave;
     private MaterialCheckBox checkboxSendMessage;
 
@@ -68,9 +68,12 @@ public class AddTransactionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_transaction);
 
+        // **FIXED**: Setup professional toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Add Transaction");
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
         initViews();
@@ -87,7 +90,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         etNote = findViewById(R.id.et_note);
         autoCustomer = findViewById(R.id.auto_customer);
         layoutCustomer = findViewById(R.id.layout_customer);
-        rgType = findViewById(R.id.rg_type);
+        toggleButtonGroup = findViewById(R.id.toggle_button_group); // **FIXED**
         btnSave = findViewById(R.id.btn_save);
         checkboxSendMessage = findViewById(R.id.checkbox_send_message);
         checkboxSendMessage.setChecked(true);
@@ -172,8 +175,10 @@ public class AddTransactionActivity extends AppCompatActivity {
                 selectedCustomerPhone = extras.getString("edit_customer_phone");
                 autoCustomer.setText(extras.getString("edit_customer_name"));
                 String typeStr = extras.getString("edit_type", "gave");
-                int type = typeStr.equals("gave") ? R.id.rb_gave : R.id.rb_got;
-                rgType.check(type);
+                
+                // **FIXED**: Check the correct button in the toggle group
+                int buttonId = typeStr.equals("gave") ? R.id.btn_gave : R.id.btn_got;
+                toggleButtonGroup.check(buttonId);
             }
         }
     }
@@ -200,7 +205,8 @@ public class AddTransactionActivity extends AppCompatActivity {
             return;
         }
 
-        boolean isGave = rgType.getCheckedRadioButtonId() == R.id.rb_gave;
+        // **FIXED**: Get the selected button from the toggle group
+        boolean isGave = toggleButtonGroup.getCheckedButtonId() == R.id.btn_gave;
         String customerName = getNameFromPhone(selectedCustomerPhone);
 
         Transaction transaction = new Transaction();
@@ -269,7 +275,7 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void sendSms(Transaction transaction){
         String message = "Hello " + transaction.getCustomerName() + ",\n"
-                + "You " + (transaction.getType().equals("gave") ? "gave" : "received") + " ₹"
+                + "You " + (transaction.getType().equals("gave") ? "received" : "gave") + " ₹" // Corrected logic
                 + String.format(Locale.getDefault(), "%.2f", transaction.getAmount())
                 + " on " + transaction.getDate() + ".\nNote: "
                 + (transaction.getNote().isEmpty() ? "No notes." : transaction.getNote())
@@ -312,5 +318,4 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

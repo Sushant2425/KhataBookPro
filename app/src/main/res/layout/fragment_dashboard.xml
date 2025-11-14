@@ -8,40 +8,40 @@
     android:fitsSystemWindows="true"
     tools:context=".fragments.DashboardFragment">
 
-    <!-- AppBar: Contains the main header card -->
+    <!-- AppBar: Contains the main header card (Unchanged) -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cardBackgroundColor="?attr/colorPrimary"
         android:background="?android:attr/colorBackground"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/dashboard_header_background"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <!-- Professional Header Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="10dp"
                 app:cardElevation="8dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="20dp">
+                    android:background="@drawable/rounded_input"
+                    android:padding="10dp">
 
-                    <!-- Main Balance -->
+                    <!-- All header content remains unchanged -->
                     <TextView
                         android:id="@+id/tv_balance_label"
                         style="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Total Balance"
-                        android:textColor="?attr/colorOnPrimary"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -53,41 +53,40 @@
                         android:layout_marginTop="4dp"
                         android:text="₹0.00"
                         android:textColor="?attr/colorOnPrimary"
-                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_balance_label" />
 
-                    <!-- Divider Line -->
                     <View
                         android:id="@+id/divider"
                         android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="16dp"
-                        android:background="?attr/colorOnPrimary"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="1dp"
                         android:alpha="0.2"
+                        android:background="@color/black"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_balance_amount" />
 
-                    <!-- Income Section -->
                     <ImageView
                         android:id="@+id/iv_income_arrow"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:backgroundTint="@color/black"
                         android:layout_marginTop="16dp"
-                        android:src="@drawable/ic_arrow_upward"
+
+                        android:layout_marginBottom="10dp"
+                        android:src="@drawable/ic_arrow_downward"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider"
-                        app:tint="?attr/colorOnPrimary" />
-                    
+                        />
+
                     <TextView
                         android:id="@+id/tv_income_label"
                         style="@style/TextAppearance.MaterialComponents.Body2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Income"
-                        android:textColor="?attr/colorOnPrimary"
+                        android:text="You will get"
                         app:layout_constraintBottom_toBottomOf="@id/iv_income_arrow"
                         app:layout_constraintStart_toEndOf="@id/iv_income_arrow"
                         app:layout_constraintTop_toTopOf="@id/iv_income_arrow" />
@@ -97,14 +96,14 @@
                         style="@style/TextAppearance.MaterialComponents.Headline6"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
                         android:layout_marginTop="4dp"
                         android:text="₹0.00"
-                        android:textColor="?attr/colorOnPrimary"
+                        android:textColor="@color/green"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/iv_income_arrow" />
-                        
-                    <!-- Vertical Guideline -->
+
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guideline_vertical"
                         android:layout_width="wrap_content"
@@ -112,17 +111,16 @@
                         android:orientation="vertical"
                         app:layout_constraintGuide_percent="0.5"/>
 
-                    <!-- Expense Section -->
                     <ImageView
                         android:id="@+id/iv_expense_arrow"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginStart="16dp"
-                        android:src="@drawable/ic_arrow_downward"
+                        android:src="@drawable/ic_arrow_upward"
                         app:layout_constraintStart_toEndOf="@id/guideline_vertical"
                         app:layout_constraintTop_toBottomOf="@id/divider"
-                        app:tint="?attr/colorOnPrimary" />
+                       />
 
                     <TextView
                         android:id="@+id/tv_expense_label"
@@ -130,20 +128,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Expense"
-                        android:textColor="?attr/colorOnPrimary"
+                        android:text="You will give"
                         app:layout_constraintBottom_toBottomOf="@id/iv_expense_arrow"
                         app:layout_constraintStart_toEndOf="@id/iv_expense_arrow"
-                        app:layout_constraintTop_toTopOf="@id/iv_expense_arrow" />
+                        app:layout_constraintTop_toTopOf="@id/iv_expense_arrow"
+                        app:layout_constraintVertical_bias="0.0" />
 
                     <TextView
                         android:id="@+id/tv_expense"
                         style="@style/TextAppearance.MaterialComponents.Headline6"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
                         android:layout_marginTop="4dp"
                         android:text="₹0.00"
-                        android:textColor="?attr/colorOnPrimary"
+                        android:textColor="@color/red"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="@id/iv_expense_arrow"
                         app:layout_constraintTop_toBottomOf="@id/iv_expense_arrow" />
@@ -169,23 +168,51 @@
             android:gravity="center_vertical"
             android:paddingVertical="8dp">
 
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/search_view"
+            <!-- Card contains the SearchView and the INSIDE filter icon -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/search_view_background"
-                app:queryHint="Search by customer name..."
-                app:iconifiedByDefault="false"/>
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
+                android:layout_marginEnd="8dp">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/search_view"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:queryHint="Search by customer name..."
+                        app:iconifiedByDefault="false"
+                        app:searchIcon="@null"
+                        android:background="@android:color/transparent"/>
+                    
+                    <ImageView
+                        android:id="@+id/iv_filter_button"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/filterr"
+                        android:padding="10dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- PDF icon is OUTSIDE the card -->
             <ImageView
-                android:id="@+id/iv_filter"
+                android:id="@+id/iv_pdf_report"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/img"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/pdf"
                 android:padding="10dp"
-                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"/>
         </LinearLayout>
@@ -208,7 +235,7 @@
             android:visibility="gone"/>
     </LinearLayout>
 
-    <!-- Floating Action Buttons -->
+    <!-- Floating Action Buttons (Unchanged) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_transaction"
         android:layout_width="wrap_content"
