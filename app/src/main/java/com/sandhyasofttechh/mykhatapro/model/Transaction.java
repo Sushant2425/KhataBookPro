@@ -3,6 +3,7 @@ package com.sandhyasofttechh.mykhatapro.model;
 public class Transaction {
     private String id;
     private String customerPhone;
+    private String customerName;
     private double amount;
     private String type; // "gave" or "got"
     private String note;
@@ -17,6 +18,9 @@ public class Transaction {
 
     public String getCustomerPhone() { return customerPhone; }
     public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }
+
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
 
     public double getAmount() { return amount; }
     public void setAmount(double amount) { this.amount = amount; }

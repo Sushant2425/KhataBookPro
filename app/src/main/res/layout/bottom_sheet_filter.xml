@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort By"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"/>
+
+    <RadioGroup
+        android:id="@+id/rg_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/rb_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Transactions"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/rb_you_gave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You Gave"/>
+
+        <RadioButton
+            android:id="@+id/rb_you_got"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You Got"/>
+
+        <RadioButton
+            android:id="@+id/rb_highest_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Highest Amount"/>
+
+        <RadioButton
+            android:id="@+id/rb_lowest_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lowest Amount"/>
+
+        <RadioButton
+            android:id="@+id/rb_most_recent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Most Recent"/>
+
+        <RadioButton
+            android:id="@+id/rb_oldest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Oldest"/>
+    </RadioGroup>
+
+</LinearLayout>

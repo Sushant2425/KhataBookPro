@@ -189,36 +189,24 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         double amount = Double.parseDouble(amountStr);
         boolean isGave = rgType.getCheckedRadioButtonId() == R.id.rb_gave;
+        String customerName = getNameFromPhone(selectedCustomerPhone);
 
         Transaction transaction = new Transaction();
+        // The 'id' field is no longer needed for the database structure, but we can keep it in the model
+        transaction.setId(selectedCustomerPhone); 
         transaction.setCustomerPhone(selectedCustomerPhone);
+        transaction.setCustomerName(customerName);
         transaction.setAmount(amount);
         transaction.setType(isGave ? "gave" : "got");
         transaction.setNote(note);
         transaction.setDate(date);
         transaction.setTimestamp(System.currentTimeMillis());
-
-        if (editTransactionId != null) {
-            // Update
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("amount", amount);
-            updates.put("type", transaction.getType());
-            updates.put("note", note);
-            updates.put("date", date);
-            updates.put("timestamp", transaction.getTimestamp());
-            transactionsRef.child(editTransactionId).updateChildren(updates)
-                    .addOnSuccessListener(a -> finishWithSuccess("Updated"))
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-        } else {
-            // Add new
-            String key = transactionsRef.push().getKey();
-            if (key != null) {
-                transaction.setId(key);
-                transactionsRef.child(key).setValue(transaction)
-                        .addOnSuccessListener(a -> finishWithSuccess("Saved"))
-                        .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-            }
-        }
+        
+        // This will save the transaction object directly under the phone number.
+        // It will overwrite any existing transaction for this customer.
+        transactionsRef.child(selectedCustomerPhone).setValue(transaction)
+                .addOnSuccessListener(a -> finishWithSuccess("Saved"))
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
     private String getPhoneFromName(String fullName) {
@@ -226,6 +214,15 @@ public class AddTransactionActivity extends AppCompatActivity {
             String display = c.getName() + " (" + c.getPhone() + ")";
             if (display.equals(fullName)) {
                 return c.getPhone();
+            }
+        }
+        return null;
+    }
+    
+    private String getNameFromPhone(String phone) {
+        for (Customer c : customerList) {
+            if (c.getPhone().equals(phone)) {
+                return c.getName();
             }
         }
         return null;
