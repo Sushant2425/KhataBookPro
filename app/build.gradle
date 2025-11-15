@@ -17,6 +17,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // --- THIS IS THE FIX ---
+    // This block tells Gradle exactly where to find the assets folder.
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

@@ -54,12 +54,13 @@
                         android:text="₹0.00"
                         android:textColor="?attr/colorOnPrimary"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_balance_label" />
+                        app:layout_constraintTop_toBottomOf="@id/tv_balance_label"
+                        tools:textSize="16sp" />
 
                     <View
                         android:id="@+id/divider"
                         android:layout_width="0dp"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:layout_marginTop="1dp"
                         android:alpha="0.2"
                         android:background="@color/black"
@@ -174,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:cardCornerRadius="24dp"
+                android:layout_marginStart="14dp"
                 app:cardElevation="4dp"
                 android:layout_marginEnd="8dp">
 
@@ -189,17 +191,18 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:queryHint="Search by customer name..."
+                        android:background="@color/white"
                         app:iconifiedByDefault="false"
                         app:searchIcon="@null"
-                        android:background="@android:color/transparent"/>
+                       />
 
                     <ImageView
                         android:id="@+id/iv_filter_button"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="40dp"
+                        android:layout_height="46dp"
                         android:src="@drawable/filterr"
                         android:padding="10dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:background="@color/white"
                         android:clickable="true"
                         android:focusable="true"/>
                 </LinearLayout>
@@ -208,8 +211,8 @@
             <!-- PDF icon is OUTSIDE the card -->
             <ImageView
                 android:id="@+id/iv_pdf_report"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="46dp"
                 android:src="@drawable/pdf"
                 android:padding="10dp"
                 android:background="?attr/selectableItemBackgroundBorderless"

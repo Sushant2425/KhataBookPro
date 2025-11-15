@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,75 +23,75 @@ import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final long SPLASH_TIMEOUT = 100; // 1.8 seconds
+    private static final long SPLASH_DELAY = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        ImageView logo = findViewById(R.id.iv_logo);
+        TextView appName = findViewById(R.id.tv_app_name_splash);
+
+        // Load animations
+        Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_slide_up_logo);
+        Animation textAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_slide_up_text);
+
+        // Start animations
+        logo.startAnimation(logoAnimation);
+        appName.startAnimation(textAnimation);
+
+        // Decide where to go after the splash screen
+        new Handler(Looper.getMainLooper()).postDelayed(this::decideNextActivity, SPLASH_DELAY);
+    }
+
+    private void decideNextActivity() {
         PrefManager prefManager = new PrefManager(this);
+        if (prefManager.isLoggedIn()) {
+            checkUserStatusFromFirebase(prefManager);
+        } else {
+            navigateTo(LoginActivity.class);
+        }
+    }
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (prefManager.isLoggedIn()) {
-                // User logged in -> check status from Firebase
-                String email = prefManager.getUserEmail();
-                if (email != null) {
-                    String emailKey = email.replace(".", ",");
-                    DatabaseReference userRef = FirebaseDatabase.getInstance()
-                            .getReference("Khatabook")
-                            .child(emailKey)
-                            .child("profile");
+    private void checkUserStatusFromFirebase(PrefManager prefManager) {
+        String email = prefManager.getUserEmail();
+        if (email == null) {
+            navigateTo(LoginActivity.class);
+            return;
+        }
 
-                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            Boolean status = snapshot.child("status").getValue(Boolean.class);
-                            if (status != null && status) {
-                                // Account active → go to MainActivity
-                                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                            } else {
-                                // Account inactive → auto logout + delete node
-                                Toast.makeText(SplashActivity.this,
-                                        "Your account is inactive. Logging out.", Toast.LENGTH_LONG).show();
+        String emailKey = email.replace(".", ",");
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("Khatabook")
+                .child(emailKey)
+                .child("profile");
 
-                                // Delete the node from Firebase
-                                userRef.removeValue().addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        // Reset local login flag
-                                        prefManager.setLogin(false);
-                                        FirebaseAuth.getInstance().signOut();
-                                        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                                    } else {
-                                        // Could not delete node, still logout locally
-                                        prefManager.setLogin(false);
-                                        FirebaseAuth.getInstance().signOut();
-                                        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                                    }
-                                    finish();
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError error) {
-                            Toast.makeText(SplashActivity.this,
-                                    "Database error: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                            finish();
-                        }
-                    });
-
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean status = snapshot.child("status").getValue(Boolean.class);
+                if (status != null && status) {
+                    navigateTo(MainActivity.class);
                 } else {
-                    // Email not found in PrefManager → go to login
-                    startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                    finish();
+                    Toast.makeText(SplashActivity.this, "Your account is inactive. Logging out.", Toast.LENGTH_LONG).show();
+                    prefManager.setLogin(false);
+                    FirebaseAuth.getInstance().signOut();
+                    navigateTo(LoginActivity.class);
                 }
-            } else {
-                // Not logged in → go to login
-                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                finish();
             }
-        }, SPLASH_TIMEOUT);
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(SplashActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                navigateTo(LoginActivity.class);
+            }
+        });
+    }
+
+    private void navigateTo(Class<?> destination) {
+        Intent intent = new Intent(SplashActivity.this, destination);
+        startActivity(intent);
+        finish();
     }
 }
