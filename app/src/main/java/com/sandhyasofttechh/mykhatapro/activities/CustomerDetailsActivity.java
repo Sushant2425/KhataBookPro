@@ -1,302 +1,245 @@
 package com.sandhyasofttechh.mykhatapro.activities;
 
-import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.*;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttechh.mykhatapro.R;
-import com.sandhyasofttechh.mykhatapro.adapter.CustomerHistoryAdapter;
-import com.sandhyasofttechh.mykhatapro.model.Customer;
-import com.sandhyasofttechh.mykhatapro.model.PaymentEntry;
+import com.sandhyasofttechh.mykhatapro.adapter.TransactionAdapter;
+import com.sandhyasofttechh.mykhatapro.fragments.ReportOptionsBottomSheet;
+import com.sandhyasofttechh.mykhatapro.model.Transaction;
+import com.sandhyasofttechh.mykhatapro.utils.ImageGenerator;
+import com.sandhyasofttechh.mykhatapro.utils.PdfGenerator;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class CustomerDetailsActivity extends AppCompatActivity {
+public class CustomerDetailsActivity extends AppCompatActivity implements ReportOptionsBottomSheet.ReportListener {
 
-    private TextView tvName, tvPhone, tvDue, tvTotalGave, tvTotalGot, tvNoHistory;
-    private RecyclerView recyclerHistory;
-    private CustomerHistoryAdapter adapter;
-    private MaterialButton btnSharePdf;
-    private TextInputEditText searchHistory;
-    private DatabaseReference transRef;
+    private String customerPhone, customerName;
+    private List<Transaction> transactionList = new ArrayList<>();
+    private TransactionAdapter adapter;
+    private TextView tvTotalGave, tvTotalGot;
+    private double netBalance = 0;
     private PrefManager prefManager;
-    private MaterialButton btnCall, btnWhatsApp;
-    private List<PaymentEntry> allEntries = new ArrayList<>();
-    private List<PaymentEntry> filteredEntries = new ArrayList<>();
-    private Customer customer;
-
-    private static final int STORAGE_PERMISSION_CODE = 101;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_details);
 
-        initViews();
-        setupToolbar();
-        getCustomerData();
-        setupRecyclerView();
-        setupSearch();
-        setupShareButton();
-        loadPaymentHistory();
-    }
-
-    private void initViews() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
-        tvName = findViewById(R.id.tv_detail_name);
-        tvPhone = findViewById(R.id.tv_detail_phone);
-        tvDue = findViewById(R.id.tv_detail_due);
-        tvTotalGave = findViewById(R.id.tv_total_gave);
-        tvTotalGot = findViewById(R.id.tv_total_got);
-        tvNoHistory = findViewById(R.id.tv_no_history);
-        recyclerHistory = findViewById(R.id.recycler_history);
-        btnSharePdf = findViewById(R.id.btn_share_pdf);
-        searchHistory = findViewById(R.id.search_history);
-        btnCall = findViewById(R.id.btn_call);
-        btnWhatsApp = findViewById(R.id.btn_whatsapp);
-        adapter = new CustomerHistoryAdapter();
         prefManager = new PrefManager(this);
+        customerPhone = getIntent().getStringExtra("CUSTOMER_PHONE");
+        customerName = getIntent().getStringExtra("CUSTOMER_NAME");
 
-        btnCall.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + customer.getPhone()));
-            startActivity(intent);
-        });
-
-        btnWhatsApp.setOnClickListener(v -> {
-            String url = "https://api.whatsapp.com/send?phone=91" + customer.getPhone();
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            startActivity(i);
-        });
-
-    }
-
-    private void setupToolbar() {
-        // Title set later
-    }
-
-    private void getCustomerData() {
-        customer = (Customer) getIntent().getSerializableExtra("customer");
-        if (customer == null) {
-            Toast.makeText(this, "Customer data missing", Toast.LENGTH_SHORT).show();
+        if (customerPhone == null || customerName == null) {
+            Toast.makeText(this, "Error: Customer data missing.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        getSupportActionBar().setTitle(customer.getName());
-        tvName.setText(customer.getName());
-        tvPhone.setText(customer.getPhone());
-        double due = customer.getPendingAmount();
-        tvDue.setText(due > 0 ? String.format("₹%.2f due", due) : "No due amount");
+        Toolbar toolbar = findViewById(R.id.toolbar_details);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(customerName);
+
+        tvTotalGave = findViewById(R.id.tv_total_gave);
+        tvTotalGot = findViewById(R.id.tv_total_got);
+        
+        setupRecyclerView();
+        setupClickListeners();
+        loadTransactions();
+    }
+    
+    // --- THIS IS THE NEW, PROFESSIONAL WHATSAPP METHOD ---
+    private void sendWhatsAppMessage() {
+        String appName = getString(R.string.app_name);
+        File imageFile = ImageGenerator.generateShareableImage(this, customerName, netBalance, appName);
+        if (imageFile == null) {
+            Toast.makeText(this, "Failed to create shareable image.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        Uri imageUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", imageFile);
+
+        // --- FIXED: Clearer and more professional message ---
+        String finalMessage;
+        if (netBalance > 0) { // Customer owes you money
+            finalMessage = "Hello " + customerName + ",\nThis is a friendly reminder for your pending payment. Thank you!";
+        } else if (netBalance < 0) { // You owe the customer money
+            finalMessage = "Hello " + customerName + ",\nThis is a confirmation of my pending payment to you. Thank you!";
+        } else {
+            finalMessage = "Hello " + customerName + ",\nJust to confirm, our account is currently settled. Thank you for your business!";
+        }
+        
+        try {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setPackage("com.whatsapp");
+            intent.setType("image/png");
+            intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            intent.putExtra(Intent.EXTRA_TEXT, finalMessage);
+            intent.putExtra("jid", customerPhone.replace("+", "") + "@s.whatsapp.net");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "WhatsApp not installed or contact not on WhatsApp.", Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    // --- FIXED: Clearer and more professional SMS message ---
+    private void sendSms() {
+        String statusMessage;
+        if (netBalance > 0) { // Customer owes you money
+            statusMessage = String.format(Locale.getDefault(), "A friendly reminder that you have a pending payment of ₹%.2f.", netBalance);
+        } else if (netBalance < 0) { // You owe the customer money
+            statusMessage = String.format(Locale.getDefault(), "A confirmation that I have a pending payment to you of ₹%.2f.", Math.abs(netBalance));
+        } else {
+            statusMessage = "Just to confirm, our account is settled.";
+        }
+        
+        String finalMessage = "Hello " + customerName + ", " + statusMessage + " Thank you. - " + getString(R.string.app_name);
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("smsto:" + customerPhone));
+        intent.putExtra("sms_body", finalMessage);
+        startActivity(intent);
+    }
+    
+    // --- All other methods are unchanged and correct ---
+
+    @Override
+    public void onReportGenerated(List<Transaction> transactions, String dateRangeLabel) {
+        if (transactions.isEmpty()) {
+            Toast.makeText(this, "No transactions for the selected period.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        File pdfFile = PdfGenerator.generatePdf(this, customerName, customerPhone, transactions, dateRangeLabel);
+        if (pdfFile != null) {
+            showPdfOptionsDialog(pdfFile);
+        } else {
+            Toast.makeText(this, "Failed to generate PDF.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    private void showPdfOptionsDialog(final File pdfFile) {
+        new AlertDialog.Builder(this)
+            .setTitle("Report Generated")
+            .setPositiveButton("Share", (dialog, which) -> sharePdfIntent(pdfFile))
+            .setNeutralButton("View", (dialog, which) -> viewPdfIntent(pdfFile))
+            .setNegativeButton("Dismiss", (dialog, which) -> dialog.dismiss())
+            .show();
+    }
+    
+    private void viewPdfIntent(File pdfFile) {
+        Uri pdfUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", pdfFile);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(pdfUri, "application/pdf");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "No application available to view PDF.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sharePdfIntent(File pdfFile) {
+        Uri pdfUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", pdfFile);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("application/pdf");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Transaction Report for " + customerName);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(shareIntent, "Share Report via..."));
+    }
+
+    private void updateSummary(double totalGave, double totalGot) {
+        TextView tvBalance = findViewById(R.id.tv_details_net_balance);
+        TextView tvLabel = findViewById(R.id.tv_details_balance_label);
+        tvTotalGave.setText(String.format(Locale.getDefault(), "₹%.2f", totalGave));
+        tvTotalGot.setText(String.format(Locale.getDefault(), "₹%.2f", totalGot));
+        this.netBalance = totalGave - totalGot;
+        String balanceText = String.format(Locale.getDefault(), "₹%.2f", Math.abs(netBalance));
+        tvBalance.setText(balanceText);
+        if (netBalance > 0) {
+            tvLabel.setText("You will get");
+            tvBalance.setTextColor(ContextCompat.getColor(this, R.color.green));
+        } else if (netBalance < 0) {
+            tvLabel.setText("You will give");
+            tvBalance.setTextColor(ContextCompat.getColor(this, R.color.error));
+        } else {
+            tvLabel.setText("Settled Up");
+            tvBalance.setTextColor(ContextCompat.getColor(this, R.color.black));
+        }
     }
 
     private void setupRecyclerView() {
-        recyclerHistory.setLayoutManager(new LinearLayoutManager(this));
-        recyclerHistory.setAdapter(adapter);
+        RecyclerView recyclerView = findViewById(R.id.recycler_customer_transactions);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setNestedScrollingEnabled(false);
+        adapter = new TransactionAdapter(transactionList);
+        recyclerView.setAdapter(adapter);
     }
 
-    private void setupSearch() {
-        searchHistory.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                filter(s.toString());
-            }
+    private void setupClickListeners() {
+        findViewById(R.id.fab_add_specific_transaction).setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddTransactionActivity.class);
+            intent.putExtra("edit_customer_phone", customerPhone);
+            intent.putExtra("edit_customer_name", customerName);
+            startActivity(intent);
+        });
+        findViewById(R.id.btn_whatsapp).setOnClickListener(v -> sendWhatsAppMessage());
+        findViewById(R.id.btn_sms).setOnClickListener(v -> sendSms());
+        findViewById(R.id.btn_report).setOnClickListener(v -> {
+            ReportOptionsBottomSheet bottomSheet = ReportOptionsBottomSheet.newInstance(transactionList);
+            bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
         });
     }
 
-    private void filter(String query) {
-        filteredEntries.clear();
-        if (query.isEmpty()) {
-            filteredEntries.addAll(allEntries);
-        } else {
-            String q = query.toLowerCase(Locale.getDefault());
-            for (PaymentEntry e : allEntries) {
-                if (e.getNote() != null && e.getNote().toLowerCase(Locale.getDefault()).contains(q) ||
-                        dateFormat.format(new Date(e.getDate())).toLowerCase(Locale.getDefault()).contains(q) ||
-                        String.format("%.2f", e.getAmount()).contains(q)) {
-                    filteredEntries.add(e);
+    private void loadTransactions() {
+        PrefManager prefManager = new PrefManager(this);
+        String userNode = prefManager.getUserEmail().replace(".", ",");
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Khatabook").child(userNode).child("transactions").child(customerPhone);
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                transactionList.clear();
+                double totalGave = 0, totalGot = 0;
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Transaction transaction = ds.getValue(Transaction.class);
+                    if (transaction != null) {
+                        transactionList.add(transaction);
+                        if ("gave".equals(transaction.getType())) totalGave += transaction.getAmount();
+                        else totalGot += transaction.getAmount();
+                    }
                 }
+                Collections.sort(transactionList, (t1, t2) -> Long.compare(t2.getTimestamp(), t1.getTimestamp()));
+                adapter.notifyDataSetChanged();
+                updateSummary(totalGave, totalGot);
             }
-        }
-        adapter.setEntries(filteredEntries);
-        updateEmptyState();
-    }
-
-    private void setupShareButton() {
-        btnSharePdf.setOnClickListener(v -> generateAndSharePDF()); // DIRECT CALL
-    }
-
-    private void loadPaymentHistory() {
-        String userEmail = prefManager.getUserEmail().replace(".", ",");
-        transRef = FirebaseDatabase.getInstance().getReference("Khatabook")
-                .child(userEmail).child("transactions");
-
-        transRef.orderByChild("customerPhone").equalTo(customer.getPhone())
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        allEntries.clear();
-                        double gave = 0, got = 0;
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            try {
-                                PaymentEntry entry = ds.getValue(PaymentEntry.class);
-                                if (entry != null && entry.getType() != null) {
-                                    allEntries.add(entry);
-                                    if ("gave".equals(entry.getType())) gave += entry.getAmount();
-                                    else if ("got".equals(entry.getType())) got += entry.getAmount();
-                                }
-                            } catch (Exception e) { e.printStackTrace(); }
-                        }
-                        filteredEntries = new ArrayList<>(allEntries);
-                        adapter.setEntries(filteredEntries);
-                        updateSummary(gave, got);
-                        updateEmptyState();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(CustomerDetailsActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void updateSummary(double gave, double got) {
-        tvTotalGave.setText(String.format("₹%.2f", gave));
-        tvTotalGot.setText(String.format("₹%.2f", got));
-    }
-
-    private void updateEmptyState() {
-        boolean empty = filteredEntries.isEmpty();
-        tvNoHistory.setVisibility(empty ? View.VISIBLE : View.GONE);
-        recyclerHistory.setVisibility(empty ? View.GONE : View.VISIBLE);
-    }
-
-//    private void checkPermissionAndShare() {
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    STORAGE_PERMISSION_CODE);
-//        } else {
-//            generateAndSharePDF();
-//        }
-//    }
-
-//    @Override
-//    public vo
-//    id onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == STORAGE_PERMISSION_CODE && grantResults.length > 0
-//                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//            generateAndSharePDF();
-//        } else {
-//            Toast.makeText(this, "Storage permission required", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
-    private void generateAndSharePDF() {
-        if (filteredEntries.isEmpty()) {
-            Toast.makeText(this, "No data to share", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        PdfDocument pdf = new PdfDocument();
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(800, 1200, 1).create();
-        PdfDocument.Page page = pdf.startPage(pageInfo);
-        Canvas canvas = page.getCanvas();
-        Paint paint = new Paint();
-        paint.setTextSize(28);
-        paint.setFakeBoldText(true);
-
-        int y = 100;
-        canvas.drawText(customer.getName() + " - Payment History", 40, y, paint);
-        y += 50;
-        paint.setTextSize(20);
-        canvas.drawText("Phone: " + customer.getPhone(), 40, y, paint);
-        y += 40;
-        canvas.drawText("Net Due: ₹" + String.format("%.2f", customer.getPendingAmount()), 40, y, paint);
-        y += 70;
-
-        paint.setTextSize(18);
-        paint.setFakeBoldText(false);
-        for (PaymentEntry e : filteredEntries) {
-            String line = String.format("%s  ₹%.2f  %s",
-                    e.getType().equals("gave") ? "You Gave" : "You Got",
-                    e.getAmount(),
-                    dateFormat.format(new Date(e.getDate())));
-            if (e.getNote() != null && !e.getNote().isEmpty()) {
-                line += "  [" + e.getNote() + "]";
-            }
-            canvas.drawText(line, 40, y, paint);
-            y += 35;
-            if (y > 1100) {
-                pdf.finishPage(page);
-                pageInfo = new PdfDocument.PageInfo.Builder(800, 1200, pdf.getPages().size() + 1).create();
-                page = pdf.startPage(pageInfo);
-                canvas = page.getCanvas();
-                y = 80;
-            }
-        }
-        pdf.finishPage(page);
-
-        try {
-            // NO PERMISSION NEEDED
-            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                    customer.getName().replace(" ", "_") + "_History.pdf");
-            pdf.writeTo(new FileOutputStream(file));
-
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("application/pdf");
-            intent.putExtra(Intent.EXTRA_STREAM, androidx.core.content.FileProvider.getUriForFile(
-                    this, getPackageName() + ".provider", file));
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(intent, "Share PDF via"));
-        } catch (Exception e) {
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        } finally {
-            pdf.close();
-        }
+            @Override public void onCancelled(@NonNull DatabaseError error) { Toast.makeText(CustomerDetailsActivity.this, "Failed to load transactions.", Toast.LENGTH_SHORT).show(); }
+        });
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;

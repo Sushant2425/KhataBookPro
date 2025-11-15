@@ -15,11 +15,12 @@ import com.sandhyasofttechh.mykhatapro.model.Transaction;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-// **IMPORTANT**: This adapter now works with a List<Transaction> again.
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
 
     private final List<Transaction> transactions;
@@ -42,20 +43,47 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         Transaction t = transactions.get(position);
         Context context = holder.itemView.getContext();
 
-        holder.tvCustomerName.setText(t.getCustomerName());
+        // Set Texts
         holder.tvNote.setText(t.getNote());
-        holder.tvAmount.setText(String.format(Locale.getDefault(), "₹%.2f", t.getAmount()));
         holder.tvDate.setText(t.getDate());
         holder.tvRelativeTime.setText(getCustomRelativeTime(t.getDate()));
+        holder.tvAmount.setText(String.format(Locale.getDefault(), "₹%.2f", t.getAmount()));
 
-        boolean isGot = "got".equals(t.getType());
-        int color = isGot ? R.color.green : R.color.error;
-
-        holder.tvAmount.setTextColor(ContextCompat.getColor(context, color));
-        holder.viewTypeIndicator.setBackgroundColor(ContextCompat.getColor(context, color));
-
-        // You can add an OnClickListener here if you want to open details
-        // holder.itemView.setOnClickListener(v -> { ... });
+        // Set Type and Colors
+        boolean isGave = "gave".equals(t.getType());
+        if (isGave) {
+            holder.tvType.setText("You Gave");
+            holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.error));
+        } else {
+            holder.tvType.setText("You Got");
+            holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.green));
+        }
+    }
+    
+    private String getCustomRelativeTime(String dateString) {
+        if (dateString == null || dateString.isEmpty()) return "";
+        try {
+            Date date = sdf.parse(dateString);
+            if (date == null) return "";
+            if (DateUtils.isToday(date.getTime())) return "(Today)";
+            long now = System.currentTimeMillis();
+            long diff = now - date.getTime();
+            if(diff < 0) return "";
+            long days = TimeUnit.MILLISECONDS.toDays(diff);
+            if (days < 7) return "(" + days + (days == 1 ? " day ago)" : " days ago)");
+            long weeks = days / 7;
+            if (weeks < 5) return "(" + weeks + (weeks == 1 ? " week ago)" : " weeks ago)");
+            Calendar start = Calendar.getInstance();
+            start.setTime(date);
+            Calendar end = Calendar.getInstance();
+            int monthDiff = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 + (end.get(Calendar.MONTH) - start.get(Calendar.MONTH));
+            if (monthDiff < 12) return "(" + monthDiff + (monthDiff == 1 ? " month ago)" : " months ago)");
+            int yearDiff = monthDiff / 12;
+            return "(" + yearDiff + (yearDiff == 1 ? " year ago)" : " years ago)");
+        } catch (ParseException e) {
+            Log.e("Adapter", "Date parsing error", e);
+            return "";
+        }
     }
 
     @Override
@@ -63,31 +91,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         return transactions.size();
     }
 
-    private String getCustomRelativeTime(String dateString) {
-        if (dateString == null) return "";
-        try {
-            Date date = sdf.parse(dateString);
-            if (date == null) return "";
-            
-            if (DateUtils.isToday(date.getTime())) {
-                return "(Today)";
-            } else {
-                return "(" + DateUtils.getRelativeTimeSpanString(date.getTime(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS) + ")";
-            }
-        } catch (ParseException e) {
-            Log.e("TransactionAdapter", "Date parsing error", e);
-            return "";
-        }
-    }
-
     static class ViewHolder extends RecyclerView.ViewHolder {
-        View viewTypeIndicator;
-        TextView tvCustomerName, tvNote, tvDate, tvRelativeTime, tvAmount;
+        TextView tvType, tvNote, tvDate, tvRelativeTime, tvAmount;
 
         ViewHolder(View v) {
             super(v);
-            viewTypeIndicator = v.findViewById(R.id.view_type_indicator);
-            tvCustomerName = v.findViewById(R.id.tv_customer_name);
+            tvType = v.findViewById(R.id.tv_transaction_type);
             tvNote = v.findViewById(R.id.tv_note);
             tvDate = v.findViewById(R.id.tv_date);
             tvRelativeTime = v.findViewById(R.id.tv_relative_time);

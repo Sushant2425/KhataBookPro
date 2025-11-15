@@ -1,35 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <RadioGroup
-        android:id="@+id/rg_filters"
+    <!-- Header -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        
-        <!-- Filter by Status -->
-        <TextView style="@style/TextAppearance.MaterialComponents.Overline" android:text="Filter By" android:layout_marginBottom="8dp"/>
-        <RadioButton android:id="@+id/rb_all_transactions" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All Customers"/>
-        <RadioButton android:id="@+id/rb_you_gave" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Customers You Will Get From"/>
-        <RadioButton android:id="@+id/rb_you_got" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Customers You Will Give To"/>
-        <RadioButton android:id="@+id/rb_has_due" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Customers with a Due Balance"/>
-        <RadioButton android:id="@+id/rb_settled_up" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Settled Up Customers"/>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+        <TextView
+            style="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="Filter &amp; Sort"/>
+        <Button
+            android:id="@+id/btn_reset"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="Reset"/>
+    </RelativeLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginVertical="16dp"/>
+    <!-- Filter by Status -->
+    <TextView
+        style="@style/TextAppearance.MaterialComponents.Overline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="STATUS"/>
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true">
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_all" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All Customers"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_you_will_get" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="You Will Get"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_you_will_give" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="You Will Give"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_settled_up" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Settled Up"/>
+    </com.google.android.material.chip.ChipGroup>
 
-        <!-- Sort by -->
-        <TextView style="@style/TextAppearance.MaterialComponents.Overline" android:text="Sort By" android:layout_marginBottom="8dp"/>
-        <RadioButton android:id="@+id/rb_most_recent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Most Recent" android:checked="true"/>
-        <RadioButton android:id="@+id/rb_oldest" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Oldest"/>
-        <RadioButton android:id="@+id/rb_highest_amount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Highest Amount"/>
-        <RadioButton android:id="@+id/rb_lowest_amount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lowest Amount"/>
-        <RadioButton android:id="@+id/rb_name_az" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (A-Z)"/>
-        <RadioButton android:id="@+id/rb_name_za" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (Z-A)"/>
+    <!-- Sort By -->
+    <TextView
+        style="@style/TextAppearance.MaterialComponents.Overline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="SORT BY"/>
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_sort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true">
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_most_recent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Most Recent"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_highest_amount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Highest Amount"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_lowest_amount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lowest Amount"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_name_az" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (A-Z)"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:id="@+id/chip_name_za" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (Z-A)"/>
+    </com.google.android.material.chip.ChipGroup>
 
-    </RadioGroup>
+    <!-- Apply Button -->
+    <Button
+        android:id="@+id/btn_apply_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Apply"/>
 
 </LinearLayout>

@@ -5,9 +5,7 @@ plugins {
 
 android {
     namespace 'com.sandhyasofttechh.mykhatapro'
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.sandhyasofttechh.mykhatapro"
@@ -53,6 +51,3 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
 }
-
-
-

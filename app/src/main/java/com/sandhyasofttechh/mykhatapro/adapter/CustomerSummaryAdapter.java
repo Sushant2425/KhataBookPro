@@ -1,6 +1,7 @@
 package com.sandhyasofttechh.mykhatapro.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.sandhyasofttechh.mykhatapro.R;
+import com.sandhyasofttechh.mykhatapro.activities.CustomerDetailsActivity;
 import com.sandhyasofttechh.mykhatapro.model.CustomerSummary;
 
 import java.text.ParseException;
@@ -43,27 +45,33 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         CustomerSummary summary = customerSummaries.get(position);
         Context context = holder.itemView.getContext();
 
-        // Set Texts
+        // --- Set Item Click Listener ---
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, CustomerDetailsActivity.class);
+            intent.putExtra("CUSTOMER_PHONE", summary.getCustomerPhone());
+            intent.putExtra("CUSTOMER_NAME", summary.getCustomerName());
+            context.startActivity(intent);
+        });
+
         holder.tvCustomerName.setText(summary.getCustomerName());
         holder.tvLastDate.setText(summary.getLastTransactionDate());
         holder.tvRelativeTime.setText(getCustomRelativeTime(summary.getLastTransactionDate()));
 
-        // Set Net Balance and Colors
         double balance = summary.getNetBalance();
         String balanceText = String.format(Locale.getDefault(), "₹%.2f", Math.abs(balance));
         holder.tvNetBalance.setText(balanceText);
 
-        if (balance > 0) { // You will GET this money
+        if (balance > 0) {
             holder.tvStatusLabel.setText(String.format("You will get: %s", balanceText));
             int green = ContextCompat.getColor(context, R.color.green);
             holder.tvNetBalance.setTextColor(green);
             holder.indicator.setBackgroundColor(green);
-        } else if (balance < 0) { // You will GIVE this money
+        } else if (balance < 0) {
             holder.tvStatusLabel.setText(String.format("You will give: %s", balanceText));
             int red = ContextCompat.getColor(context, R.color.error);
             holder.tvNetBalance.setTextColor(red);
             holder.indicator.setBackgroundColor(red);
-        } else { // Settled
+        } else {
             holder.tvStatusLabel.setText("Settled Up");
             int black = ContextCompat.getColor(context, R.color.black);
             holder.tvNetBalance.setTextColor(black);

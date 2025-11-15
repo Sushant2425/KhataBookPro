@@ -51,9 +51,9 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     private ValueEventListener transactionListener;
     private PrefManager prefManager;
     
-    // --- FIXED: Separated filter and sort state ---
-    private FilterBottomSheetFragment.FilterOption currentStatusFilter = FilterBottomSheetFragment.FilterOption.ALL;
-    private FilterBottomSheetFragment.FilterOption currentSortOption = FilterBottomSheetFragment.FilterOption.MOST_RECENT;
+    // --- State Variables for Filtering & Sorting ---
+    private FilterBottomSheetFragment.FilterType currentFilter = FilterBottomSheetFragment.FilterType.ALL;
+    private FilterBottomSheetFragment.SortType currentSort = FilterBottomSheetFragment.SortType.MOST_RECENT;
     private String currentSearchQuery = "";
 
     @Override
@@ -72,77 +72,52 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         loadTransactionData();
     }
     
-    // --- onFilterSelected (FIXED) ---
-    // This now correctly separates sorting options from filtering options.
+    // --- THIS IS THE CORRECT, IMPLEMENTED METHOD ---
     @Override
-    public void onFilterSelected(FilterBottomSheetFragment.FilterOption option) {
-        switch (option) {
-            case MOST_RECENT:
-            case OLDEST:
-            case HIGHEST_AMOUNT:
-            case LOWEST_AMOUNT:
-            case BY_NAME_AZ:
-            case BY_NAME_ZA:
-                currentSortOption = option;
-                break;
-            default:
-                currentStatusFilter = option;
-                break;
-        }
+    public void onFiltersApplied(FilterBottomSheetFragment.FilterType filter, FilterBottomSheetFragment.SortType sort) {
+        this.currentFilter = filter;
+        this.currentSort = sort;
         applyFilters();
     }
 
-    // --- applyFilters (FIXED) ---
-    // This logic is now separated into distinct filter and sort stages.
     private void applyFilters() {
         List<CustomerSummary> filteredList = new ArrayList<>(allCustomerSummaries);
 
-        // 1. Apply search query
-        if (currentSearchQuery != null && !currentSearchQuery.isEmpty()) {
+        // 1. Search Filter
+        if (!currentSearchQuery.isEmpty()) {
             filteredList = filteredList.stream()
-                    .filter(s -> s.getCustomerName() != null && s.getCustomerName().toLowerCase().contains(currentSearchQuery.toLowerCase()))
-                    .collect(Collectors.toList());
+                .filter(s -> s.getCustomerName().toLowerCase().contains(currentSearchQuery.toLowerCase()))
+                .collect(Collectors.toList());
         }
-
-        // 2. Apply status filters (using the correct state variable)
-        switch (currentStatusFilter) {
-            case YOU_GAVE:
+        
+        // 2. Status Filter
+        switch (currentFilter) {
+            case YOU_WILL_GET:
                 filteredList = filteredList.stream().filter(s -> s.getNetBalance() > 0).collect(Collectors.toList());
                 break;
-            case YOU_GOT:
+            case YOU_WILL_GIVE:
                 filteredList = filteredList.stream().filter(s -> s.getNetBalance() < 0).collect(Collectors.toList());
                 break;
             case SETTLED_UP:
                 filteredList = filteredList.stream().filter(s -> s.getNetBalance() == 0).collect(Collectors.toList());
                 break;
-            case HAS_DUE_BALANCE:
-                filteredList = filteredList.stream().filter(s -> s.getNetBalance() != 0).collect(Collectors.toList());
-                break;
-            case ALL:
-            default:
-                // No status filter needed
-                break;
         }
 
-        // 3. Apply sorting (using the correct state variable)
-        switch (currentSortOption) {
-            case OLDEST:
-                Collections.sort(filteredList, (s1, s2) -> Long.compare(s1.getLastTransactionTimestamp(), s2.getLastTransactionTimestamp()));
-                break;
+        // 3. Sorting
+        switch (currentSort) {
             case HIGHEST_AMOUNT:
                 Collections.sort(filteredList, (s1, s2) -> Double.compare(s2.getNetBalance(), s1.getNetBalance()));
                 break;
             case LOWEST_AMOUNT:
                 Collections.sort(filteredList, (s1, s2) -> Double.compare(s1.getNetBalance(), s2.getNetBalance()));
                 break;
-            case BY_NAME_AZ:
+            case NAME_AZ:
                 Collections.sort(filteredList, (s1, s2) -> s1.getCustomerName().compareToIgnoreCase(s2.getCustomerName()));
                 break;
-            case BY_NAME_ZA:
+            case NAME_ZA:
                 Collections.sort(filteredList, (s1, s2) -> s2.getCustomerName().compareToIgnoreCase(s1.getCustomerName()));
                 break;
-            case MOST_RECENT:
-            default:
+            default: // MOST_RECENT
                 Collections.sort(filteredList, (s1, s2) -> Long.compare(s2.getLastTransactionTimestamp(), s1.getLastTransactionTimestamp()));
                 break;
         }
@@ -153,7 +128,7 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         updateEmptyState();
     }
     
-    // --- All other methods are unchanged ---
+    // --- Unchanged Methods ---
 
     private void initViews(View view) {
         tvBalance = view.findViewById(R.id.tv_balance_amount);
@@ -178,16 +153,12 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         if (transactionRef == null) return;
         removeFirebaseListener();
         transactionListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!isAdded()) return;
                 processTransactions(snapshot);
                 applyFilters();
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                if (isAdded()) Toast.makeText(getContext(), "Failed to load: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            @Override public void onCancelled(@NonNull DatabaseError error) { if (isAdded()) Toast.makeText(getContext(), "Failed to load.", Toast.LENGTH_SHORT).show(); }
         };
         transactionRef.addValueEventListener(transactionListener);
     }
@@ -199,34 +170,26 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
                 Transaction t = transactionSnapshot.getValue(Transaction.class);
                 if (t != null && t.getCustomerPhone() != null) {
                     summaryMap.putIfAbsent(t.getCustomerPhone(), new CustomerSummary(t.getCustomerName(), t.getCustomerPhone()));
-                    CustomerSummary summary = summaryMap.get(t.getCustomerPhone());
-                    if (summary != null) {
-                        summary.addTransaction(t);
-                    }
+                    summaryMap.get(t.getCustomerPhone()).addTransaction(t);
                 }
             }
         }
         allCustomerSummaries = new ArrayList<>(summaryMap.values());
-        double headerTotalToGet = 0;
-        double headerTotalToGive = 0;
+        double headerTotalToGet = 0, headerTotalToGive = 0;
         for (CustomerSummary summary : allCustomerSummaries) {
-            if (summary.getNetBalance() > 0) {
-                headerTotalToGet += summary.getNetBalance();
-            } else if (summary.getNetBalance() < 0) {
-                headerTotalToGive += Math.abs(summary.getNetBalance());
-            }
+            if (summary.getNetBalance() > 0) headerTotalToGet += summary.getNetBalance();
+            else if (summary.getNetBalance() < 0) headerTotalToGive += Math.abs(summary.getNetBalance());
         }
         updateHeaderSummary(headerTotalToGet, headerTotalToGive);
     }
-
+    
     private void updateHeaderSummary(double totalToGet, double totalToGive) {
         if (!isAdded() || getContext() == null) return;
         double finalBalance = totalToGet - totalToGive;
         tvYouWillGet.setText(String.format("₹%.2f", totalToGet));
         tvYouWillGive.setText(String.format("₹%.2f", totalToGive));
         tvBalance.setText(String.format("₹%.2f", finalBalance));
-        int colorRes = (finalBalance >= 0) ? R.color.green : R.color.error;
-        tvBalance.setTextColor(ContextCompat.getColor(getContext(), colorRes));
+        tvBalance.setTextColor(ContextCompat.getColor(getContext(), (finalBalance >= 0) ? R.color.green : R.color.error));
     }
 
     private void updateEmptyState() {
@@ -245,9 +208,9 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
 
     private void setupClickListeners() {
         fabAddTransaction.setOnClickListener(v -> startActivity(new Intent(getContext(), AddTransactionActivity.class)));
-        fabAddCustomer.setOnClickListener(v -> startActivity(new Intent(getContext(), AddTransactionActivity.class)));
+        fabAddCustomer.setOnClickListener(v -> startActivity(new Intent(getContext(), AddCustomerActivity.class)));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override public boolean onQueryTextSubmit(String query) { return false; }
+            @Override public boolean onQueryTextSubmit(String q) { return false; }
             @Override public boolean onQueryTextChange(String newText) {
                 currentSearchQuery = newText;
                 applyFilters();
@@ -255,15 +218,13 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
             }
         });
         ivFilterButton.setOnClickListener(v -> {
-            FilterBottomSheetFragment bottomSheet = new FilterBottomSheetFragment();
+            FilterBottomSheetFragment bottomSheet = FilterBottomSheetFragment.newInstance(currentFilter, currentSort);
             bottomSheet.show(getChildFragmentManager(), bottomSheet.getTag());
         });
         ivPdfReport.setOnClickListener(v -> Toast.makeText(getContext(), "PDF Report Clicked!", Toast.LENGTH_SHORT).show());
     }
     
     private void removeFirebaseListener() {
-        if (transactionRef != null && transactionListener != null) {
-            transactionRef.removeEventListener(transactionListener);
-        }
+        if (transactionRef != null && transactionListener != null) transactionRef.removeEventListener(transactionListener);
     }
 }
