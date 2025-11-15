@@ -8,15 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,27 +24,28 @@ import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttechh.mykhatapro.R;
 import com.sandhyasofttechh.mykhatapro.activities.AddCustomerActivity;
 import com.sandhyasofttechh.mykhatapro.activities.AddTransactionActivity;
-import com.sandhyasofttechh.mykhatapro.adapter.TransactionAdapter;
+import com.sandhyasofttechh.mykhatapro.adapter.CustomerSummaryAdapter;
+import com.sandhyasofttechh.mykhatapro.model.CustomerSummary;
 import com.sandhyasofttechh.mykhatapro.model.Transaction;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
-import com.sandhyasofttechh.mykhatapro.utils.TransactionCalculator;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DashboardFragment extends Fragment implements FilterBottomSheetFragment.FilterListener {
 
-    private TextView tvBalance, tvIncome, tvExpense, tvEmpty;
+    private TextView tvBalance, tvYouWillGet, tvYouWillGive, tvEmpty;
     private RecyclerView recyclerView;
     private FloatingActionButton fabAddTransaction, fabAddCustomer;
     private SearchView searchView;
     private ImageView ivFilterButton, ivPdfReport;
 
-    private List<Transaction> allTransactions = new ArrayList<>();
-    private List<Transaction> displayedTransactions = new ArrayList<>(); // **FIXED**: Back to holding Transactions
-    private TransactionAdapter adapter;
+    private List<CustomerSummary> allCustomerSummaries = new ArrayList<>();
+    private List<CustomerSummary> displayedCustomerSummaries = new ArrayList<>();
+    private CustomerSummaryAdapter adapter;
 
     private DatabaseReference transactionRef;
     private ValueEventListener transactionListener;
@@ -60,7 +59,6 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
         initViews(view);
         setupRecyclerView();
-        setupFABs();
         setupClickListeners();
         return view;
     }
@@ -69,13 +67,13 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initFirebase();
-        loadTransactions();
+        loadTransactionData();
     }
-
+    
     private void initViews(View view) {
         tvBalance = view.findViewById(R.id.tv_balance_amount);
-        tvIncome = view.findViewById(R.id.tv_income);
-        tvExpense = view.findViewById(R.id.tv_expense);
+        tvYouWillGet = view.findViewById(R.id.tv_income);
+        tvYouWillGive = view.findViewById(R.id.tv_expense);
         tvEmpty = view.findViewById(R.id.tv_empty);
         recyclerView = view.findViewById(R.id.recycler_transactions);
         fabAddTransaction = view.findViewById(R.id.fab_add_transaction);
@@ -86,12 +84,12 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     }
     
     private void setupRecyclerView() {
-        adapter = new TransactionAdapter(displayedTransactions);
+        adapter = new CustomerSummaryAdapter(displayedCustomerSummaries);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
     }
-
-    private void loadTransactions() {
+    
+    private void loadTransactionData() {
         if (transactionRef == null) return;
         removeFirebaseListener();
 
@@ -99,20 +97,7 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!isAdded()) return;
-
-                allTransactions.clear();
-                for (DataSnapshot customerSnapshot : snapshot.getChildren()) {
-                    for (DataSnapshot transactionSnapshot : customerSnapshot.getChildren()) {
-                        Transaction t = transactionSnapshot.getValue(Transaction.class);
-                        if (t != null) {
-                            allTransactions.add(t);
-                        }
-                    }
-                }
-                
-                TransactionCalculator.Summary summary = TransactionCalculator.calculate(allTransactions);
-                updateHeaderSummary(summary);
-                
+                processTransactions(snapshot);
                 applyFilters();
             }
 
@@ -124,6 +109,39 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         transactionRef.addValueEventListener(transactionListener);
     }
     
+    private void processTransactions(DataSnapshot snapshot) {
+        Map<String, CustomerSummary> summaryMap = new HashMap<>();
+
+        // First, build the summary for each customer
+        for (DataSnapshot customerSnapshot : snapshot.getChildren()) {
+            for (DataSnapshot transactionSnapshot : customerSnapshot.getChildren()) {
+                Transaction t = transactionSnapshot.getValue(Transaction.class);
+                if (t != null && t.getCustomerPhone() != null) {
+                    summaryMap.putIfAbsent(t.getCustomerPhone(), new CustomerSummary(t.getCustomerName(), t.getCustomerPhone()));
+                    CustomerSummary summary = summaryMap.get(t.getCustomerPhone());
+                    if (summary != null) {
+                        summary.addTransaction(t);
+                    }
+                }
+            }
+        }
+        
+        allCustomerSummaries = new ArrayList<>(summaryMap.values());
+        
+        // NOW, calculate the header totals based on the final customer balances
+        double headerTotalToGet = 0;
+        double headerTotalToGive = 0;
+        for (CustomerSummary summary : allCustomerSummaries) {
+            if (summary.getNetBalance() > 0) { // You will GET this money
+                headerTotalToGet += summary.getNetBalance();
+            } else if (summary.getNetBalance() < 0) { // You will GIVE this money
+                headerTotalToGive += Math.abs(summary.getNetBalance());
+            }
+        }
+        
+        updateHeaderSummary(headerTotalToGet, headerTotalToGive);
+    }
+    
     @Override
     public void onFilterSelected(FilterBottomSheetFragment.FilterOption option) {
         currentFilter = option;
@@ -131,62 +149,61 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     }
 
     private void applyFilters() {
-        // **FIXED**: This logic now filters and sorts the list of individual transactions.
-        List<Transaction> filteredList = new ArrayList<>(allTransactions);
+        List<CustomerSummary> filteredList = new ArrayList<>(allCustomerSummaries);
 
         if (currentSearchQuery != null && !currentSearchQuery.isEmpty()) {
             filteredList = filteredList.stream()
-                    .filter(t -> t.getCustomerName() != null && t.getCustomerName().toLowerCase().contains(currentSearchQuery.toLowerCase()))
+                    .filter(s -> s.getCustomerName() != null && s.getCustomerName().toLowerCase().contains(currentSearchQuery.toLowerCase()))
                     .collect(Collectors.toList());
         }
 
         switch (currentFilter) {
-            case YOU_GAVE:
-                filteredList = filteredList.stream().filter(t -> "gave".equals(t.getType())).collect(Collectors.toList());
+            case YOU_GAVE: // Customers you will GET from (your balance with them is positive)
+                filteredList = filteredList.stream().filter(s -> s.getNetBalance() > 0).collect(Collectors.toList());
                 break;
-            case YOU_GOT:
-                filteredList = filteredList.stream().filter(t -> "got".equals(t.getType())).collect(Collectors.toList());
+            case YOU_GOT: // Customers you will GIVE to (your balance with them is negative)
+                filteredList = filteredList.stream().filter(s -> s.getNetBalance() < 0).collect(Collectors.toList());
                 break;
             case HIGHEST_AMOUNT:
-                Collections.sort(filteredList, (t1, t2) -> Double.compare(t2.getAmount(), t1.getAmount()));
+                Collections.sort(filteredList, (s1, s2) -> Double.compare(s2.getNetBalance(), s1.getNetBalance()));
                 break;
             case LOWEST_AMOUNT:
-                Collections.sort(filteredList, (t1, t2) -> Double.compare(t1.getAmount(), t2.getAmount()));
+                Collections.sort(filteredList, (s1, s2) -> Double.compare(s1.getNetBalance(), s2.getNetBalance()));
                 break;
             case OLDEST:
-                Collections.sort(filteredList, (t1, t2) -> Long.compare(t1.getTimestamp(), t2.getTimestamp()));
+                Collections.sort(filteredList, (s1, s2) -> Long.compare(s1.getLastTransactionTimestamp(), s2.getLastTransactionTimestamp()));
                 break;
-            default: // MOST_RECENT and ALL
-                Collections.sort(filteredList, (t1, t2) -> Long.compare(t2.getTimestamp(), t1.getTimestamp()));
+            case MOST_RECENT:
+            default:
+                Collections.sort(filteredList, (s1, s2) -> Long.compare(s2.getLastTransactionTimestamp(), s1.getLastTransactionTimestamp()));
                 break;
         }
 
-        displayedTransactions.clear();
-        displayedTransactions.addAll(filteredList);
+        displayedCustomerSummaries.clear();
+        displayedCustomerSummaries.addAll(filteredList);
         adapter.notifyDataSetChanged();
         updateEmptyState();
     }
-
-    private void updateHeaderSummary(TransactionCalculator.Summary summary) {
+    
+    private void updateHeaderSummary(double totalToGet, double totalToGive) {
         if (!isAdded() || getContext() == null) return;
+        
+        double finalBalance = totalToGet - totalToGive;
 
-        double finalBalance = summary.balance;
-        tvIncome.setText(String.format("₹%.2f", summary.totalGot));
-        tvExpense.setText(String.format("₹%.2f", summary.totalGave));
+        tvYouWillGet.setText(String.format("₹%.2f", totalToGet));
+        tvYouWillGive.setText(String.format("₹%.2f", totalToGive));
         tvBalance.setText(String.format("₹%.2f", finalBalance));
-
-        int colorRes = (finalBalance > 0) ? R.color.green : (finalBalance < 0) ? R.color.error : R.color.black;
+        
+        int colorRes = (finalBalance >= 0) ? R.color.green : R.color.error;
         tvBalance.setTextColor(ContextCompat.getColor(getContext(), colorRes));
     }
 
     private void updateEmptyState() {
         if (!isAdded()) return;
-        tvEmpty.setVisibility(displayedTransactions.isEmpty() ? View.VISIBLE : View.GONE);
-        recyclerView.setVisibility(displayedTransactions.isEmpty() ? View.GONE : View.VISIBLE);
+        tvEmpty.setVisibility(displayedCustomerSummaries.isEmpty() ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(displayedCustomerSummaries.isEmpty() ? View.GONE : View.VISIBLE);
     }
     
-    // All other methods (initFirebase, setupFABs, etc.) remain unchanged.
-    // ...
     private void initFirebase() {
         if (getContext() == null) return;
         prefManager = new PrefManager(getContext());
@@ -195,12 +212,10 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         transactionRef = FirebaseDatabase.getInstance().getReference("Khatabook").child(userNode).child("transactions");
     }
 
-    private void setupFABs() {
+    private void setupClickListeners() {
         fabAddTransaction.setOnClickListener(v -> startActivity(new Intent(getContext(), AddTransactionActivity.class)));
         fabAddCustomer.setOnClickListener(v -> startActivity(new Intent(getContext(), AddCustomerActivity.class)));
-    }
-
-    private void setupClickListeners() {
+        
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { return false; }
             @Override public boolean onQueryTextChange(String newText) {
@@ -209,10 +224,12 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
                 return true;
             }
         });
+        
         ivFilterButton.setOnClickListener(v -> {
             FilterBottomSheetFragment bottomSheet = new FilterBottomSheetFragment();
             bottomSheet.show(getChildFragmentManager(), bottomSheet.getTag());
         });
+        
         ivPdfReport.setOnClickListener(v -> Toast.makeText(getContext(), "PDF Report Clicked!", Toast.LENGTH_SHORT).show());
     }
     
