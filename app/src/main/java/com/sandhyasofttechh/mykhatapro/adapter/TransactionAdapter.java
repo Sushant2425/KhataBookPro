@@ -24,10 +24,16 @@ import java.util.concurrent.TimeUnit;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
 
     private final List<Transaction> transactions;
+    private final OnItemClickListener listener;
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
-    public TransactionAdapter(List<Transaction> transactions) {
+    public interface OnItemClickListener {
+        void onItemClick(Transaction transaction);
+    }
+
+    public TransactionAdapter(List<Transaction> transactions, OnItemClickListener listener) {
         this.transactions = transactions;
+        this.listener = listener;
     }
 
     @NonNull
@@ -58,6 +64,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             holder.tvType.setText("You Got");
             holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.green));
         }
+
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(t));
     }
     
     private String getCustomRelativeTime(String dateString) {

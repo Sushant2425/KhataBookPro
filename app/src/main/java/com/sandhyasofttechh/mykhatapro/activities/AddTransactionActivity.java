@@ -47,7 +47,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private TextInputEditText etDate, etAmount, etNote;
     private AutoCompleteTextView autoCustomer;
     private TextInputLayout layoutCustomer;
-    private MaterialButtonToggleGroup toggleButtonGroup; // **FIXED**
+    private MaterialButtonToggleGroup toggleButtonGroup;
     private MaterialButton btnSave;
     private MaterialCheckBox checkboxSendMessage;
 
@@ -57,8 +57,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private List<String> customerNames = new ArrayList<>();
     private ArrayAdapter<String> customerAdapter;
 
-    private String editTransactionId = null;
-    private String selectedCustomerPhone = null;
+    private Transaction editTransaction;
 
     private final Calendar calendar = Calendar.getInstance();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
@@ -68,7 +67,6 @@ public class AddTransactionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_transaction);
 
-        // **FIXED**: Setup professional toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -90,7 +88,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         etNote = findViewById(R.id.et_note);
         autoCustomer = findViewById(R.id.auto_customer);
         layoutCustomer = findViewById(R.id.layout_customer);
-        toggleButtonGroup = findViewById(R.id.toggle_button_group); // **FIXED**
+        toggleButtonGroup = findViewById(R.id.toggle_button_group);
         btnSave = findViewById(R.id.btn_save);
         checkboxSendMessage = findViewById(R.id.checkbox_send_message);
         checkboxSendMessage.setChecked(true);
@@ -105,15 +103,14 @@ public class AddTransactionActivity extends AppCompatActivity {
         autoCustomer.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                selectedCustomerPhone = getPhoneFromName(s.toString());
+            @Override public void afterTextChanged(Editable s) {
+                // Logic to get phone from name can be improved or changed if needed
             }
         });
 
         autoCustomer.setOnItemClickListener((parent, view, position, id) -> {
             String name = (String) parent.getItemAtPosition(position);
-            selectedCustomerPhone = getPhoneFromName(name);
+            // Logic to get phone from name
         });
     }
 
@@ -145,6 +142,10 @@ public class AddTransactionActivity extends AppCompatActivity {
                             }
                         }
                         customerAdapter.notifyDataSetChanged();
+                        // If editing, set the customer after the list is loaded
+                        if (editTransaction != null) {
+                            autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
+                        }
                     }
                     @Override public void onCancelled(@NonNull DatabaseError error) {
                         Toast.makeText(AddTransactionActivity.this, "Failed to load customers", Toast.LENGTH_SHORT).show();
@@ -164,36 +165,38 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private void handleIntent() {
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            editTransactionId = extras.getString("edit_transaction_id");
-            if (editTransactionId != null) {
-                getSupportActionBar().setTitle("Edit Transaction");
-                etAmount.setText(extras.getString("edit_amount"));
-                etNote.setText(extras.getString("edit_note"));
-                etDate.setText(extras.getString("edit_date"));
-                selectedCustomerPhone = extras.getString("edit_customer_phone");
-                autoCustomer.setText(extras.getString("edit_customer_name"));
-                String typeStr = extras.getString("edit_type", "gave");
-                
-                // **FIXED**: Check the correct button in the toggle group
-                int buttonId = typeStr.equals("gave") ? R.id.btn_gave : R.id.btn_got;
-                toggleButtonGroup.check(buttonId);
+        editTransaction = (Transaction) getIntent().getSerializableExtra("EDIT_TRANSACTION");
+        if (editTransaction != null) {
+            getSupportActionBar().setTitle("Edit Transaction");
+            btnSave.setText("Update");
+
+            etAmount.setText(String.valueOf(editTransaction.getAmount()));
+            etNote.setText(editTransaction.getNote());
+            etDate.setText(editTransaction.getDate());
+
+            autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
+            autoCustomer.setEnabled(false); // Don't allow changing customer when editing
+
+            if ("gave".equals(editTransaction.getType())) {
+                toggleButtonGroup.check(R.id.btn_gave);
+            } else {
+                toggleButtonGroup.check(R.id.btn_got);
             }
+        } else {
+            getSupportActionBar().setTitle("Add Transaction");
         }
     }
+
 
     private void saveTransaction() {
         String amountStr = etAmount.getText().toString().trim();
         String note = etNote.getText().toString().trim();
         String date = etDate.getText().toString();
+        String customerInfo = autoCustomer.getText().toString();
+
 
         if (amountStr.isEmpty()) {
             etAmount.setError("Enter amount");
-            return;
-        }
-        if (selectedCustomerPhone == null) {
-            layoutCustomer.setError("Select a customer");
             return;
         }
 
@@ -204,49 +207,45 @@ public class AddTransactionActivity extends AppCompatActivity {
             etAmount.setError("Invalid amount");
             return;
         }
+        
+        String selectedPhone;
+        String selectedName;
 
-        // **FIXED**: Get the selected button from the toggle group
+        if (editTransaction != null) {
+            selectedPhone = editTransaction.getCustomerPhone();
+            selectedName = editTransaction.getCustomerName();
+        } else {
+             if (customerInfo.isEmpty() || !customerInfo.contains("(")) {
+                layoutCustomer.setError("Select a customer");
+                return;
+            }
+            selectedName = customerInfo.substring(0, customerInfo.lastIndexOf(" (")).trim();
+            selectedPhone = customerInfo.substring(customerInfo.lastIndexOf(" (") + 2, customerInfo.length() - 1);
+        }
+
+
         boolean isGave = toggleButtonGroup.getCheckedButtonId() == R.id.btn_gave;
-        String customerName = getNameFromPhone(selectedCustomerPhone);
 
         Transaction transaction = new Transaction();
-        if (editTransactionId != null){
-            transaction.setId(editTransactionId);
-        } else {
-            String newId = transactionsRef.child(selectedCustomerPhone).push().getKey();
-            transaction.setId(newId);
-        }
-        transaction.setCustomerPhone(selectedCustomerPhone);
-        transaction.setCustomerName(customerName);
+        String idToSave = editTransaction != null ? editTransaction.getId() : transactionsRef.child(selectedPhone).push().getKey();
+        
+        transaction.setId(idToSave);
+        transaction.setCustomerPhone(selectedPhone);
+        transaction.setCustomerName(selectedName);
         transaction.setAmount(amount);
         transaction.setType(isGave ? "gave" : "got");
         transaction.setNote(note);
         transaction.setDate(date);
         transaction.setTimestamp(System.currentTimeMillis());
 
-        DatabaseReference customerTransRef = transactionsRef.child(selectedCustomerPhone);
-
-        if (editTransactionId != null) {
-            customerTransRef.child(editTransactionId).setValue(transaction)
-                    .addOnSuccessListener(aVoid -> {
-                        finishWithSuccess("Updated");
-                        if (checkboxSendMessage.isChecked()){
-                            checkSmsPermissionAndSend(transaction);
-                        }
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-        } else {
-            String newId = customerTransRef.push().getKey();
-            transaction.setId(newId);
-            customerTransRef.child(newId).setValue(transaction)
-                    .addOnSuccessListener(aVoid -> {
-                        finishWithSuccess("Saved");
-                        if (checkboxSendMessage.isChecked()) {
-                            checkSmsPermissionAndSend(transaction);
-                        }
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-        }
+        transactionsRef.child(selectedPhone).child(idToSave).setValue(transaction)
+                .addOnSuccessListener(aVoid -> {
+                    finishWithSuccess(editTransaction != null ? "Updated" : "Saved");
+                    if (checkboxSendMessage.isChecked()) {
+                        checkSmsPermissionAndSend(transaction);
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
     private void checkSmsPermissionAndSend(Transaction transaction){
@@ -275,7 +274,7 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void sendSms(Transaction transaction){
         String message = "Hello " + transaction.getCustomerName() + ",\n"
-                + "You " + (transaction.getType().equals("gave") ? "received" : "gave") + " ₹" // Corrected logic
+                + "Transaction update: you " + (transaction.getType().equals("gave") ? "received" : "gave") + " ₹"
                 + String.format(Locale.getDefault(), "%.2f", transaction.getAmount())
                 + " on " + transaction.getDate() + ".\nNote: "
                 + (transaction.getNote().isEmpty() ? "No notes." : transaction.getNote())
@@ -289,20 +288,6 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
     }
 
-    private String getPhoneFromName(String fullName){
-        for (Customer c : customerList){
-            String display = c.getName() + " (" + c.getPhone() + ")";
-            if (display.equals(fullName)) return c.getPhone();
-        }
-        return null;
-    }
-
-    private String getNameFromPhone(String phone){
-        for (Customer c : customerList){
-            if (c.getPhone().equals(phone)) return c.getName();
-        }
-        return null;
-    }
 
     private void finishWithSuccess(String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();

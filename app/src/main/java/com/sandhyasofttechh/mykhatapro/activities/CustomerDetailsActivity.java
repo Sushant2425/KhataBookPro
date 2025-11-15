@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class CustomerDetailsActivity extends AppCompatActivity implements ReportOptionsBottomSheet.ReportListener {
+public class CustomerDetailsActivity extends AppCompatActivity implements ReportOptionsBottomSheet.ReportListener, TransactionAdapter.OnItemClickListener {
 
     private String customerPhone, customerName;
     private List<Transaction> transactionList = new ArrayList<>();
@@ -195,7 +195,7 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         RecyclerView recyclerView = findViewById(R.id.recycler_customer_transactions);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setNestedScrollingEnabled(false);
-        adapter = new TransactionAdapter(transactionList);
+        adapter = new TransactionAdapter(transactionList, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -245,5 +245,13 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(Transaction transaction) {
+        Intent intent = new Intent(this, EntryDetailsActivity.class);
+        intent.putExtra("TRANSACTION_DATA", transaction);
+        intent.putExtra("CUSTOMER_NAME", customerName);
+        startActivity(intent);
     }
 }

@@ -45,6 +45,12 @@
             android:name=".activities.AddTransactionActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.EditTransactionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.EntryDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".register.LoginActivity"
             android:exported="false" />
         <activity

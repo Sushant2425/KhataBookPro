@@ -1,6 +1,8 @@
 package com.sandhyasofttechh.mykhatapro.model;
 
-public class Transaction {
+import java.io.Serializable;
+
+public class Transaction implements Serializable {
     private String id;
     private String customerPhone;
     private String customerName;

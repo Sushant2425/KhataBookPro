@@ -119,8 +119,13 @@
 
                 <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
                     <LinearLayout style="@style/DetailsSummaryContent">
-                        <TextView style="@style/DetailsSummaryLabel" android:text="Total You Gave" android:textColor="@color/error"/>
-                        <TextView android:id="@+id/tv_total_gave" style="@style/DetailsSummaryAmount" tools:text="₹5000.00"/>
+                        <TextView style="@style/DetailsSummaryLabel"
+
+                            android:text="Total You Gave"
+                            android:textColor="@color/error"/>
+                        <TextView android:id="@+id/tv_total_gave"
+                            style="@style/DetailsSummaryAmount"
+                            tools:text="₹5000.00"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
                 <View android:layout_width="12dp" android:layout_height="0dp"/>
