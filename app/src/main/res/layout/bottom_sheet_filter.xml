@@ -6,61 +6,30 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sort By"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="12dp"/>
-
     <RadioGroup
         android:id="@+id/rg_filters"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        
+        <!-- Filter by Status -->
+        <TextView style="@style/TextAppearance.MaterialComponents.Overline" android:text="Filter By" android:layout_marginBottom="8dp"/>
+        <RadioButton android:id="@+id/rb_all_transactions" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All Customers"/>
+        <RadioButton android:id="@+id/rb_you_gave" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Customers You Will Get From"/>
+        <RadioButton android:id="@+id/rb_you_got" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Customers You Will Give To"/>
+        <RadioButton android:id="@+id/rb_has_due" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Customers with a Due Balance"/>
+        <RadioButton android:id="@+id/rb_settled_up" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Settled Up Customers"/>
 
-        <RadioButton
-            android:id="@+id/rb_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="All Transactions"
-            android:checked="true"/>
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginVertical="16dp"/>
 
-        <RadioButton
-            android:id="@+id/rb_you_gave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="You Gave"/>
+        <!-- Sort by -->
+        <TextView style="@style/TextAppearance.MaterialComponents.Overline" android:text="Sort By" android:layout_marginBottom="8dp"/>
+        <RadioButton android:id="@+id/rb_most_recent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Most Recent" android:checked="true"/>
+        <RadioButton android:id="@+id/rb_oldest" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Oldest"/>
+        <RadioButton android:id="@+id/rb_highest_amount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Highest Amount"/>
+        <RadioButton android:id="@+id/rb_lowest_amount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lowest Amount"/>
+        <RadioButton android:id="@+id/rb_name_az" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (A-Z)"/>
+        <RadioButton android:id="@+id/rb_name_za" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (Z-A)"/>
 
-        <RadioButton
-            android:id="@+id/rb_you_got"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="You Got"/>
-
-        <RadioButton
-            android:id="@+id/rb_highest_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Highest Amount"/>
-
-        <RadioButton
-            android:id="@+id/rb_lowest_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lowest Amount"/>
-
-        <RadioButton
-            android:id="@+id/rb_most_recent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Most Recent"/>
-
-        <RadioButton
-            android:id="@+id/rb_oldest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Oldest"/>
     </RadioGroup>
 
 </LinearLayout>

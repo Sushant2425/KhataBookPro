@@ -43,28 +43,31 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         CustomerSummary summary = customerSummaries.get(position);
         Context context = holder.itemView.getContext();
 
+        // Set Texts
         holder.tvCustomerName.setText(summary.getCustomerName());
-        
-        // Set last transaction date and relative time
         holder.tvLastDate.setText(summary.getLastTransactionDate());
         holder.tvRelativeTime.setText(getCustomRelativeTime(summary.getLastTransactionDate()));
 
+        // Set Net Balance and Colors
         double balance = summary.getNetBalance();
         String balanceText = String.format(Locale.getDefault(), "₹%.2f", Math.abs(balance));
         holder.tvNetBalance.setText(balanceText);
 
-        if (balance > 0) {
-            // Net balance is positive -> You will GET money
-            holder.tvBalanceLabel.setText(String.format("You will get: %s", balanceText));
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.green));
-        } else if (balance < 0) {
-            // Net balance is negative -> You will GIVE money
-            holder.tvBalanceLabel.setText(String.format("You will give: %s", balanceText));
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.error));
-        } else {
-            // Settled up
-            holder.tvBalanceLabel.setText("Settled up");
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.black));
+        if (balance > 0) { // You will GET this money
+            holder.tvStatusLabel.setText(String.format("You will get: %s", balanceText));
+            int green = ContextCompat.getColor(context, R.color.green);
+            holder.tvNetBalance.setTextColor(green);
+            holder.indicator.setBackgroundColor(green);
+        } else if (balance < 0) { // You will GIVE this money
+            holder.tvStatusLabel.setText(String.format("You will give: %s", balanceText));
+            int red = ContextCompat.getColor(context, R.color.error);
+            holder.tvNetBalance.setTextColor(red);
+            holder.indicator.setBackgroundColor(red);
+        } else { // Settled
+            holder.tvStatusLabel.setText("Settled Up");
+            int black = ContextCompat.getColor(context, R.color.black);
+            holder.tvNetBalance.setTextColor(black);
+            holder.indicator.setBackgroundColor(black);
         }
     }
     
@@ -73,29 +76,21 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         try {
             Date date = sdf.parse(dateString);
             if (date == null) return "";
-            
             if (DateUtils.isToday(date.getTime())) return "(Today)";
-            
             long now = System.currentTimeMillis();
             long diff = now - date.getTime();
-            if(diff < 0) return ""; // Future date
-
+            if(diff < 0) return "";
             long days = TimeUnit.MILLISECONDS.toDays(diff);
             if (days < 7) return "(" + days + (days == 1 ? " day ago)" : " days ago)");
-            
             long weeks = days / 7;
             if (weeks < 5) return "(" + weeks + (weeks == 1 ? " week ago)" : " weeks ago)");
-            
             Calendar start = Calendar.getInstance();
             start.setTime(date);
             Calendar end = Calendar.getInstance();
-            
             int monthDiff = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 + (end.get(Calendar.MONTH) - start.get(Calendar.MONTH));
             if (monthDiff < 12) return "(" + monthDiff + (monthDiff == 1 ? " month ago)" : " months ago)");
-            
             int yearDiff = monthDiff / 12;
             return "(" + yearDiff + (yearDiff == 1 ? " year ago)" : " years ago)");
-            
         } catch (ParseException e) {
             Log.e("Adapter", "Date parsing error", e);
             return "";
@@ -108,15 +103,17 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCustomerName, tvNetBalance, tvBalanceLabel, tvLastDate, tvRelativeTime;
+        TextView tvCustomerName, tvNetBalance, tvStatusLabel, tvLastDate, tvRelativeTime;
+        View indicator;
 
         ViewHolder(View v) {
             super(v);
-            tvCustomerName = v.findViewById(R.id.tv_customer_name_summary);
-            tvNetBalance = v.findViewById(R.id.tv_net_balance);
-            tvBalanceLabel = v.findViewById(R.id.tv_balance_label_summary);
-            tvLastDate = v.findViewById(R.id.tv_last_transaction_date);
-            tvRelativeTime = v.findViewById(R.id.tv_last_transaction_relative);
+            tvCustomerName = v.findViewById(R.id.summary_customer_name);
+            tvNetBalance = v.findViewById(R.id.summary_net_balance);
+            tvStatusLabel = v.findViewById(R.id.summary_status_label);
+            tvLastDate = v.findViewById(R.id.summary_last_date);
+            tvRelativeTime = v.findViewById(R.id.summary_relative_time);
+            indicator = v.findViewById(R.id.summary_indicator);
         }
     }
 }

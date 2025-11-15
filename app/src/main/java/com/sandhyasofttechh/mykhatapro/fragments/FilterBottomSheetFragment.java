@@ -14,7 +14,10 @@ import com.sandhyasofttechh.mykhatapro.R;
 public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
 
     public enum FilterOption {
-        ALL, YOU_GAVE, YOU_GOT, HIGHEST_AMOUNT, LOWEST_AMOUNT, MOST_RECENT, OLDEST
+        // Sort Options
+        MOST_RECENT, OLDEST, HIGHEST_AMOUNT, LOWEST_AMOUNT, BY_NAME_AZ, BY_NAME_ZA,
+        // Filter Options
+        ALL, YOU_GAVE, YOU_GOT, SETTLED_UP, HAS_DUE_BALANCE
     }
 
     private FilterListener listener;
@@ -40,24 +43,34 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
 
         RadioGroup rgFilters = view.findViewById(R.id.rg_filters);
         rgFilters.setOnCheckedChangeListener((group, checkedId) -> {
-            FilterOption selectedOption = FilterOption.ALL; // Default
-            if (checkedId == R.id.rb_all) {
+            FilterOption selectedOption = FilterOption.MOST_RECENT; // Default
+            if (checkedId == R.id.rb_most_recent) {
+                selectedOption = FilterOption.MOST_RECENT;
+            } else if (checkedId == R.id.rb_oldest) {
+                selectedOption = FilterOption.OLDEST;
+            } else if (checkedId == R.id.rb_highest_amount) {
+                selectedOption = FilterOption.HIGHEST_AMOUNT;
+            } else if (checkedId == R.id.rb_lowest_amount) {
+                selectedOption = FilterOption.LOWEST_AMOUNT;
+            } else if (checkedId == R.id.rb_name_az) {
+                selectedOption = FilterOption.BY_NAME_AZ;
+            } else if (checkedId == R.id.rb_name_za) {
+                selectedOption = FilterOption.BY_NAME_ZA;
+            } else if (checkedId == R.id.rb_all_transactions) {
                 selectedOption = FilterOption.ALL;
             } else if (checkedId == R.id.rb_you_gave) {
                 selectedOption = FilterOption.YOU_GAVE;
             } else if (checkedId == R.id.rb_you_got) {
                 selectedOption = FilterOption.YOU_GOT;
-            } else if (checkedId == R.id.rb_highest_amount) {
-                selectedOption = FilterOption.HIGHEST_AMOUNT;
-            } else if (checkedId == R.id.rb_lowest_amount) {
-                selectedOption = FilterOption.LOWEST_AMOUNT;
-            } else if (checkedId == R.id.rb_most_recent) {
-                selectedOption = FilterOption.MOST_RECENT;
-            } else if (checkedId == R.id.rb_oldest) {
-                selectedOption = FilterOption.OLDEST;
+            } else if (checkedId == R.id.rb_settled_up) {
+                selectedOption = FilterOption.SETTLED_UP;
+            } else if (checkedId == R.id.rb_has_due) {
+                selectedOption = FilterOption.HAS_DUE_BALANCE;
             }
             
-            listener.onFilterSelected(selectedOption);
+            if (listener != null) {
+                listener.onFilterSelected(selectedOption);
+            }
             dismiss();
         });
 
