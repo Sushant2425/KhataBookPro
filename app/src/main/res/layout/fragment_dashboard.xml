@@ -10,16 +10,17 @@
 
     <!-- AppBar: Contains the main header card (Unchanged) -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/colorPrimary"
         android:background="?android:attr/colorBackground"
+        app:cardBackgroundColor="?attr/colorPrimary"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/dashboard_header_background"
+            android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <com.google.android.material.card.MaterialCardView
@@ -72,14 +73,13 @@
                         android:id="@+id/iv_income_arrow"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:backgroundTint="@color/black"
                         android:layout_marginTop="16dp"
-
                         android:layout_marginBottom="10dp"
+
+                        android:backgroundTint="@color/black"
                         android:src="@drawable/ic_arrow_downward"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/divider"
-                        />
+                        app:layout_constraintTop_toBottomOf="@id/divider" />
 
                     <TextView
                         android:id="@+id/tv_income_label"
@@ -110,18 +110,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.5"/>
+                        app:layout_constraintGuide_percent="0.5" />
 
                     <ImageView
                         android:id="@+id/iv_expense_arrow"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:layout_marginTop="16dp"
                         android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
                         android:src="@drawable/ic_arrow_upward"
                         app:layout_constraintStart_toEndOf="@id/guideline_vertical"
-                        app:layout_constraintTop_toBottomOf="@id/divider"
-                        />
+                        app:layout_constraintTop_toBottomOf="@id/divider" />
 
                     <TextView
                         android:id="@+id/tv_expense_label"
@@ -158,6 +157,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="@color/white"
         android:paddingHorizontal="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 

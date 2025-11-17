@@ -14,9 +14,12 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
+            android:background="@drawable/background_receipt_header"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="New Transaction"
+            app:titleTextColor="@color/white"
+            app:navigationIconTint="@color/white"
             app:navigationIcon="@drawable/ic_arrow_back" />
 
     </com.google.android.material.appbar.AppBarLayout>

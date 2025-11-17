@@ -18,7 +18,9 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_details"
+            android:background="@drawable/dashboard_header_background"
             android:layout_width="match_parent"
+            app:navigationIconTint="@color/white"
             android:layout_height="?attr/actionBarSize"
             app:titleTextColor="?attr/colorOnPrimary"/>
 
@@ -74,6 +76,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:background="@color/white"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -81,7 +84,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_margin="5dp"
                 app:cardElevation="4dp"
                 app:cardCornerRadius="12dp">
                 <LinearLayout
@@ -114,15 +117,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginHorizontal="8dp"
                 android:layout_marginBottom="8dp">
 
-                <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
-                    <LinearLayout style="@style/DetailsSummaryContent">
-                        <TextView style="@style/DetailsSummaryLabel"
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/DetailsSummaryCard">
+                    <LinearLayout style="@style/DetailsSummaryContent"
+                        android:background="@color/white">
 
+                        <TextView style="@style/DetailsSummaryLabel"
                             android:text="Total You Gave"
                             android:textColor="@color/error"/>
+
                         <TextView android:id="@+id/tv_total_gave"
                             style="@style/DetailsSummaryAmount"
                             tools:text="₹5000.00"/>
@@ -130,7 +137,8 @@
                 </com.google.android.material.card.MaterialCardView>
                 <View android:layout_width="12dp" android:layout_height="0dp"/>
                 <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
-                    <LinearLayout style="@style/DetailsSummaryContent">
+                    <LinearLayout style="@style/DetailsSummaryContent"
+                        android:background="@color/white">
                         <TextView style="@style/DetailsSummaryLabel" android:text="Total You Got" android:textColor="@color/green"/>
                         <TextView android:id="@+id/tv_total_got" style="@style/DetailsSummaryAmount" tools:text="₹3500.00"/>
                     </LinearLayout>
@@ -143,12 +151,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="6dp"
                 android:text="TRANSACTION HISTORY"/>
             
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_customer_transactions"
                 android:layout_width="match_parent"
+                android:background="@color/white"
+                android:padding="2dp"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_transaction"/>
@@ -162,7 +172,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:backgroundTint="@color/primary_dark"
         android:layout_margin="16dp"
+        app:tint="@color/white"
         android:src="@drawable/ic_add"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

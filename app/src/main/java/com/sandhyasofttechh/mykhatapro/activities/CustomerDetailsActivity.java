@@ -70,7 +70,6 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         loadTransactions();
     }
     
-    // --- THIS IS THE NEW, PROFESSIONAL WHATSAPP METHOD ---
     private void sendWhatsAppMessage() {
         String appName = getString(R.string.app_name);
         File imageFile = ImageGenerator.generateShareableImage(this, customerName, netBalance, appName);
@@ -81,7 +80,6 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         
         Uri imageUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", imageFile);
 
-        // --- FIXED: Clearer and more professional message ---
         String finalMessage;
         if (netBalance > 0) { // Customer owes you money
             finalMessage = "Hello " + customerName + ",\nThis is a friendly reminder for your pending payment. Thank you!";
@@ -92,20 +90,23 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         }
         
         try {
+            // **FIX**: This is the reliable, professional method.
+            // It opens the WhatsApp contact picker with the image and text ready.
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setPackage("com.whatsapp");
             intent.setType("image/png");
             intent.putExtra(Intent.EXTRA_STREAM, imageUri);
             intent.putExtra(Intent.EXTRA_TEXT, finalMessage);
-            intent.putExtra("jid", customerPhone.replace("+", "") + "@s.whatsapp.net");
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(intent);
+            
+            // This will create a chooser if WhatsApp is not installed, but since we set the package, it will go straight to it if available.
+            startActivity(Intent.createChooser(intent, "Share with"));
+
         } catch (Exception e) {
-            Toast.makeText(this, "WhatsApp not installed or contact not on WhatsApp.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "WhatsApp not installed.", Toast.LENGTH_LONG).show();
         }
     }
     
-    // --- FIXED: Clearer and more professional SMS message ---
     private void sendSms() {
         String statusMessage;
         if (netBalance > 0) { // Customer owes you money
@@ -117,15 +118,14 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         }
         
         String finalMessage = "Hello " + customerName + ", " + statusMessage + " Thank you. - " + getString(R.string.app_name);
-
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("smsto:" + customerPhone));
+        
+        // **CORRECT IMPLEMENTATION**: This opens the specific chat directly.
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("sms:" + customerPhone));
         intent.putExtra("sms_body", finalMessage);
         startActivity(intent);
     }
     
-    // --- All other methods are unchanged and correct ---
-
     @Override
     public void onReportGenerated(List<Transaction> transactions, String dateRangeLabel) {
         if (transactions.isEmpty()) {

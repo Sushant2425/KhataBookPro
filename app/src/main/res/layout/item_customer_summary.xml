@@ -5,11 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp"
-    android:background="@color/white"
-
+    android:layout_marginHorizontal="3dp"
+    android:layout_marginVertical="5dp"
+    app:cardCornerRadius="5dp"
     app:cardElevation="2dp"
     app:strokeWidth="0dp">
 
@@ -18,83 +16,84 @@
         android:background="@color/white"
         android:layout_height="wrap_content">
 
-        <!-- Side Color Bar for Net Balance Indication -->
-        <View
-            android:id="@+id/summary_indicator"
-            android:layout_width="4dp"
-            android:layout_height="0dp"
-            android:background="@color/green"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <!-- Customer Name -->
+        <!-- PART 1: Information Section -->
         <TextView
             android:id="@+id/summary_customer_name"
             style="@style/TextAppearance.MaterialComponents.Subtitle1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/summary_indicator"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/summary_net_balance"
+            app:layout_constraintEnd_toStartOf="@id/balance_container"
             tools:text="Customer Name" />
 
-        <!-- Final Status Label (You will get/give/settled) -->
         <TextView
             android:id="@+id/summary_status_label"
             style="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="6dp"
+            android:textSize="13sp"
             android:textColor="?android:attr/textColorSecondary"
             app:layout_constraintStart_toStartOf="@id/summary_customer_name"
             app:layout_constraintTop_toBottomOf="@id/summary_customer_name"
             app:layout_constraintEnd_toEndOf="@id/summary_customer_name"
             tools:text="You will get: ₹1500.00" />
 
-        <!-- Last Transaction Date -->
         <TextView
             android:id="@+id/summary_last_date"
             style="@style/TextAppearance.MaterialComponents.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="13sp"
             android:textColor="?android:attr/textColorSecondary"
             app:layout_constraintStart_toStartOf="@id/summary_customer_name"
             app:layout_constraintTop_toBottomOf="@id/summary_status_label"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="14 Nov 2025" />
 
-        <!-- Last Transaction Relative Time -->
         <TextView
             android:id="@+id/summary_relative_time"
             style="@style/TextAppearance.MaterialComponents.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:textSize="13sp"
             android:textColor="?android:attr/textColorSecondary"
             app:layout_constraintStart_toEndOf="@id/summary_last_date"
             app:layout_constraintBaseline_toBaselineOf="@id/summary_last_date"
             tools:text="(2 days ago)" />
 
-        <!-- Net Balance Amount -->
-        <TextView
-            android:id="@+id/summary_net_balance"
-            style="@style/TextAppearance.MaterialComponents.Headline6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
-            android:textStyle="bold"
+        <!-- PART 2: Balance Section -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/balance_container"
+            android:layout_width="120dp"
+            android:layout_height="0dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="₹1500.00"
-            tools:textColor="@color/green" />
+            tools:background="@drawable/background_balance_get">
+
+            <TextView
+                android:id="@+id/summary_net_balance"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="₹1500"
+                tools:textColor="@color/green" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -2,11 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="green1">#B8FFB8</color>
+
 
     <color name="primary_color">#1976D2</color> <!-- Blue -->
     <color name="secondary_color">#03A9F4</color> <!-- Light Blue -->
     <color name="background_light">#F9FAFB</color>
-    <color name="gray">#9E9E9E</color>
+    <color name="gray">#DBDBDB</color>
 
     <color name="purple_500">#6200EE</color>
     <color name="purple_700">#3700B3</color>
@@ -18,6 +20,8 @@
 
     <color name="primary">#6C63FF</color>
     <color name="primary_dark">#5A52D5</color>
+    <color name="primary_dark1">#5754AF</color>
+
     <color name="background">#F8FAFC</color>
     <color name="surface">#FFFFFF</color>
     <color name="error">#D32F2F</color>

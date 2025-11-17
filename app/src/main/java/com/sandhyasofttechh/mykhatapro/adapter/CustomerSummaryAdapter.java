@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.sandhyasofttechh.mykhatapro.R;
@@ -45,7 +46,6 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         CustomerSummary summary = customerSummaries.get(position);
         Context context = holder.itemView.getContext();
 
-        // --- Set Item Click Listener ---
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, CustomerDetailsActivity.class);
             intent.putExtra("CUSTOMER_PHONE", summary.getCustomerPhone());
@@ -58,24 +58,21 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         holder.tvRelativeTime.setText(getCustomRelativeTime(summary.getLastTransactionDate()));
 
         double balance = summary.getNetBalance();
-        String balanceText = String.format(Locale.getDefault(), "₹%.2f", Math.abs(balance));
+        String balanceText = String.format(Locale.getDefault(), "₹%,.0f", Math.abs(balance));
         holder.tvNetBalance.setText(balanceText);
 
         if (balance > 0) {
-            holder.tvStatusLabel.setText(String.format("You will get: %s", balanceText));
-            int green = ContextCompat.getColor(context, R.color.green);
-            holder.tvNetBalance.setTextColor(green);
-            holder.indicator.setBackgroundColor(green);
+            holder.tvStatusLabel.setText(String.format("You will get: ₹%,.2f", balance));
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.green));
+            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_get);
         } else if (balance < 0) {
-            holder.tvStatusLabel.setText(String.format("You will give: %s", balanceText));
-            int red = ContextCompat.getColor(context, R.color.error);
-            holder.tvNetBalance.setTextColor(red);
-            holder.indicator.setBackgroundColor(red);
+            holder.tvStatusLabel.setText(String.format("You will give: ₹%,.2f", Math.abs(balance)));
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.error));
+            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_give);
         } else {
             holder.tvStatusLabel.setText("Settled Up");
-            int black = ContextCompat.getColor(context, R.color.black);
-            holder.tvNetBalance.setTextColor(black);
-            holder.indicator.setBackgroundColor(black);
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.black));
+            holder.balanceContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.gray)); // Assuming a light_grey color exists
         }
     }
     
@@ -112,7 +109,7 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvCustomerName, tvNetBalance, tvStatusLabel, tvLastDate, tvRelativeTime;
-        View indicator;
+        ConstraintLayout balanceContainer;
 
         ViewHolder(View v) {
             super(v);
@@ -121,7 +118,7 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
             tvStatusLabel = v.findViewById(R.id.summary_status_label);
             tvLastDate = v.findViewById(R.id.summary_last_date);
             tvRelativeTime = v.findViewById(R.id.summary_relative_time);
-            indicator = v.findViewById(R.id.summary_indicator);
+            balanceContainer = v.findViewById(R.id.balance_container);
         }
     }
 }

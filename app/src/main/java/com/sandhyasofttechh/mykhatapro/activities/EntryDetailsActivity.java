@@ -2,37 +2,30 @@ package com.sandhyasofttechh.mykhatapro.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateUtils;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
+import androidx.core.content.ContextCompat;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sandhyasofttechh.mykhatapro.R;
 import com.sandhyasofttechh.mykhatapro.fragments.DeleteConfirmationBottomSheet;
 import com.sandhyasofttechh.mykhatapro.model.Transaction;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class EntryDetailsActivity extends AppCompatActivity implements DeleteConfirmationBottomSheet.DeleteConfirmationListener {
 
     private Transaction transaction;
     private String customerName;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-
+    private final SimpleDateFormat sdfWithTime = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +35,6 @@ public class EntryDetailsActivity extends AppCompatActivity implements DeleteCon
         Toolbar toolbar = findViewById(R.id.toolbar_entry_details);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Entry Details");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -54,76 +46,78 @@ public class EntryDetailsActivity extends AppCompatActivity implements DeleteCon
             finish();
             return;
         }
+        
+        if (TextUtils.isEmpty(transaction.getCustomerName())) {
+            transaction.setCustomerName(customerName);
+        }
 
         populateViews();
         setupClickListeners();
     }
 
     private void populateViews() {
-        TextView tvCustomerName = findViewById(R.id.tv_customer_name_entry);
-        TextView tvAmount = findViewById(R.id.tv_amount_entry);
-        TextView tvDate = findViewById(R.id.tv_date_entry);
-        TextView tvDaysAgo = findViewById(R.id.tv_days_ago_entry);
-        TextView tvNote = findViewById(R.id.tv_note_entry);
+        TextView tvCustomerName = findViewById(R.id.tv_customer_name_receipt);
+        TextView tvDate = findViewById(R.id.tv_date_receipt);
+        TextView tvNote = findViewById(R.id.tv_note_receipt);
+        TextView tvAmount = findViewById(R.id.tv_amount_receipt);
+        TextView tvType = findViewById(R.id.tv_type_receipt);
+        TextView tvSmsMessage = findViewById(R.id.tv_sms_message);
+        
+        tvCustomerName.setText(transaction.getCustomerName());
+        
+        Date date = new Date(transaction.getTimestamp());
+        String formattedDate = sdfWithTime.format(date);
+        tvDate.setText(formattedDate);
 
-        tvCustomerName.setText(customerName);
-        tvAmount.setText(String.format(Locale.getDefault(), "₹%.2f", transaction.getAmount()));
-        tvDate.setText(transaction.getDate());
-        tvDaysAgo.setText(getCustomRelativeTime(transaction.getDate())); // Use the improved method
-        tvNote.setText(transaction.getNote());
-    }
-
-    private String getCustomRelativeTime(String dateString) {
-        if (dateString == null || dateString.isEmpty()) return "";
-        try {
-            Date date = sdf.parse(dateString);
-            if (date == null) return "";
-            if (DateUtils.isToday(date.getTime())) return "(Today)";
-            long now = System.currentTimeMillis();
-            long diff = now - date.getTime();
-            if(diff < 0) return "";
-            long days = TimeUnit.MILLISECONDS.toDays(diff);
-            if (days < 7) return "(" + days + (days == 1 ? " day ago)" : " days ago)");
-            long weeks = days / 7;
-            if (weeks < 5) return "(" + weeks + (weeks == 1 ? " week ago)" : " weeks ago)");
-            Calendar start = Calendar.getInstance();
-            start.setTime(date);
-            Calendar end = Calendar.getInstance();
-            int monthDiff = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 + (end.get(Calendar.MONTH) - start.get(Calendar.MONTH));
-            if (monthDiff < 12) return "(" + monthDiff + (monthDiff == 1 ? " month ago)" : " months ago)");
-            int yearDiff = monthDiff / 12;
-            return "(" + yearDiff + (yearDiff == 1 ? " year ago)" : " years ago)");
-        } catch (ParseException e) {
-            Log.e("EntryDetailsActivity", "Date parsing error", e);
-            return "";
+        if (TextUtils.isEmpty(transaction.getNote())) {
+            tvNote.setVisibility(View.GONE);
+        } else {
+            tvNote.setVisibility(View.VISIBLE);
+            tvNote.setText("Note: " + transaction.getNote());
         }
-    }
 
+        String formattedAmount = String.format(Locale.getDefault(), "₹%,.2f", transaction.getAmount());
+        tvAmount.setText(formattedAmount);
+
+        boolean isGave = "gave".equals(transaction.getType());
+        if (isGave) {
+            tvType.setText("YOU GAVE");
+            tvType.setTextColor(ContextCompat.getColor(this, R.color.error));
+            tvAmount.setTextColor(ContextCompat.getColor(this, R.color.error));
+        } else {
+            tvType.setText("YOU GOT");
+            tvType.setTextColor(ContextCompat.getColor(this, R.color.green));
+            tvAmount.setTextColor(ContextCompat.getColor(this, R.color.green));
+        }
+
+        // Updated SMS Message with more details
+        String smsText = "Hello " + transaction.getCustomerName() + ",\n" +
+                "A transaction of " + formattedAmount + " (" + (isGave ? "You Gave" : "You Got") + ") " +
+                "was recorded on " + formattedDate + ".\n\n" +
+                "Sent by " + getString(R.string.app_name) + ".";
+        tvSmsMessage.setText(smsText);
+    }
 
     private void setupClickListeners() {
-        Button btnEdit = findViewById(R.id.btn_edit_entry);
-        Button btnDelete = findViewById(R.id.btn_delete_entry);
-        Button btnShare = findViewById(R.id.btn_share_entry);
-
-        btnEdit.setOnClickListener(v -> {
+        findViewById(R.id.btn_edit_entry_receipt).setOnClickListener(v -> {
             Intent intent = new Intent(this, EditTransactionActivity.class);
             intent.putExtra("EDIT_TRANSACTION", transaction);
             startActivity(intent);
             finish();
         });
 
-        btnDelete.setOnClickListener(v -> {
+        findViewById(R.id.btn_delete_entry).setOnClickListener(v -> {
             DeleteConfirmationBottomSheet bottomSheet = new DeleteConfirmationBottomSheet();
             bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
         });
 
-        btnShare.setOnClickListener(v -> {
+        findViewById(R.id.btn_share_entry).setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
             String shareBody = "Transaction Details:\n" +
-                    "Customer: " + customerName + "\n" +
+                    "Customer: " + transaction.getCustomerName() + "\n" +
                     "Amount: ₹" + transaction.getAmount() + "\n" +
-                    "Date: " + transaction.getDate() + "\n" +
+                    "Date: " + sdfWithTime.format(new Date(transaction.getTimestamp())) + "\n" +
                     "Note: " + transaction.getNote();
             intent.putExtra(Intent.EXTRA_TEXT, shareBody);
             startActivity(Intent.createChooser(intent, "Share via"));

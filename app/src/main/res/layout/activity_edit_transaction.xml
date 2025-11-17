@@ -15,12 +15,16 @@
             android:id="@+id/toolbar_edit"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/dashboard_header_background"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="Edit Transaction" />
+            app:title="Edit Transaction"
+            app:navigationIconTint="@color/white"
+            app:titleTextColor="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
+        android:background="@color/white"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -55,11 +59,13 @@
                     tools:text="from Customer Name" />
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardElevation="4dp">
+<!--            <com.google.android.material.card.MaterialCardView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:layout_marginStart="5dp"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                app:cardElevation="4dp">-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -115,7 +121,7 @@
                             android:focusable="false" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+<!--            </com.google.android.material.card.MaterialCardView>-->
 
         </LinearLayout>
     </ScrollView>
