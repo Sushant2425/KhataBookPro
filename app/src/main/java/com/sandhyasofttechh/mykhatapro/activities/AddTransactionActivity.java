@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
-import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -41,15 +40,11 @@ import java.util.Locale;
 
 public class AddTransactionActivity extends AppCompatActivity {
 
-    private static final int PERMISSION_REQUEST_SEND_SMS = 555;
-    private Transaction pendingTransactionForSms;
-
     private TextInputEditText etDate, etAmount, etNote;
     private AutoCompleteTextView autoCustomer;
     private TextInputLayout layoutCustomer;
     private MaterialButtonToggleGroup toggleButtonGroup;
     private MaterialButton btnSave;
-    private MaterialCheckBox checkboxSendMessage;
 
     private PrefManager prefManager;
     private DatabaseReference transactionsRef;
@@ -61,6 +56,8 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private final Calendar calendar = Calendar.getInstance();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+
+    private static final int SMS_PERMISSION_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +76,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         loadCustomers();
         handleIntent();
 
+        checkSmsPermission();
+
         btnSave.setOnClickListener(v -> saveTransaction());
     }
 
@@ -90,8 +89,6 @@ public class AddTransactionActivity extends AppCompatActivity {
         layoutCustomer = findViewById(R.id.layout_customer);
         toggleButtonGroup = findViewById(R.id.toggle_button_group);
         btnSave = findViewById(R.id.btn_save);
-        checkboxSendMessage = findViewById(R.id.checkbox_send_message);
-        checkboxSendMessage.setChecked(true);
 
         etDate.setOnClickListener(v -> showDatePicker());
         etDate.setText(dateFormat.format(calendar.getTime()));
@@ -103,14 +100,12 @@ public class AddTransactionActivity extends AppCompatActivity {
         autoCustomer.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable s) {
-                // Logic to get phone from name can be improved or changed if needed
-            }
+            @Override public void afterTextChanged(Editable s) {}
         });
 
         autoCustomer.setOnItemClickListener((parent, view, position, id) -> {
             String name = (String) parent.getItemAtPosition(position);
-            // Logic to get phone from name
+            // Optionally set phone/name logic if you want real-time fetching
         });
     }
 
@@ -175,7 +170,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             etDate.setText(editTransaction.getDate());
 
             autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
-            autoCustomer.setEnabled(false); // Don't allow changing customer when editing
+            autoCustomer.setEnabled(false);
 
             if ("gave".equals(editTransaction.getType())) {
                 toggleButtonGroup.check(R.id.btn_gave);
@@ -187,13 +182,11 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
     }
 
-
     private void saveTransaction() {
         String amountStr = etAmount.getText().toString().trim();
         String note = etNote.getText().toString().trim();
         String date = etDate.getText().toString();
         String customerInfo = autoCustomer.getText().toString();
-
 
         if (amountStr.isEmpty()) {
             etAmount.setError("Enter amount");
@@ -207,7 +200,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             etAmount.setError("Invalid amount");
             return;
         }
-        
+
         String selectedPhone;
         String selectedName;
 
@@ -215,7 +208,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             selectedPhone = editTransaction.getCustomerPhone();
             selectedName = editTransaction.getCustomerName();
         } else {
-             if (customerInfo.isEmpty() || !customerInfo.contains("(")) {
+            if (customerInfo.isEmpty() || !customerInfo.contains("(")) {
                 layoutCustomer.setError("Select a customer");
                 return;
             }
@@ -223,12 +216,11 @@ public class AddTransactionActivity extends AppCompatActivity {
             selectedPhone = customerInfo.substring(customerInfo.lastIndexOf(" (") + 2, customerInfo.length() - 1);
         }
 
-
         boolean isGave = toggleButtonGroup.getCheckedButtonId() == R.id.btn_gave;
 
         Transaction transaction = new Transaction();
         String idToSave = editTransaction != null ? editTransaction.getId() : transactionsRef.child(selectedPhone).push().getKey();
-        
+
         transaction.setId(idToSave);
         transaction.setCustomerPhone(selectedPhone);
         transaction.setCustomerName(selectedName);
@@ -240,65 +232,61 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         transactionsRef.child(selectedPhone).child(idToSave).setValue(transaction)
                 .addOnSuccessListener(aVoid -> {
+                    sendTransactionSms(selectedPhone, selectedName, amount, isGave, date);
                     finishWithSuccess(editTransaction != null ? "Updated" : "Saved");
-                    if (checkboxSendMessage.isChecked()) {
-                        checkSmsPermissionAndSend(transaction);
-                    }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
-
-    private void checkSmsPermissionAndSend(Transaction transaction){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
-            pendingTransactionForSms = transaction;
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_SEND_SMS);
-        } else {
-            sendSms(transaction);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_SEND_SMS){
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                if (pendingTransactionForSms != null){
-                    sendSms(pendingTransactionForSms);
-                    pendingTransactionForSms = null;
-                }
-            } else {
-                Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void sendSms(Transaction transaction){
-        String message = "Hello " + transaction.getCustomerName() + ",\n"
-                + "Transaction update: you " + (transaction.getType().equals("gave") ? "received" : "gave") + " ₹"
-                + String.format(Locale.getDefault(), "%.2f", transaction.getAmount())
-                + " on " + transaction.getDate() + ".\nNote: "
-                + (transaction.getNote().isEmpty() ? "No notes." : transaction.getNote())
-                + "\nThank you for using MyKhataPro.";
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(transaction.getCustomerPhone(), null, message, null, null);
-            Toast.makeText(this, "SMS sent successfully", Toast.LENGTH_SHORT).show();
-        } catch (Exception e){
-            Toast.makeText(this, "Failed to send SMS: "+e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-
-    private void finishWithSuccess(String msg){
+    private void finishWithSuccess(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
     }
 
+    // SMS PERMISSION SUPPORT
+    private void checkSmsPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},
+                    SMS_PERMISSION_CODE);
+        }
+    }
+
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item){
-        if (item.getItemId() == android.R.id.home){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == SMS_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "SMS permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "SMS permission denied. SMS will not be sent.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // SMS SENDING METHOD
+    private void sendTransactionSms(String phone, String name, double amount, boolean isGave, String date) {
+        String msg;
+        if (isGave) {
+            msg = "Dear " + name + ", ₹" + amount + " has been lent to you on " + date + ". Please confirm receipt. - MyKhataPro";
+        } else {
+            msg = "Dear " + name + ", ₹" + amount + " has been received from you on " + date + ". Thank you! - MyKhataPro";
+        }
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            ArrayList<String> parts = smsManager.divideMessage(msg);
+            smsManager.sendMultipartTextMessage(phone, null, parts, null, null);
+            Toast.makeText(this, "SMS sent to " + name, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "SMS failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
