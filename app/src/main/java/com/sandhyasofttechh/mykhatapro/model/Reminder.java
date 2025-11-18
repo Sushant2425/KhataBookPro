@@ -4,6 +4,7 @@ public class Reminder {
     private String method;
     private long timestamp;
 
+
     public Reminder() {}
 
     public Reminder(String method, long timestamp) {

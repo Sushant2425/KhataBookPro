@@ -100,6 +100,7 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
         } else {
             return FilterType.ALL;
         }
+
     }
     
     // --- FIXED: Replaced switch with if-else if ---

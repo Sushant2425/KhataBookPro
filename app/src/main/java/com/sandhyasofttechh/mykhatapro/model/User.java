@@ -5,6 +5,7 @@ public class User {
     private String email;
     private String password;
     private boolean status;
+
     public User() {
         // Default constructor required for Firebase
     }

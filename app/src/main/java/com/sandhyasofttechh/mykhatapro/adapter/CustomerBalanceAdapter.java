@@ -21,6 +21,7 @@ public class CustomerBalanceAdapter extends RecyclerView.Adapter<CustomerBalance
         this.customers = customers;
     }
 
+
     @NonNull
     @Override
     public CustomerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

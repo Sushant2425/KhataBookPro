@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private BottomNavigationView bottomNav;
     private NavigationView navigationView;
+
     private Toolbar toolbar;
 
     private static final String TAG_DASHBOARD = "dashboard";

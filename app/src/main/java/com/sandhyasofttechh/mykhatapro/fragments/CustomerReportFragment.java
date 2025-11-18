@@ -38,6 +38,7 @@ public class CustomerReportFragment extends Fragment {
     private DatabaseReference customerRef, transRef;
     private List<CustomerReport> customerReports = new ArrayList<>();
     private CustomerReportAdapter adapter;
+
     private int totalCustomers = 0;
     private int loadedCount = 0;
 

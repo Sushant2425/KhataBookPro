@@ -19,6 +19,7 @@ public class FabScrollBehavior extends CoordinatorLayout.Behavior<FloatingAction
     public boolean onStartNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull FloatingActionButton child, @NonNull View directTargetChild, @NonNull View target, int axes, int type) {
         // We are only interested in vertical scrolling.
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL;
+
     }
 
     @Override

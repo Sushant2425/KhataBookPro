@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class Customer implements Serializable {
     private String customerId;
+
     private String name, phone, email, address;
     private double pendingAmount = 0.0;
     private boolean hasDuePayment = false;

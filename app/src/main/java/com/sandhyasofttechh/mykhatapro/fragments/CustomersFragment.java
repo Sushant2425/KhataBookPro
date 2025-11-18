@@ -405,6 +405,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
         }
     }
 
+
     private void logReminder(Customer customer, String method) {
         Reminder reminder = new Reminder(method, System.currentTimeMillis());
         customerService.logReminder(customer.getCustomerId(), reminder);

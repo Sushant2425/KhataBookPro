@@ -10,6 +10,7 @@ import java.util.List;
 public class TransactionCalculator {
 
     /**
+     *
      * A simple data class to hold the results of the calculation.
      */
     public static class Summary {

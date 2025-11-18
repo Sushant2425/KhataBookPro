@@ -24,6 +24,7 @@ public class CustomerReportAdapter extends RecyclerView.Adapter<CustomerReportAd
         this.list = l; this.listener = lis;
     }
 
+
     @NonNull @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int vt) {
         return new ViewHolder(LayoutInflater.from(p.getContext())

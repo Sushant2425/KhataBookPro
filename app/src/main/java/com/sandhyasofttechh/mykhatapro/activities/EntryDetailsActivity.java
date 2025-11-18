@@ -23,6 +23,7 @@ import java.util.Locale;
 
 public class EntryDetailsActivity extends AppCompatActivity implements DeleteConfirmationBottomSheet.DeleteConfirmationListener {
 
+
     private Transaction transaction;
     private String customerName;
     private final SimpleDateFormat sdfWithTime = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());

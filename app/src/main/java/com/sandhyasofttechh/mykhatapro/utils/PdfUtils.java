@@ -24,6 +24,7 @@ import java.util.Locale;
 public class PdfUtils {
 
     private final PdfDocument document;
+
     private final Context context;
     private int pageNumber = 0;
 

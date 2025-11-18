@@ -7,6 +7,7 @@ public class PrefManager {
 
     private static final String PREF_NAME = "mykhata_pref";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+
     private static final String KEY_USER_EMAIL = "user_email";
 
     private SharedPreferences sharedPreferences;

@@ -14,6 +14,7 @@ import com.sandhyasofttechh.mykhatapro.R;
  * A simple {@link Fragment} subclass.
  * Use the {@link SettingsFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
  */
 public class SettingsFragment extends Fragment {
 

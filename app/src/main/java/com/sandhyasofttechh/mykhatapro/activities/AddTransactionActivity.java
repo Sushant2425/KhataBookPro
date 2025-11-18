@@ -248,6 +248,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
+
     private void checkSmsPermissionAndSend(Transaction transaction){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
             pendingTransactionForSms = transaction;

@@ -20,6 +20,7 @@ import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 
 public class RegistrationActivity extends AppCompatActivity {
 
+
     private EditText emailEt, passwordEt, confirmPasswordEt;
     private Button registerBtn;
     private TextView loginTv;

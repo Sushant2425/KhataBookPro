@@ -63,6 +63,7 @@ public class EditTransactionActivity extends AppCompatActivity {
             return;
         }
 
+
         initViews();
         populateData();
         setupClickListeners();

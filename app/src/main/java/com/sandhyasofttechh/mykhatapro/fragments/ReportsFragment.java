@@ -20,6 +20,7 @@ public class ReportsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_reports, container, false);
 
+
         rowCustomerReports = v.findViewById(R.id.rowCustomerReports);
         rowCustomerList = v.findViewById(R.id.rowCustomerList);
 

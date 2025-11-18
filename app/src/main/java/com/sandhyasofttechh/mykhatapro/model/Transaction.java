@@ -8,6 +8,7 @@ public class Transaction implements Serializable {
     private String customerName;
     private double amount;
     private String type; // "gave" or "got"
+
     private String note;
     private String date;
     private long timestamp;

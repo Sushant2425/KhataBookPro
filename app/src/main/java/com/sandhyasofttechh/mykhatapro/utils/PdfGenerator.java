@@ -21,6 +21,7 @@ public class PdfGenerator {
     public static File generatePdf(Context context, String customerName, String customerPhone, List<Transaction> transactions, String dateRangeLabel) {
         
         // Standard A4 page size
+
         int pageWidth = 595;
         int pageHeight = 842;
 

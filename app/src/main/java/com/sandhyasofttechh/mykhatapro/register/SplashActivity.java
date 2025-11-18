@@ -9,8 +9,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,7 +25,7 @@ import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final long SPLASH_DELAY = 1000;
+    private static final long SPLASH_DELAY = 1500; // smooth delay
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,8 @@ public class SplashActivity extends AppCompatActivity {
 
         ImageView logo = findViewById(R.id.iv_logo);
         TextView appName = findViewById(R.id.tv_app_name_splash);
+        TextView madeInIndia = findViewById(R.id.tv_made_in_india);
+        TextView companyName = findViewById(R.id.tv_company_name);
 
         // Load animations
         Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_slide_up_logo);
@@ -40,13 +44,15 @@ public class SplashActivity extends AppCompatActivity {
         // Start animations
         logo.startAnimation(logoAnimation);
         appName.startAnimation(textAnimation);
+        madeInIndia.startAnimation(textAnimation);
+        companyName.startAnimation(textAnimation);
 
-        // Decide where to go after the splash screen
         new Handler(Looper.getMainLooper()).postDelayed(this::decideNextActivity, SPLASH_DELAY);
     }
 
     private void decideNextActivity() {
         PrefManager prefManager = new PrefManager(this);
+
         if (prefManager.isLoggedIn()) {
             checkUserStatusFromFirebase(prefManager);
         } else {
@@ -56,6 +62,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void checkUserStatusFromFirebase(PrefManager prefManager) {
         String email = prefManager.getUserEmail();
+
         if (email == null) {
             navigateTo(LoginActivity.class);
             return;
@@ -71,6 +78,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Boolean status = snapshot.child("status").getValue(Boolean.class);
+
                 if (status != null && status) {
                     navigateTo(MainActivity.class);
                 } else {

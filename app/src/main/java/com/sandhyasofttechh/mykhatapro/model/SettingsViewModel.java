@@ -17,6 +17,7 @@ public class SettingsViewModel extends AndroidViewModel {
         mAuth = FirebaseAuth.getInstance();
     }
 
+
     public void triggerBackup() {
         String uid = mAuth.getCurrentUser().getUid();
         String time = new SimpleDateFormat("dd MMM, hh:mm a", Locale.getDefault()).format(new Date());

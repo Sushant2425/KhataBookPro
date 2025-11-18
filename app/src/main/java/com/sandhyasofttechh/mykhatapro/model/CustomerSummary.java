@@ -1,5 +1,6 @@
 package com.sandhyasofttechh.mykhatapro.model;
 
+
 public class CustomerSummary {
     private String customerName;
     private String customerPhone;

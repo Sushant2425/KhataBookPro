@@ -20,6 +20,7 @@ public class ImageGenerator {
 
     private static final int IMAGE_WIDTH = 800;
     private static final int IMAGE_HEIGHT = 600;
+
     private static final int PADDING = 50;
 
     public static File generateShareableImage(Context context, String customerName, double netBalance, String appName) {

@@ -14,6 +14,7 @@ public class TableDrawer {
     private final Canvas canvas;
     private final PdfUtils utils;
 
+
     // X-coordinates for columns
     private final float[] colX = {40, 130, 260, 370, 470};
     private final float tableWidth = 515;

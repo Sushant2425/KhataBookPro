@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class PaymentEntry implements Serializable {
     private String type;
     private double amount;
+
     private Object date;  // ← CHANGE: Use Object to accept String or Long
     private String note;
 

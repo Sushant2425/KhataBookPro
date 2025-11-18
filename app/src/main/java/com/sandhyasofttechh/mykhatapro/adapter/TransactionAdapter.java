@@ -92,6 +92,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             Log.e("Adapter", "Date parsing error", e);
             return "";
         }
+
     }
 
     @Override

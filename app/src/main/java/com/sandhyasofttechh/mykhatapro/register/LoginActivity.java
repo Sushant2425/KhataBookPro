@@ -25,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBtn;
     private TextView registerTv, forgotPasswordTv;
     private ProgressBar progressBar;
+
     private FirebaseAuth mAuth;
 
     @Override

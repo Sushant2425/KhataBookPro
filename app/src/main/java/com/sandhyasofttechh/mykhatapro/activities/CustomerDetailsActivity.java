@@ -69,7 +69,7 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         setupClickListeners();
         loadTransactions();
     }
-    
+
     private void sendWhatsAppMessage() {
         String appName = getString(R.string.app_name);
         File imageFile = ImageGenerator.generateShareableImage(this, customerName, netBalance, appName);
@@ -77,33 +77,35 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
             Toast.makeText(this, "Failed to create shareable image.", Toast.LENGTH_SHORT).show();
             return;
         }
-        
+
         Uri imageUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", imageFile);
 
         String finalMessage;
-        if (netBalance > 0) { // Customer owes you money
+        if (netBalance > 0) {
             finalMessage = "Hello " + customerName + ",\nThis is a friendly reminder for your pending payment. Thank you!";
-        } else if (netBalance < 0) { // You owe the customer money
+        } else if (netBalance < 0) {
             finalMessage = "Hello " + customerName + ",\nThis is a confirmation of my pending payment to you. Thank you!";
         } else {
             finalMessage = "Hello " + customerName + ",\nJust to confirm, our account is currently settled. Thank you for your business!";
         }
-        
+
         try {
-            // **FIX**: This is the reliable, professional method.
-            // It opens the WhatsApp contact picker with the image and text ready.
+            // Format WhatsApp contact JID (phone number must be in international format without + or 00 prefix)
+            String phoneWithCountryCode = customerPhone; // Make sure this is in correct format e.g. "919876543210"
+            String jid = phoneWithCountryCode + "@s.whatsapp.net";
+
             Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setPackage("com.whatsapp");
             intent.setType("image/png");
             intent.putExtra(Intent.EXTRA_STREAM, imageUri);
             intent.putExtra(Intent.EXTRA_TEXT, finalMessage);
+            intent.putExtra("jid", jid); // WhatsApp expects this exact extra for direct chat
+            intent.setPackage("com.whatsapp");
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            
-            // This will create a chooser if WhatsApp is not installed, but since we set the package, it will go straight to it if available.
-            startActivity(Intent.createChooser(intent, "Share with"));
+
+            startActivity(intent);
 
         } catch (Exception e) {
-            Toast.makeText(this, "WhatsApp not installed.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "WhatsApp not installed or error opening chat.", Toast.LENGTH_LONG).show();
         }
     }
     

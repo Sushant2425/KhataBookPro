@@ -1,113 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F9F9F9"
-    android:padding="32dp">
+    android:orientation="vertical"
+    android:background="#F9F9F9">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <!-- Top App Bar -->
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_add_customer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:elevation="6dp"
-        android:padding="32dp"
-        android:layout_margin="16dp"
-        android:clipToPadding="false"
-        android:clipChildren="false">
+        android:background="@drawable/background_receipt_header"
+        android:elevation="4dp"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="Add Customer"
+        app:titleCentered="true"
+        app:navigationIconTint="@color/white"
+        app:titleTextColor="@color/white" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add New Customer"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="32dp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_customer_name"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="Customer Name"
-            app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_person"
-            app:endIconContentDescription="Pick contact">
+            android:elevation="8dp"
+            android:padding="28dp"
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_customer_name"
+            <!-- Customer Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_customer_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Customer Name"
+                android:layout_marginBottom="22dp"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_person"
+                app:endIconTint="@color/gray">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_customer_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:inputType="textPersonName" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Phone -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_customer_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone Number"
+                android:layout_marginBottom="22dp"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_phone"
+                app:endIconTint="@color/gray">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_customer_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:inputType="phone" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_customer_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:hint="Email (Optional)">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_customer_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Address -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_customer_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Address (Optional)"
+                android:layout_marginBottom="28dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_customer_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:gravity="top"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:inputType="textMultiLine" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Save Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save_customer"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:inputType="textPersonName"
-                android:padding="16dp"
-                android:textColor="#212121"
-                android:textSize="18sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:backgroundTint="@color/primary"
+                android:text="Save Customer"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_customer_phone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="Phone Number"
-            app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_phone"
-            app:endIconContentDescription="Pick number from call log">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_customer_phone"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:inputType="phone"
-                android:padding="16dp"
-                android:textColor="#212121"
-                android:textSize="18sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="Email (Optional)">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_customer_email"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:inputType="textEmailAddress"
-                android:padding="16dp"
-                android:textColor="#212121"
-                android:textSize="18sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:hint="Address (Optional)">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_customer_address"
-                android:layout_width="match_parent"
-                android:layout_height="96dp"
-                android:gravity="top"
-                android:inputType="textPostalAddress"
-                android:padding="16dp"
-                android:textColor="#212121"
-                android:textSize="18sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Button
-            android:id="@+id/btn_save_customer"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Save Customer"
-            android:textSize="20sp"
-            android:backgroundTint="#00796B"
-            android:textColor="#FFFFFF"
-            android:textAllCaps="false"
-            android:fontFamily="sans-serif-medium"/>
-    </LinearLayout>
-</ScrollView>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

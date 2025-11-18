@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -44,6 +45,7 @@ public class AddCustomerActivity extends AppCompatActivity {
     private Button btnSave;
     private DatabaseReference databaseReference;
     private PrefManager prefManager;
+
     private boolean isEditMode = false;
 
     @Override
@@ -51,50 +53,82 @@ public class AddCustomerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_customer);
 
+        setupToolbar();
         initViews();
         setupFirebase();
         handleEditMode();
         setupClickListeners();
     }
 
+    // -------------------------- Toolbar ------------------------------
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar_add_customer);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Add Customer");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        toolbar.setNavigationOnClickListener(v -> {
+            finish();
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        });
+    }
+
+    // ------------------------ Initialize Views ------------------------
     private void initViews() {
         tilName = findViewById(R.id.til_customer_name);
         tilPhone = findViewById(R.id.til_customer_phone);
+
         etName = findViewById(R.id.et_customer_name);
         etPhone = findViewById(R.id.et_customer_phone);
         etEmail = findViewById(R.id.et_customer_email);
         etAddress = findViewById(R.id.et_customer_address);
+
         btnSave = findViewById(R.id.btn_save_customer);
+
         prefManager = new PrefManager(this);
     }
 
+    // -------------------------- Firebase Setup ------------------------
     private void setupFirebase() {
         databaseReference = FirebaseDatabase.getInstance().getReference("Khatabook");
     }
 
+    // ------------------------ Handle Edit Mode -------------------------
     private void handleEditMode() {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("edit_customer_name")) {
+
             isEditMode = true;
+
             etName.setText(intent.getStringExtra("edit_customer_name"));
             etPhone.setText(intent.getStringExtra("edit_customer_phone"));
             etPhone.setEnabled(false);
+
             etEmail.setText(intent.getStringExtra("edit_customer_email"));
             etAddress.setText(intent.getStringExtra("edit_customer_address"));
+
             btnSave.setText("Update Customer");
+
         } else {
             btnSave.setText("Save Customer");
             etPhone.setEnabled(true);
         }
     }
 
+    // ------------------------ Click Listeners -------------------------
     private void setupClickListeners() {
+
         tilName.setEndIconOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                     != PackageManager.PERMISSION_GRANTED) {
+
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_CONTACTS},
                         PERMISSIONS_REQUEST_READ_CONTACTS);
+
             } else {
                 openContactPicker();
             }
@@ -103,9 +137,11 @@ public class AddCustomerActivity extends AppCompatActivity {
         tilPhone.setEndIconOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
                     != PackageManager.PERMISSION_GRANTED) {
+
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_CALL_LOG},
                         PERMISSIONS_REQUEST_READ_CALL_LOG);
+
             } else {
                 openCallLogPicker();
             }
@@ -114,19 +150,26 @@ public class AddCustomerActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> saveCustomer());
     }
 
-    // ===================== CONTACT PICKER =====================
+    // ------------------------ Contact Picker --------------------------
     private void openContactPicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+
         startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT);
     }
 
-    // ===================== CALL LOG PICKER (CUSTOM) =====================
+    // ------------------- Call Log Picker (Custom Dialog) --------------------
     private void openCallLogPicker() {
         Cursor cursor = null;
+
         try {
             cursor = getContentResolver().query(
                     CallLog.Calls.CONTENT_URI,
-                    new String[]{CallLog.Calls.NUMBER, CallLog.Calls.CACHED_NAME, CallLog.Calls.DATE},
+                    new String[]{
+                            CallLog.Calls.NUMBER,
+                            CallLog.Calls.CACHED_NAME,
+                            CallLog.Calls.DATE
+                    },
                     null, null,
                     CallLog.Calls.DATE + " DESC"
             );
@@ -140,16 +183,21 @@ public class AddCustomerActivity extends AppCompatActivity {
             Set<String> seenNumbers = new HashSet<>();
 
             while (cursor.moveToNext()) {
-                String number = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME));
+                String number = cursor.getString(
+                        cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER));
+
+                String name = cursor.getString(
+                        cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME));
 
                 // Clean number
                 number = number.replaceAll("[^0-9+]", "");
+
                 if (number.startsWith("+91") && number.length() > 10) {
                     number = number.substring(3);
                 } else if (number.startsWith("0") && number.length() > 10) {
                     number = number.substring(1);
                 }
+
                 if (number.length() < 10) continue;
 
                 if (!seenNumbers.contains(number)) {
@@ -159,19 +207,20 @@ public class AddCustomerActivity extends AppCompatActivity {
             }
 
             if (callLogs.isEmpty()) {
-                Toast.makeText(this, "No valid phone numbers in call log", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No valid phone numbers found", Toast.LENGTH_SHORT).show();
             } else {
                 showCallLogPickerDialog(callLogs);
             }
 
         } catch (Exception e) {
-            Toast.makeText(this, "Error reading call log: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error reading call log", Toast.LENGTH_SHORT).show();
         } finally {
             if (cursor != null) cursor.close();
         }
     }
 
     private void showCallLogPickerDialog(List<CallLogEntry> callLogs) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Pick from Call Log");
 
@@ -183,7 +232,10 @@ public class AddCustomerActivity extends AppCompatActivity {
         builder.setItems(items, (dialog, which) -> {
             CallLogEntry entry = callLogs.get(which);
             etPhone.setText(entry.number);
-            if (!TextUtils.isEmpty(entry.name) && TextUtils.isEmpty(etName.getText().toString().trim())) {
+
+            if (!TextUtils.isEmpty(entry.name)
+                    && TextUtils.isEmpty(etName.getText().toString().trim())) {
+
                 etName.setText(entry.name);
             }
         });
@@ -192,7 +244,7 @@ public class AddCustomerActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // ===================== MODEL CLASS =====================
+    // ---------------------- Model Class -------------------------
     private static class CallLogEntry {
         String name;
         String number;
@@ -211,19 +263,23 @@ public class AddCustomerActivity extends AppCompatActivity {
         }
     }
 
-    // ===================== PERMISSIONS =====================
+    // ------------------------ Permissions -------------------------
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
+
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openContactPicker();
             } else {
                 Toast.makeText(this, "Contacts permission denied", Toast.LENGTH_SHORT).show();
             }
+
         } else if (requestCode == PERMISSIONS_REQUEST_READ_CALL_LOG) {
+
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCallLogPicker();
             } else {
@@ -232,40 +288,51 @@ public class AddCustomerActivity extends AppCompatActivity {
         }
     }
 
-    // ===================== ON ACTIVITY RESULT =====================
+    // ------------------------ OnActivityResult -------------------------
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK && data != null) {
             Uri uri = data.getData();
+
+
+            // Contact
             if (requestCode == REQUEST_CODE_PICK_CONTACT && uri != null) {
+
                 try (Cursor cursor = getContentResolver().query(uri,
                         new String[]{
                                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                                 ContactsContract.CommonDataKinds.Phone.NUMBER
-                        }, null, null, null)) {
+                        },
+                        null, null, null)) {
 
                     if (cursor != null && cursor.moveToFirst()) {
+
                         String name = cursor.getString(0);
                         String number = cursor.getString(1);
+
                         number = number.replaceAll("[^0-9+]", "");
+
                         if (number.startsWith("+91") && number.length() > 10) {
                             number = number.substring(3);
                         }
+
                         etName.setText(name);
                         etPhone.setText(number);
                     }
+
                 } catch (Exception e) {
                     Toast.makeText(this, "Error reading contact", Toast.LENGTH_SHORT).show();
                 }
             }
-            // Call log uses custom dialog → no need to handle here
         }
     }
 
-    // ===================== SAVE CUSTOMER =====================
+    // ------------------------ Save Customer -------------------------
     private void saveCustomer() {
+
         String name = etName.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
@@ -275,21 +342,20 @@ public class AddCustomerActivity extends AppCompatActivity {
             tilName.setError("Name is required");
             etName.requestFocus();
             return;
-        } else {
-            tilName.setError(null);
         }
+        tilName.setError(null);
 
         if (TextUtils.isEmpty(phone)) {
             tilPhone.setError("Phone number is required");
             etPhone.requestFocus();
             return;
-        } else {
-            tilPhone.setError(null);
         }
+        tilPhone.setError(null);
 
         String userEmail = prefManager.getUserEmail();
+
         if (TextUtils.isEmpty(userEmail)) {
-            Toast.makeText(this, "Please login again.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -300,15 +366,24 @@ public class AddCustomerActivity extends AppCompatActivity {
         customerMap.put("address", address);
 
         String userNode = userEmail.replace(".", ",");
-        databaseReference.child(userNode).child("customers").child(phone)
+
+        databaseReference
+                .child(userNode)
+                .child("customers")
+                .child(phone)
                 .setValue(customerMap)
                 .addOnSuccessListener(aVoid -> {
+
                     Toast.makeText(this,
-                            isEditMode ? "Customer updated successfully" : "Customer saved successfully",
+                            isEditMode ? "Customer updated successfully" :
+                                    "Customer saved successfully",
                             Toast.LENGTH_SHORT).show();
+
                     finish();
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
                 })
                 .addOnFailureListener(e -> Toast.makeText(this,
-                        "Failed to save: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

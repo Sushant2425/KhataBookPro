@@ -81,7 +81,8 @@ public class ReportOptionsBottomSheet extends BottomSheetDialogFragment {
         
         RadioGroup rg = getView().findViewById(R.id.rg_date_options);
         int checkedId = rg.getCheckedRadioButtonId();
-        
+
+
         long startTimeValue;
         long endTimeValue;
         String dateRangeLabel;

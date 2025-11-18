@@ -26,6 +26,7 @@ public class CustomerHistoryAdapter extends RecyclerView.Adapter<CustomerHistory
         notifyDataSetChanged();
     }
 
+
     @NonNull
     @Override
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

@@ -43,6 +43,7 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     private SearchView searchView;
     private ImageView ivFilterButton, ivPdfReport;
 
+
     private List<CustomerSummary> allCustomerSummaries = new ArrayList<>();
     private List<CustomerSummary> displayedCustomerSummaries = new ArrayList<>();
     private CustomerSummaryAdapter adapter;

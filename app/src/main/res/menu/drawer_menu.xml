@@ -5,6 +5,7 @@
         <!-- Main Sections (optional: highlight active) -->
         <item
             android:id="@+id/nav_dashboard"
+
             android:icon="@drawable/ic_dashboard"
             android:title="@string/dashboard" />
 

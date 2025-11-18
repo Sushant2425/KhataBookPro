@@ -33,6 +33,7 @@ public class CustomerListFragment extends Fragment {
     private RecyclerView rvCustomerList;
     private FloatingActionButton fabExportAll;
     private DatabaseReference customerRef, transRef;
+
     private List<CustomerSummary> customerSummaries = new ArrayList<>();
     private CustomerBalanceAdapter adapter;
 

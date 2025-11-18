@@ -15,15 +15,15 @@
         <!-- AppBar with Toolbar -->
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:background="@drawable/background_receipt_header"
             android:layout_height="wrap_content"
+            android:background="@drawable/dashboard_header_background"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@drawable/background_receipt_header"
+                android:background="@drawable/dashboard_header_background"
                 app:titleTextColor="@android:color/white"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 

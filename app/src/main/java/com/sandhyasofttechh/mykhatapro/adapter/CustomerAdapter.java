@@ -247,6 +247,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ViewHo
         TextView tvName, tvPhone, tvPending;
         MaterialButton btnEdit, btnDelete, btnWhatsApp, btnSms;
 
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tv_customer_name);
