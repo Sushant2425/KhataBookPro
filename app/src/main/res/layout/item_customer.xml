@@ -1,187 +1,52 @@
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<androidx.cardview.widget.CardView-->
-<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="wrap_content"-->
-<!--    android:layout_marginHorizontal="@dimen/margin_small"-->
-<!--    android:layout_marginVertical="@dimen/margin_xsmall"-->
-<!--    app:cardCornerRadius="@dimen/card_corner_radius"-->
-<!--    app:cardElevation="@dimen/card_elevation"-->
-<!--    app:cardBackgroundColor="@android:color/white"-->
-<!--    android:clickable="true"-->
-<!--    android:focusable="true"-->
-<!--    android:foreground="?android:attr/selectableItemBackground">-->
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="vertical"-->
-<!--        android:padding="@dimen/padding_large">-->
-
-<!--        &lt;!&ndash; Name &ndash;&gt;-->
-<!--        <TextView-->
-<!--            android:id="@+id/tv_customer_name"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="John Doe"-->
-<!--            android:textSize="17sp"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textColor="@color/text_primary" />-->
-
-<!--        &lt;!&ndash; Phone &ndash;&gt;-->
-<!--        <TextView-->
-<!--            android:id="@+id/tv_customer_phone"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="+91 98765 43210"-->
-<!--            android:textSize="14sp"-->
-<!--            android:textColor="@color/text_secondary"-->
-<!--            android:layout_marginTop="4dp" />-->
-
-<!--        &lt;!&ndash; Action Buttons &ndash;&gt;-->
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:layout_marginTop="12dp"-->
-<!--            android:layout_gravity="end">-->
-
-<!--            <com.google.android.material.button.MaterialButton-->
-<!--                android:id="@+id/btn_edit_customer"-->
-<!--                style="@style/Widget.Material3.Button.IconButton"-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                app:icon="@drawable/ic_edit"-->
-<!--                app:iconTint="@color/primary"-->
-<!--                app:iconSize="20dp"-->
-<!--                android:contentDescription="Edit" />-->
-
-<!--            <com.google.android.material.button.MaterialButton-->
-<!--                android:id="@+id/btn_delete_customer"-->
-<!--                style="@style/Widget.Material3.Button.IconButton"-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                app:icon="@drawable/ic_delete"-->
-<!--                app:iconTint="@color/error"-->
-<!--                app:iconSize="20dp"-->
-<!--                android:contentDescription="Delete" />-->
-
-<!--        </LinearLayout>-->
-
-<!--    </LinearLayout>-->
-<!--</androidx.cardview.widget.CardView>-->
-
-<androidx.cardview.widget.CardView
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-
-    android:layout_marginHorizontal="@dimen/margin_small"
-    android:layout_marginVertical="@dimen/margin_xsmall"
-    app:cardCornerRadius="@dimen/card_corner_radius"
-    app:cardElevation="@dimen/card_elevation"
-    app:cardBackgroundColor="@android:color/white"
+    android:layout_height="56dp"
+    android:paddingHorizontal="16dp"
     android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:background="@drawable/edittext_bg"
+    android:layout_margin="2.5dp"
+    android:focusable="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Person icon at start -->
+    <ImageView
+        android:id="@+id/iv_person_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_person"
+        android:tint="@color/icon_tint"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Customer name -->
+    <TextView
+        android:id="@+id/tv_customer_name"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/padding_large">
+        android:text="Customer Name"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/iv_person_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/iv_forward_icon"
+        app:layout_constraintVertical_bias="0.5" />
 
-        <!-- Name -->
-        <TextView
-            android:id="@+id/tv_customer_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="John Doe"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary" />
+    <!-- Forward arrow icon at end -->
+    <ImageView
+        android:id="@+id/iv_forward_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/img_1"
+        android:tint="@color/icon_tint"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Phone -->
-        <TextView
-            android:id="@+id/tv_customer_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+91 98765 43210"
-            android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            android:layout_marginTop="4dp" />
-
-        <!-- Pending Amount -->
-        <TextView
-            android:id="@+id/tv_pending_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="₹500.00 due"
-            android:textSize="14sp"
-            android:textColor="@color/error"
-            android:layout_marginTop="4dp"
-            android:visibility="gone" />
-
-        <!-- Action Buttons -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="12dp"
-            android:layout_gravity="end">
-
-            <!-- WHATSAPP ICON -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_whatsapp"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:icon="@drawable/ic_whatsapp"
-                app:iconTint="#25D366"
-                app:iconSize="20dp"
-                android:contentDescription="WhatsApp Reminder"
-                android:visibility="gone" />
-
-            <!-- SMS ICON -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_sms"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                app:icon="@drawable/ic_sms"
-                app:iconTint="@color/secondary"
-                app:iconSize="20dp"
-                android:contentDescription="SMS Reminder"
-                android:visibility="gone" />
-
-            <!-- EDIT -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_edit_customer"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                app:icon="@drawable/ic_edit"
-                app:iconTint="@color/primary"
-                app:iconSize="20dp"
-                android:contentDescription="Edit" />
-
-            <!-- DELETE -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_delete_customer"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                app:icon="@drawable/ic_delete"
-                app:iconTint="@color/error"
-                app:iconSize="20dp"
-                android:contentDescription="Delete" />
-
-        </LinearLayout>
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
