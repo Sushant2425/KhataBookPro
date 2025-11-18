@@ -56,5 +56,12 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="TabButtonStyle" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:paddingHorizontal">22dp</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 
 </resources>
