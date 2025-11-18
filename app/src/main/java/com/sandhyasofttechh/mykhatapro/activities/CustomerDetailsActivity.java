@@ -135,25 +135,31 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
                 Toast.makeText(this, "WhatsApp not installed or number invalid.", Toast.LENGTH_LONG).show();
             }
         }
-    }    private void sendSms() {
+    }
+
+    private void sendSms() {
         String statusMessage;
-        if (netBalance > 0) { // Customer owes you money
+        if (netBalance > 0) {
             statusMessage = String.format(Locale.getDefault(), "A friendly reminder that you have a pending payment of ₹%.2f.", netBalance);
-        } else if (netBalance < 0) { // You owe the customer money
+        } else if (netBalance < 0) {
             statusMessage = String.format(Locale.getDefault(), "A confirmation that I have a pending payment to you of ₹%.2f.", Math.abs(netBalance));
         } else {
             statusMessage = "Just to confirm, our account is settled.";
         }
-        
-        String finalMessage = "Hello " + customerName + ", " + statusMessage + " Thank you. - " + getString(R.string.app_name);
-        
-        // **CORRECT IMPLEMENTATION**: This opens the specific chat directly.
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("sms:" + customerPhone));
-        intent.putExtra("sms_body", finalMessage);
-        startActivity(intent);
+
+        String finalMessage = "Hello " + customerName + ", " + statusMessage + " Thank you! - " + getString(R.string.app_name);
+
+        String phone = customerPhone.replaceAll("[^\\d+]", "");
+        if (phone.startsWith("+")) phone = phone.substring(1);
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phone));
+            intent.putExtra("sms_body", finalMessage);
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "No SMS app found", Toast.LENGTH_SHORT).show();
+        }
     }
-    
     @Override
     public void onReportGenerated(List<Transaction> transactions, String dateRangeLabel) {
         if (transactions.isEmpty()) {
