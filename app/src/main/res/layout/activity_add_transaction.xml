@@ -5,10 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".activities.AddTransactionActivity">
 
-    android:background="?attr/colorSurface">
-
-    <!-- Professional Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -25,16 +24,35 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Scrollable Form Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:padding="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="wrap_content">
+
+            <!-- Date -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_date"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Date"
+                app:startIconDrawable="@drawable/ic_calendar"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Customer Selection -->
             <com.google.android.material.textfield.TextInputLayout
@@ -44,7 +62,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Select Customer"
                 app:startIconDrawable="@drawable/ic_person"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_date"
+                android:layout_marginTop="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
@@ -52,47 +71,28 @@
                     android:id="@+id/auto_customer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+                    android:inputType="none"
+                    android:imeOptions="actionDone" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Amount -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_amount"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Amount"
-                app:startIconDrawable="@drawable/ic_rupee"
-                app:layout_constraintTop_toBottomOf="@id/layout_customer"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_amount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Modern Transaction Type Toggle -->
+            <!-- Transaction Type Label -->
             <TextView
                 android:id="@+id/tv_type_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Transaction Type"
                 android:layout_marginTop="24dp"
-                style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                app:layout_constraintTop_toBottomOf="@id/layout_amount"
-                app:layout_constraintStart_toStartOf="parent"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:layout_constraintTop_toBottomOf="@id/layout_customer"
+                app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- Transaction Type Toggle -->
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/toggle_button_group"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:singleSelection="true"
-                app:checkedButton="@id/btn_gave"
                 app:layout_constraintTop_toBottomOf="@id/tv_type_label"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
@@ -114,72 +114,94 @@
                     android:text="You Get" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
-            <!-- Date -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_date"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <!-- Fields container to show/hide -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/container_fields"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Date"
-                app:startIconDrawable="@drawable/ic_calendar"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/toggle_button_group"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:clickable="true" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Note -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_note"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Note (optional)"
-                app:layout_constraintTop_toBottomOf="@id/layout_date"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_note"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textCapSentences" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- SMS Checkbox -->
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/checkbox_send_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Send SMS notification"
-                android:checked="true"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/layout_note"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <!-- Save Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_save"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Save Transaction"
-                android:paddingVertical="14dp"
-                android:layout_marginTop="32dp"
-                app:icon="@drawable/ic_save"
-                app:iconGravity="textStart"
-                app:layout_constraintTop_toBottomOf="@id/checkbox_send_message"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:layout_marginTop="16dp">
+
+                <!-- Amount -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout_amount"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Amount"
+                    app:startIconDrawable="@drawable/ic_rupee"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_amount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Note -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout_note"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Note (optional)"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_amount"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_note"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Send SMS Checkbox -->
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/checkbox_send_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Send SMS notification"
+                    android:checked="true"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/layout_note"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- Attach File Button -->
+                <Button
+                    android:id="@+id/btn_attach_file"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Attach File/Photo"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/checkbox_send_message"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <!-- Save Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_save"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Save Transaction"
+                    android:layout_marginTop="32dp"
+                    android:paddingVertical="14dp"
+                    app:icon="@drawable/ic_save"
+                    app:iconGravity="textStart"
+                    app:layout_constraintTop_toBottomOf="@id/btn_attach_file"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

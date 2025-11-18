@@ -2,14 +2,19 @@ package com.sandhyasofttechh.mykhatapro.activities;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.telephony.SmsManager;
+import android.text.TextUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -45,6 +51,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     private TextInputLayout layoutCustomer;
     private MaterialButtonToggleGroup toggleButtonGroup;
     private MaterialButton btnSave;
+    private MaterialCheckBox checkboxSendMessage;
+    private Button btnAttachFile;
+
+    private androidx.constraintlayout.widget.ConstraintLayout containerFields;
 
     private PrefManager prefManager;
     private DatabaseReference transactionsRef;
@@ -58,6 +68,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
     private static final int SMS_PERMISSION_CODE = 101;
+    private static final int PICK_IMAGE_REQUEST_CODE = 201;
+    private static final int PICK_FILE_REQUEST_CODE = 202;
+
+    private Uri attachedFileUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +92,19 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         checkSmsPermission();
 
+        // Show/hide fields container based on toggle selection
+        toggleButtonGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                containerFields.setVisibility(android.view.View.VISIBLE);
+            } else {
+                containerFields.setVisibility(android.view.View.GONE);
+            }
+        });
+
+        etDate.setOnClickListener(v -> showDatePicker());
+
+        btnAttachFile.setOnClickListener(v -> showFilePickerOptions());
+
         btnSave.setOnClickListener(v -> saveTransaction());
     }
 
@@ -89,8 +116,10 @@ public class AddTransactionActivity extends AppCompatActivity {
         layoutCustomer = findViewById(R.id.layout_customer);
         toggleButtonGroup = findViewById(R.id.toggle_button_group);
         btnSave = findViewById(R.id.btn_save);
+        checkboxSendMessage = findViewById(R.id.checkbox_send_message);
+        btnAttachFile = findViewById(R.id.btn_attach_file);
+        containerFields = findViewById(R.id.container_fields);
 
-        etDate.setOnClickListener(v -> showDatePicker());
         etDate.setText(dateFormat.format(calendar.getTime()));
 
         customerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, customerNames);
@@ -101,11 +130,6 @@ public class AddTransactionActivity extends AppCompatActivity {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override public void afterTextChanged(Editable s) {}
-        });
-
-        autoCustomer.setOnItemClickListener((parent, view, position, id) -> {
-            String name = (String) parent.getItemAtPosition(position);
-            // Optionally set phone/name logic if you want real-time fetching
         });
     }
 
@@ -137,7 +161,6 @@ public class AddTransactionActivity extends AppCompatActivity {
                             }
                         }
                         customerAdapter.notifyDataSetChanged();
-                        // If editing, set the customer after the list is loaded
                         if (editTransaction != null) {
                             autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
                         }
@@ -156,7 +179,8 @@ public class AddTransactionActivity extends AppCompatActivity {
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)).show();
+                calendar.get(Calendar.DAY_OF_MONTH)
+        ).show();
     }
 
     private void handleIntent() {
@@ -165,9 +189,9 @@ public class AddTransactionActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Edit Transaction");
             btnSave.setText("Update");
 
+            etDate.setText(editTransaction.getDate());
             etAmount.setText(String.valueOf(editTransaction.getAmount()));
             etNote.setText(editTransaction.getNote());
-            etDate.setText(editTransaction.getDate());
 
             autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
             autoCustomer.setEnabled(false);
@@ -177,8 +201,10 @@ public class AddTransactionActivity extends AppCompatActivity {
             } else {
                 toggleButtonGroup.check(R.id.btn_got);
             }
+            containerFields.setVisibility(android.view.View.VISIBLE);
         } else {
             getSupportActionBar().setTitle("Add Transaction");
+            containerFields.setVisibility(android.view.View.GONE);
         }
     }
 
@@ -187,8 +213,14 @@ public class AddTransactionActivity extends AppCompatActivity {
         String note = etNote.getText().toString().trim();
         String date = etDate.getText().toString();
         String customerInfo = autoCustomer.getText().toString();
+        boolean sendSms = checkboxSendMessage.isChecked();
 
-        if (amountStr.isEmpty()) {
+        if (toggleButtonGroup.getCheckedButtonId() == -1) {
+            Toast.makeText(this, "Please select 'You Give' or 'You Get'", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(amountStr)) {
             etAmount.setError("Enter amount");
             return;
         }
@@ -208,7 +240,7 @@ public class AddTransactionActivity extends AppCompatActivity {
             selectedPhone = editTransaction.getCustomerPhone();
             selectedName = editTransaction.getCustomerName();
         } else {
-            if (customerInfo.isEmpty() || !customerInfo.contains("(")) {
+            if (TextUtils.isEmpty(customerInfo) || !customerInfo.contains("(")) {
                 layoutCustomer.setError("Select a customer");
                 return;
             }
@@ -229,10 +261,13 @@ public class AddTransactionActivity extends AppCompatActivity {
         transaction.setNote(note);
         transaction.setDate(date);
         transaction.setTimestamp(System.currentTimeMillis());
+        // TODO: Add support for attachedFileUri to upload & save file URL as needed
 
         transactionsRef.child(selectedPhone).child(idToSave).setValue(transaction)
                 .addOnSuccessListener(aVoid -> {
-                    sendTransactionSms(selectedPhone, selectedName, amount, isGave, date);
+                    if (sendSms) {
+                        calculateBalanceAndSendSms(selectedPhone, selectedName, amount, isGave, date);
+                    }
                     finishWithSuccess(editTransaction != null ? "Updated" : "Saved");
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
@@ -244,7 +279,6 @@ public class AddTransactionActivity extends AppCompatActivity {
         finish();
     }
 
-    // SMS PERMISSION SUPPORT
     private void checkSmsPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -255,7 +289,10 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == SMS_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -266,21 +303,97 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
     }
 
-    // SMS SENDING METHOD
-    private void sendTransactionSms(String phone, String name, double amount, boolean isGave, String date) {
-        String msg;
-        if (isGave) {
-            msg = "Dear " + name + ", ₹" + amount + " has been lent to you on " + date + ". Please confirm receipt. - MyKhataPro";
-        } else {
-            msg = "Dear " + name + ", ₹" + amount + " has been received from you on " + date + ". Thank you! - MyKhataPro";
-        }
+    private void calculateBalanceAndSendSms(String phone, String name, double amount, boolean isGave, String date) {
+        transactionsRef.child(phone).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double totalGave = 0;
+                double totalGot = 0;
+
+                for (DataSnapshot txSnapshot : snapshot.getChildren()) {
+                    Transaction tx = txSnapshot.getValue(Transaction.class);
+                    if (tx != null) {
+                        if ("gave".equals(tx.getType())) {
+                            totalGave += tx.getAmount();
+                        } else if ("got".equals(tx.getType())) {
+                            totalGot += tx.getAmount();
+                        }
+                    }
+                }
+
+                double balance = totalGot - totalGave;
+
+                String txnType = isGave ? "debit" : "credit";
+                String msg = "Dear " + name + ", your account has been " + txnType + "ed by ₹" + amount +
+                        " on " + date + ". Current balance: ₹" + balance + ". - MyKhataPro";
+
+                sendSms(phone, msg);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AddTransactionActivity.this, "Failed to fetch transactions for balance", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void sendSms(String phone, String msg) {
         try {
             SmsManager smsManager = SmsManager.getDefault();
             ArrayList<String> parts = smsManager.divideMessage(msg);
             smsManager.sendMultipartTextMessage(phone, null, parts, null, null);
-            Toast.makeText(this, "SMS sent to " + name, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "SMS sent.", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, "SMS failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to send SMS: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showFilePickerOptions() {
+        String[] options = {"Camera", "Gallery"};
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle("Select option");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                // Camera
+                openCamera();
+            } else if (which == 1) {
+                // Gallery
+                openGallery();
+            }
+        });
+        builder.show();
+    }
+
+    private void openCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, PICK_IMAGE_REQUEST_CODE);
+        }
+    }
+
+    private void openGallery() {
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto, PICK_FILE_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PICK_FILE_REQUEST_CODE) {
+                if (data != null) {
+                    attachedFileUri = data.getData();
+                    Toast.makeText(this, "File selected: " + attachedFileUri.getLastPathSegment(), Toast.LENGTH_SHORT).show();
+                    // TODO: Upload or handle file URI
+                }
+            } else if (requestCode == PICK_IMAGE_REQUEST_CODE) {
+                if (data != null && data.getExtras() != null) {
+                    // Get bitmap or URI from camera data
+                    // For simplicity just notify user here, extend as needed
+                    Toast.makeText(this, "Photo captured", Toast.LENGTH_SHORT).show();
+                    // TODO: Save photo bitmap or URI and upload or handle accordingly
+                }
+            }
         }
     }
 
