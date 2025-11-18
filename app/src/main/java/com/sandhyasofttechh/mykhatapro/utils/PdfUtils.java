@@ -24,7 +24,6 @@ import java.util.Locale;
 public class PdfUtils {
 
     private final PdfDocument document;
-
     private final Context context;
     private int pageNumber = 0;
 
@@ -113,7 +112,9 @@ public class PdfUtils {
             document.close();
 
             Uri uri = FileProvider.getUriForFile(context,
-                    context.getPackageName() + ".provider", pdfFile);
+                    context.getPackageName() + ".fileprovider", pdfFile);
+
+
 
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(uri, "application/pdf");
