@@ -71,45 +71,71 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
     }
 
     private void sendWhatsAppMessage() {
+        // Generate the balance image
         String appName = getString(R.string.app_name);
         File imageFile = ImageGenerator.generateShareableImage(this, customerName, netBalance, appName);
-        if (imageFile == null) {
-            Toast.makeText(this, "Failed to create shareable image.", Toast.LENGTH_SHORT).show();
+        if (imageFile == null || !imageFile.exists()) {
+            Toast.makeText(this, "Failed to create image.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Uri imageUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", imageFile);
+        Uri imageUri = FileProvider.getUriForFile(
+                this,
+                getApplicationContext().getPackageName() + ".fileprovider",
+                imageFile
+        );
 
-        String finalMessage;
+        // Clean & format phone number properly
+        String phone = customerPhone.replaceAll("[^\\d+]", "");
+        if (phone.startsWith("+")) phone = phone.substring(1);
+        if (!phone.startsWith("91") && phone.length() == 10) {
+            phone = "91" + phone;
+        }
+        if (phone.length() < 10) {
+            Toast.makeText(this, "Invalid phone number", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Build message
+        String message;
         if (netBalance > 0) {
-            finalMessage = "Hello " + customerName + ",\nThis is a friendly reminder for your pending payment. Thank you!";
+            message = "Hello " + customerName + ",\nThis is a friendly reminder for your pending payment of ₹" +
+                    String.format(Locale.getDefault(), "%.2f", netBalance) + ".\nThank you!";
         } else if (netBalance < 0) {
-            finalMessage = "Hello " + customerName + ",\nThis is a confirmation of my pending payment to you. Thank you!";
+            message = "Hello " + customerName + ",\nThis is a confirmation that I have a pending payment to you of ₹" +
+                    String.format(Locale.getDefault(), "%.2f", Math.abs(netBalance)) + ".\nThank you!";
         } else {
-            finalMessage = "Hello " + customerName + ",\nJust to confirm, our account is currently settled. Thank you for your business!";
+            message = "Hello " + customerName + ",\nJust to confirm, our account is currently settled. Thank you!";
         }
 
         try {
-            // Format WhatsApp contact JID (phone number must be in international format without + or 00 prefix)
-            String phoneWithCountryCode = customerPhone; // Make sure this is in correct format e.g. "919876543210"
-            String jid = phoneWithCountryCode + "@s.whatsapp.net";
-
+            // METHOD: Use WhatsApp's official direct send intent (BEST & MOST RELIABLE)
             Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("image/png");
+            intent.setType("image/*");
+            intent.setPackage("com.whatsapp");  // Only open official WhatsApp
+
             intent.putExtra(Intent.EXTRA_STREAM, imageUri);
-            intent.putExtra(Intent.EXTRA_TEXT, finalMessage);
-            intent.putExtra("jid", jid); // WhatsApp expects this exact extra for direct chat
-            intent.setPackage("com.whatsapp");
+            intent.putExtra(Intent.EXTRA_TEXT, message);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // This forces direct chat (magic line)
+            intent.putExtra("jid", phone + "@s.whatsapp.net");
 
             startActivity(intent);
 
         } catch (Exception e) {
-            Toast.makeText(this, "WhatsApp not installed or error opening chat.", Toast.LENGTH_LONG).show();
+            // Fallback if above fails (very rare)
+            try {
+                String url = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + Uri.encode(message);
+                Intent fallbackIntent = new Intent(Intent.ACTION_VIEW);
+                fallbackIntent.setData(Uri.parse(url));
+                fallbackIntent.setPackage("com.whatsapp");
+                startActivity(fallbackIntent);
+            } catch (Exception ex) {
+                Toast.makeText(this, "WhatsApp not installed or number invalid.", Toast.LENGTH_LONG).show();
+            }
         }
-    }
-    
-    private void sendSms() {
+    }    private void sendSms() {
         String statusMessage;
         if (netBalance > 0) { // Customer owes you money
             statusMessage = String.format(Locale.getDefault(), "A friendly reminder that you have a pending payment of ₹%.2f.", netBalance);
