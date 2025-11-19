@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,11 +16,12 @@ import com.sandhyasofttechh.mykhatapro.activities.RecycleBinActivity;
 import com.sandhyasofttechh.mykhatapro.activities.AboutUsActivity;
 import com.sandhyasofttechh.mykhatapro.activities.HelpAndSupportActivity;
 import com.sandhyasofttechh.mykhatapro.activities.AppLockActivity;
+import com.sandhyasofttechh.mykhatapro.activities.SmsSettingsActivity;
 
 public class SettingsFragment extends Fragment {
 
-    private TextView optChangePassword, optSmsSettings, optPaymentSettings;
-    private TextView optRecycleBin, optAppLock, optHelpSupport, optAboutApp, optAboutUs;
+    private LinearLayout optChangePassword, optSmsSettings, optPaymentSettings;
+    private LinearLayout optRecycleBin, optAppLock, optHelpSupport, optAboutApp, optAboutUs;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -29,13 +30,12 @@ public class SettingsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         initViews(view);
-        onClicks();
+        setClickListeners();
 
         return view;
     }
 
     private void initViews(View view) {
-
         optChangePassword = view.findViewById(R.id.opt_change_password);
         optSmsSettings = view.findViewById(R.id.opt_sms_settings);
         optPaymentSettings = view.findViewById(R.id.opt_payment_settings);
@@ -47,46 +47,39 @@ public class SettingsFragment extends Fragment {
         optAboutUs = view.findViewById(R.id.opt_about_us);
     }
 
-    private void onClicks() {
-
-        // Change Password
+    private void setClickListeners() {
         optChangePassword.setOnClickListener(v -> {
             startActivity(new Intent(requireContext(), ChangePasswordActivity.class));
         });
 
-        // Recycle Bin
+        optSmsSettings.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), SmsSettingsActivity.class));
+        });
+
+        optPaymentSettings.setOnClickListener(v -> {
+            // Uncomment and implement PaymentSettingsActivity when available
+           startActivity(new Intent(requireContext(), PaymentSettingsActivity.class));
+        });
+
         optRecycleBin.setOnClickListener(v -> {
             startActivity(new Intent(requireContext(), RecycleBinActivity.class));
         });
 
-        // About Us
-        optAboutUs.setOnClickListener(v -> {
-            startActivity(new Intent(requireContext(), AboutUsActivity.class));
-        });
-
-        // Help & Support
-        optHelpSupport.setOnClickListener(v -> {
-            startActivity(new Intent(requireContext(), HelpAndSupportActivity.class));
-        });
-
-        // App Lock (If available)
         optAppLock.setOnClickListener(v -> {
             startActivity(new Intent(requireContext(), AppLockActivity.class));
         });
 
-        // Optional: About App (if you have AboutAppActivity)
+        optHelpSupport.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), HelpAndSupportActivity.class));
+        });
+
         optAboutApp.setOnClickListener(v -> {
+            // Uncomment and implement AboutAppActivity when available
             // startActivity(new Intent(requireContext(), AboutAppActivity.class));
         });
 
-        // Optional SMS Settings
-        optSmsSettings.setOnClickListener(v -> {
-            // startActivity(new Intent(requireContext(), SmsSettingsActivity.class));
-        });
-
-        // Optional Payment Settings
-        optPaymentSettings.setOnClickListener(v -> {
-            // startActivity(new Intent(requireContext(), PaymentSettingsActivity.class));
+        optAboutUs.setOnClickListener(v -> {
+            startActivity(new Intent(requireContext(), AboutUsActivity.class));
         });
     }
 }
