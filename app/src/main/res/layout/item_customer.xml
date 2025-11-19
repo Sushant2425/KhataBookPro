@@ -6,6 +6,7 @@
     android:layout_height="56dp"
     android:paddingHorizontal="16dp"
     android:clickable="true"
+    android:fitsSystemWindows="true"
     android:background="@drawable/edittext_bg"
     android:layout_margin="2.5dp"
     android:focusable="true">
@@ -16,7 +17,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_person"
-        android:tint="@color/icon_tint"
+        app:tint="@color/icon_tint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

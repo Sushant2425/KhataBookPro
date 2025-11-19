@@ -4,7 +4,7 @@
     android:layout_height="180dp"
     android:background="@drawable/nav_header_gradient"
     android:orientation="vertical"
-
+    android:fitsSystemWindows="true"
     android:padding="@dimen/padding_large"
     android:gravity="bottom">
 
