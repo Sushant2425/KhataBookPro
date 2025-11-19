@@ -37,6 +37,9 @@
             android:name=".activities.RecycleBinActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.HelpAndSupportActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.AboutUsActivity"
             android:exported="false" />
         <activity
