@@ -145,6 +145,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.replace(R.id.fragment_container, existing, tag);
         tx.commit();
+
+        setToolbarTitle(tag);
+    }
+
+    private void setToolbarTitle(String tag) {
+        switch (tag) {
+            case TAG_DASHBOARD:
+                getSupportActionBar().setTitle("Dashboard");
+                break;
+            case TAG_CUSTOMERS:
+                getSupportActionBar().setTitle("Customers");
+                break;
+            case TAG_REPORTS:
+                getSupportActionBar().setTitle("Reports");
+                break;
+            case TAG_SETTINGS:
+                getSupportActionBar().setTitle("Settings");
+                break;
+            case TAG_PROFILE:
+                getSupportActionBar().setTitle("Profile");
+                break;
+            case TAG_ABOUT:
+                getSupportActionBar().setTitle("About");
+                break;
+            default:
+                getSupportActionBar().setTitle("MyKhata Pro");
+                break;
+        }
     }
 
     private void shareApp() {
