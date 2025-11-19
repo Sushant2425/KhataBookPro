@@ -35,8 +35,18 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-
+        <activity
+            android:name=".activities.RecycleBinActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AboutUsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.HelpSupportActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.CustomerDetailsActivity"
             android:exported="false" />

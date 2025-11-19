@@ -12,6 +12,8 @@ public class Transaction implements Serializable {
     private String note;
     private String date;
     private long timestamp;
+    private long deletedAt; // timestamp in milliseconds
+
 
     public Transaction() {}
 
@@ -39,4 +41,7 @@ public class Transaction implements Serializable {
 
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+
+    public long getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(long deletedAt) { this.deletedAt = deletedAt; }
 }

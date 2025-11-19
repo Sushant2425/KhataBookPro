@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -22,7 +21,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class EntryDetailsActivity extends AppCompatActivity implements DeleteConfirmationBottomSheet.DeleteConfirmationListener {
-
 
     private Transaction transaction;
     private String customerName;
@@ -47,7 +45,7 @@ public class EntryDetailsActivity extends AppCompatActivity implements DeleteCon
             finish();
             return;
         }
-        
+
         if (TextUtils.isEmpty(transaction.getCustomerName())) {
             transaction.setCustomerName(customerName);
         }
@@ -63,17 +61,17 @@ public class EntryDetailsActivity extends AppCompatActivity implements DeleteCon
         TextView tvAmount = findViewById(R.id.tv_amount_receipt);
         TextView tvType = findViewById(R.id.tv_type_receipt);
         TextView tvSmsMessage = findViewById(R.id.tv_sms_message);
-        
+
         tvCustomerName.setText(transaction.getCustomerName());
-        
+
         Date date = new Date(transaction.getTimestamp());
         String formattedDate = sdfWithTime.format(date);
         tvDate.setText(formattedDate);
 
         if (TextUtils.isEmpty(transaction.getNote())) {
-            tvNote.setVisibility(View.GONE);
+            tvNote.setVisibility(TextView.GONE);
         } else {
-            tvNote.setVisibility(View.VISIBLE);
+            tvNote.setVisibility(TextView.VISIBLE);
             tvNote.setText("Note: " + transaction.getNote());
         }
 
@@ -91,11 +89,9 @@ public class EntryDetailsActivity extends AppCompatActivity implements DeleteCon
             tvAmount.setTextColor(ContextCompat.getColor(this, R.color.green));
         }
 
-        // Updated SMS Message with more details
         String smsText = "Hello " + transaction.getCustomerName() + ",\n" +
                 "A transaction of " + formattedAmount + " (" + (isGave ? "You Gave" : "You Got") + ") " +
-                "was recorded on " + formattedDate + ".\n\n" +
-                "Sent by " + getString(R.string.app_name) + ".";
+                "was recorded on " + formattedDate + ".\n\nSent by " + getString(R.string.app_name) + ".";
         tvSmsMessage.setText(smsText);
     }
 
@@ -125,21 +121,35 @@ public class EntryDetailsActivity extends AppCompatActivity implements DeleteCon
         });
     }
 
-    private void deleteTransaction() {
+    private void moveToRecycleBinAndDelete() {
         PrefManager prefManager = new PrefManager(this);
         String userNode = prefManager.getUserEmail().replace(".", ",");
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Khatabook")
+
+        DatabaseReference activeRef = FirebaseDatabase.getInstance()
+                .getReference("Khatabook")
                 .child(userNode)
                 .child("transactions")
                 .child(transaction.getCustomerPhone())
                 .child(transaction.getId());
 
-        dbRef.removeValue().addOnCompleteListener(task -> {
+        DatabaseReference recycleBinRef = FirebaseDatabase.getInstance()
+                .getReference("Khatabook")
+                .child(userNode)
+                .child("RecycleBin")
+                .child(transaction.getId());
+
+        recycleBinRef.setValue(transaction).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Toast.makeText(this, "Transaction deleted successfully", Toast.LENGTH_SHORT).show();
-                finish();
+                activeRef.removeValue().addOnCompleteListener(delTask -> {
+                    if (delTask.isSuccessful()) {
+                        Toast.makeText(this, "Transaction moved to Recycle Bin", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Failed to delete transaction", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
-                Toast.makeText(this, "Failed to delete transaction", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Failed to move transaction to Recycle Bin", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -155,6 +165,6 @@ public class EntryDetailsActivity extends AppCompatActivity implements DeleteCon
 
     @Override
     public void onDeleteConfirmed() {
-        deleteTransaction();
+        moveToRecycleBinAndDelete();
     }
 }
