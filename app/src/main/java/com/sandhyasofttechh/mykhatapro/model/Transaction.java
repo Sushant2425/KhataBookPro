@@ -8,6 +8,7 @@ public class Transaction implements Serializable {
     private String customerName;
     private double amount;
     private String type; // "gave" or "got"
+    private String attachedFileUrl;  // URL of uploaded image/file in Firebase Storage
 
     private String note;
     private String date;
@@ -44,4 +45,12 @@ public class Transaction implements Serializable {
 
     public long getDeletedAt() { return deletedAt; }
     public void setDeletedAt(long deletedAt) { this.deletedAt = deletedAt; }
+
+    public String getAttachedFileUrl() {
+        return attachedFileUrl;
+    }
+
+    public void setAttachedFileUrl(String attachedFileUrl) {
+        this.attachedFileUrl = attachedFileUrl;
+    }
 }

@@ -1,7 +1,9 @@
 package com.sandhyasofttechh.mykhatapro.register;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.*;
@@ -25,9 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBtn;
     private TextView registerTv, forgotPasswordTv;
     private ProgressBar progressBar;
-
     private FirebaseAuth mAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,11 +40,8 @@ public class LoginActivity extends AppCompatActivity {
 
         registerTv.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegistrationActivity.class)));
 
-        forgotPasswordTv.setOnClickListener(v ->
-                Toast.makeText(LoginActivity.this, "Forgot Password feature coming soon", Toast.LENGTH_SHORT).show()
-        );
+        forgotPasswordTv.setOnClickListener(v -> showForgotPasswordDialog());
     }
-
     private void initViews() {
         emailEt = findViewById(R.id.email_et);
         passwordEt = findViewById(R.id.password_et);
@@ -75,10 +72,8 @@ public class LoginActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null && user.isEmailVerified()) {
-                    // Replace '.' with ',' for Firebase key
                     String emailKey = email.replace(".", ",");
 
-                    // Reference to profile in database
                     DatabaseReference userRef = FirebaseDatabase.getInstance()
                             .getReference("Khatabook")
                             .child(emailKey)
@@ -89,19 +84,16 @@ public class LoginActivity extends AppCompatActivity {
                         public void onDataChange(DataSnapshot snapshot) {
                             toggleLoading(false);
                             if (snapshot.exists()) {
-                                // ✅ NEW: Check status field
                                 Boolean status = snapshot.child("status").getValue(Boolean.class);
                                 if (status != null && status) {
                                     String uid = snapshot.child("uid").getValue(String.class);
                                     String userEmail = snapshot.child("email").getValue(String.class);
-                                    String password = snapshot.child("password").getValue(String.class);
+                                    // Password from DB should be avoided ideally.
 
-                                    // Save in PrefManager
                                     PrefManager prefManager = new PrefManager(LoginActivity.this);
                                     prefManager.setLogin(true);
                                     prefManager.setUserEmail(userEmail);
 
-                                    // Navigate to MainActivity
                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                     finish();
                                 } else {
@@ -109,7 +101,6 @@ public class LoginActivity extends AppCompatActivity {
                                     FirebaseAuth.getInstance().signOut();
                                 }
                             } else {
-                                // User deleted from Firebase or database
                                 Toast.makeText(LoginActivity.this, "This account no longer exists.", Toast.LENGTH_LONG).show();
                                 FirebaseAuth.getInstance().signOut();
                             }
@@ -134,13 +125,56 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void showForgotPasswordDialog() {
+        final EditText emailInput = new EditText(this);
+        emailInput.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        emailInput.setHint("Enter your registered email");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Reset Password")
+                .setMessage("Please enter your registered email to receive password reset instructions.")
+                .setView(emailInput)
+                .setPositiveButton("Send", (dialog, which) -> {
+                    String email = emailInput.getText().toString().trim();
+                    if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        Toast.makeText(LoginActivity.this, "Enter a valid email address!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        sendPasswordResetEmail(email);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void sendPasswordResetEmail(String email) {
+        toggleLoading(true);
+
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(task -> {
+                    toggleLoading(false);
+                    if (task.isSuccessful()) {
+                        Toast.makeText(LoginActivity.this,
+                                "Password reset email sent. Check your inbox.",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        String errorMessage = "Failed to send reset email.";
+                        if (task.getException() != null) {
+                            errorMessage += " " + task.getException().getMessage();
+                        }
+                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
     private void toggleLoading(boolean isLoading) {
         if (isLoading) {
             progressBar.setVisibility(View.VISIBLE);
             loginBtn.setEnabled(false);
+            forgotPasswordTv.setEnabled(false);
         } else {
             progressBar.setVisibility(View.GONE);
             loginBtn.setEnabled(true);
+            forgotPasswordTv.setEnabled(true);
         }
     }
 }
