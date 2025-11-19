@@ -6,8 +6,6 @@
     <uses-permission android:name="android.permission.SEND_SMS" /> <!-- Permission to read call log -->
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
 
-
-
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
