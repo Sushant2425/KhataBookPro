@@ -134,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_about) {
 //            loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
         }
-
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }

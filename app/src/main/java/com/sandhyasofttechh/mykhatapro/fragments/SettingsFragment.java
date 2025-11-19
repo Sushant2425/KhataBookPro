@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import com.sandhyasofttechh.mykhatapro.R;
 import com.sandhyasofttechh.mykhatapro.activities.ChangePasswordActivity;
+import com.sandhyasofttechh.mykhatapro.activities.PaymentSettingsActivity;
 import com.sandhyasofttechh.mykhatapro.activities.RecycleBinActivity;
 import com.sandhyasofttechh.mykhatapro.activities.AboutUsActivity;
 import com.sandhyasofttechh.mykhatapro.activities.HelpAndSupportActivity;

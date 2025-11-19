@@ -1,73 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp"
-    android:fitsSystemWindows="true"
-    android:background="@color/bg_light">
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
 
-    <TextView
-        android:text="Reports"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:textColor="@color/text_dark"/>
-
-    <!-- Existing Customer Reports -->
     <LinearLayout
-        android:id="@+id/rowCustomerReports"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:src="@drawable/ic_person"
-            android:layout_width="32dp"
-            android:layout_height="32dp" />
-
+        <!-- Section Title -->
         <TextView
-            android:text="Customer Reports"
-            android:textSize="16sp"
+            android:id="@+id/tx_reports_title"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginStart="12dp"
+            android:textColor="@color/text_dark"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+          />
+
+        <!-- Customer Reports Row -->
+        <LinearLayout
+            android:id="@+id/rowCustomerReports"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:clickable="true"
+            android:background="@color/gray"
+            android:focusable="true"
+            android:layout_marginBottom="8dp"
+            android:elevation="2dp">
+
+            <ImageView
+                android:src="@drawable/custreport"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Customer Reports Icon"/>
+
+            <TextView
+                android:text="Customer Reports"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_dark"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- Customer List Row -->
+        <LinearLayout
+            android:id="@+id/rowCustomerList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@color/gray"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginBottom="8dp"
+            android:elevation="2dp"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:src="@drawable/custlist"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Customer List Icon"/>
+
+            <TextView
+                android:text="Customer List"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_dark"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- Additional categories can be added similarly -->
+
     </LinearLayout>
-
-    <!-- New Customer List row -->
-    <LinearLayout
-        android:id="@+id/rowCustomerList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_marginTop="8dp">
-
-        <ImageView
-            android:src="@drawable/ic_list"
-        android:layout_width="32dp"
-        android:layout_height="32dp" />
-
-        <TextView
-            android:text="Customer List"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginStart="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <!-- You can add more report categories below -->
-
-</LinearLayout>
+</ScrollView>
