@@ -1,14 +1,13 @@
 package com.sandhyasofttechh.mykhatapro.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -33,7 +32,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class CustomerDetailsActivity extends AppCompatActivity implements ReportOptionsBottomSheet.ReportListener, TransactionAdapter.OnItemClickListener {
+public class CustomerDetailsActivity extends AppCompatActivity
+        implements ReportOptionsBottomSheet.ReportListener, TransactionAdapter.OnItemClickListener {
 
     private String customerPhone, customerName;
     private List<Transaction> transactionList = new ArrayList<>();
@@ -57,21 +57,87 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
             return;
         }
 
-        Toolbar toolbar = findViewById(R.id.toolbar_details);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(customerName);
-
+        setupToolbar();
         tvTotalGave = findViewById(R.id.tv_total_gave);
         tvTotalGot = findViewById(R.id.tv_total_got);
-        
+
         setupRecyclerView();
         setupClickListeners();
         loadTransactions();
     }
 
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar_details);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(customerName);
+            getSupportActionBar().setSubtitle(formatPhoneNumber(customerPhone));
+        }
+    }
+
+    // Format phone number nicely: 98765 43210
+    private String formatPhoneNumber(String phone) {
+        String clean = phone.replaceAll("[^\\d]", "");
+        if (clean.startsWith("91") && clean.length() == 12) {
+            clean = clean.substring(2);
+        } else if (clean.startsWith("+91")) {
+            clean = clean.substring(3);
+        }
+        if (clean.length() == 10) {
+            return clean.substring(0, 5) + " " + clean.substring(5);
+        }
+        return phone;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_customer_details, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        } else if (item.getItemId() == R.id.action_edit_customer) {
+            editCustomer();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void editCustomer() {
+        Intent intent = new Intent(this, AddCustomerActivity.class);
+        intent.putExtra("EDIT_MODE", true);
+        intent.putExtra("CUSTOMER_PHONE", customerPhone);
+        intent.putExtra("CUSTOMER_NAME", customerName);
+        startActivity(intent);
+    }
+
+    // Refresh name & phone when user returns after editing
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Get updated values if passed back (optional: you can also re-fetch from DB)
+        String updatedName = getIntent().getStringExtra("UPDATED_CUSTOMER_NAME");
+        String updatedPhone = getIntent().getStringExtra("UPDATED_CUSTOMER_PHONE");
+
+        if (updatedName != null && updatedPhone != null) {
+            customerName = updatedName;
+            customerPhone = updatedPhone;
+
+            // Update toolbar
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(customerName);
+                getSupportActionBar().setSubtitle(formatPhoneNumber(customerPhone));
+            }
+        }
+    }
+
     private void sendWhatsAppMessage() {
-        // Generate the balance image
         String appName = getString(R.string.app_name);
         File imageFile = ImageGenerator.generateShareableImage(this, customerName, netBalance, appName);
         if (imageFile == null || !imageFile.exists()) {
@@ -85,7 +151,6 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
                 imageFile
         );
 
-        // Clean & format phone number properly
         String phone = customerPhone.replaceAll("[^\\d+]", "");
         if (phone.startsWith("+")) phone = phone.substring(1);
         if (!phone.startsWith("91") && phone.length() == 10) {
@@ -96,7 +161,6 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
             return;
         }
 
-        // Build message
         String message;
         if (netBalance > 0) {
             message = "Hello " + customerName + ",\nThis is a friendly reminder for your pending payment of ₹" +
@@ -109,28 +173,20 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         }
 
         try {
-            // METHOD: Use WhatsApp's official direct send intent (BEST & MOST RELIABLE)
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("image/*");
-            intent.setPackage("com.whatsapp");  // Only open official WhatsApp
-
+            intent.setPackage("com.whatsapp");
             intent.putExtra(Intent.EXTRA_STREAM, imageUri);
             intent.putExtra(Intent.EXTRA_TEXT, message);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            // This forces direct chat (magic line)
             intent.putExtra("jid", phone + "@s.whatsapp.net");
-
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(intent);
-
         } catch (Exception e) {
-            // Fallback if above fails (very rare)
             try {
                 String url = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + Uri.encode(message);
-                Intent fallbackIntent = new Intent(Intent.ACTION_VIEW);
-                fallbackIntent.setData(Uri.parse(url));
-                fallbackIntent.setPackage("com.whatsapp");
-                startActivity(fallbackIntent);
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                i.setPackage("com.whatsapp");
+                startActivity(i);
             } catch (Exception ex) {
                 Toast.makeText(this, "WhatsApp not installed or number invalid.", Toast.LENGTH_LONG).show();
             }
@@ -160,6 +216,7 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
             Toast.makeText(this, "No SMS app found", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public void onReportGenerated(List<Transaction> transactions, String dateRangeLabel) {
         if (transactions.isEmpty()) {
@@ -173,36 +230,36 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
             Toast.makeText(this, "Failed to generate PDF.", Toast.LENGTH_SHORT).show();
         }
     }
-    
+
     private void showPdfOptionsDialog(final File pdfFile) {
-        new AlertDialog.Builder(this)
-            .setTitle("Report Generated")
-            .setPositiveButton("Share", (dialog, which) -> sharePdfIntent(pdfFile))
-            .setNeutralButton("View", (dialog, which) -> viewPdfIntent(pdfFile))
-            .setNegativeButton("Dismiss", (dialog, which) -> dialog.dismiss())
-            .show();
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Report Generated")
+                .setPositiveButton("Share", (d, w) -> sharePdfIntent(pdfFile))
+                .setNeutralButton("View", (d, w) -> viewPdfIntent(pdfFile))
+                .setNegativeButton("Dismiss", null)
+                .show();
     }
-    
+
     private void viewPdfIntent(File pdfFile) {
-        Uri pdfUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", pdfFile);
+        Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(pdfUri, "application/pdf");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         try {
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(this, "No application available to view PDF.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No PDF viewer found", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void sharePdfIntent(File pdfFile) {
-        Uri pdfUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", pdfFile);
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("application/pdf");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Transaction Report for " + customerName);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(Intent.createChooser(shareIntent, "Share Report via..."));
+        Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("application/pdf");
+        intent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Report - " + customerName);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(intent, "Share PDF"));
     }
 
     private void updateSummary(double totalGave, double totalGot) {
@@ -211,8 +268,10 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         tvTotalGave.setText(String.format(Locale.getDefault(), "₹%.2f", totalGave));
         tvTotalGot.setText(String.format(Locale.getDefault(), "₹%.2f", totalGot));
         this.netBalance = totalGave - totalGot;
+
         String balanceText = String.format(Locale.getDefault(), "₹%.2f", Math.abs(netBalance));
         tvBalance.setText(balanceText);
+
         if (netBalance > 0) {
             tvLabel.setText("You will get");
             tvBalance.setTextColor(ContextCompat.getColor(this, R.color.red));
@@ -244,41 +303,43 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         findViewById(R.id.btn_sms).setOnClickListener(v -> sendSms());
         findViewById(R.id.btn_report).setOnClickListener(v -> {
             ReportOptionsBottomSheet bottomSheet = ReportOptionsBottomSheet.newInstance(transactionList);
-            bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+            bottomSheet.show(getSupportFragmentManager(), "ReportBottomSheet");
         });
     }
 
     private void loadTransactions() {
-        PrefManager prefManager = new PrefManager(this);
         String userNode = prefManager.getUserEmail().replace(".", ",");
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Khatabook").child(userNode).child("transactions").child(customerPhone);
+        DatabaseReference dbRef = FirebaseDatabase.getInstance()
+                .getReference("Khatabook")
+                .child(userNode)
+                .child("transactions")
+                .child(customerPhone);
+
         dbRef.addValueEventListener(new ValueEventListener() {
-            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 transactionList.clear();
                 double totalGave = 0, totalGot = 0;
+
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    Transaction transaction = ds.getValue(Transaction.class);
-                    if (transaction != null) {
-                        transactionList.add(transaction);
-                        if ("gave".equals(transaction.getType())) totalGave += transaction.getAmount();
-                        else totalGot += transaction.getAmount();
+                    Transaction t = ds.getValue(Transaction.class);
+                    if (t != null) {
+                        transactionList.add(t);
+                        if ("gave".equals(t.getType())) totalGave += t.getAmount();
+                        else totalGot += t.getAmount();
                     }
                 }
-                Collections.sort(transactionList, (t1, t2) -> Long.compare(t2.getTimestamp(), t1.getTimestamp()));
+
+                Collections.sort(transactionList, (a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
                 adapter.notifyDataSetChanged();
                 updateSummary(totalGave, totalGot);
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) { Toast.makeText(CustomerDetailsActivity.this, "Failed to load transactions.", Toast.LENGTH_SHORT).show(); }
-        });
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(CustomerDetailsActivity.this, "Failed to load data", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

@@ -64,6 +64,8 @@ public class AddCustomerActivity extends AppCompatActivity {
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar_add_customer);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Add Customer");
@@ -97,27 +99,73 @@ public class AddCustomerActivity extends AppCompatActivity {
     }
 
     // ------------------------ Handle Edit Mode -------------------------
+//    private void handleEditMode() {
+//        Intent intent = getIntent();
+//        if (intent != null && intent.hasExtra("edit_customer_name")) {
+//
+//            isEditMode = true;
+//
+//            etName.setText(intent.getStringExtra("edit_customer_name"));
+//            etPhone.setText(intent.getStringExtra("edit_customer_phone"));
+//            etPhone.setEnabled(false);
+//
+//            etEmail.setText(intent.getStringExtra("edit_customer_email"));
+//            etAddress.setText(intent.getStringExtra("edit_customer_address"));
+//
+//            btnSave.setText("Update Customer");
+//
+//        } else {
+//            btnSave.setText("Save Customer");
+//            etPhone.setEnabled(true);
+//        }
+//    }
+// ------------------------ Handle Edit Mode (UPDATED & FIXED) -------------------------
     private void handleEditMode() {
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("edit_customer_name")) {
 
+        // We are now using "EDIT_MODE" + standard keys from CustomerDetailsActivity
+        if (intent.getBooleanExtra("EDIT_MODE", false)) {
             isEditMode = true;
 
-            etName.setText(intent.getStringExtra("edit_customer_name"));
-            etPhone.setText(intent.getStringExtra("edit_customer_phone"));
-            etPhone.setEnabled(false);
+            String name = intent.getStringExtra("CUSTOMER_NAME");
+            String phone = intent.getStringExtra("CUSTOMER_PHONE");
+            String email = intent.getStringExtra("CUSTOMER_EMAIL");
+            String address = intent.getStringExtra("CUSTOMER_ADDRESS");
 
-            etEmail.setText(intent.getStringExtra("edit_customer_email"));
-            etAddress.setText(intent.getStringExtra("edit_customer_address"));
+            // Fill the fields safely
+            if (!TextUtils.isEmpty(name)) {
+                etName.setText(name);
+            }
 
+            if (!TextUtils.isEmpty(phone)) {
+                etPhone.setText(phone);
+                etPhone.setEnabled(false); // Phone is unique key, cannot change
+            }
+
+            if (!TextUtils.isEmpty(email)) {
+                etEmail.setText(email);
+            }
+
+            if (!TextUtils.isEmpty(address)) {
+                etAddress.setText(address);
+            }
+
+            // Change button & title
             btnSave.setText("Update Customer");
 
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Edit Customer");
+            }
+
         } else {
+            // Normal Add Mode
             btnSave.setText("Save Customer");
             etPhone.setEnabled(true);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Add Customer");
+            }
         }
     }
-
     // ------------------------ Click Listeners -------------------------
     private void setupClickListeners() {
 
@@ -378,6 +426,11 @@ public class AddCustomerActivity extends AppCompatActivity {
                             isEditMode ? "Customer updated successfully" :
                                     "Customer saved successfully",
                             Toast.LENGTH_SHORT).show();
+
+// 2. In saveCustomer() success block, add this before finish():
+                    Intent result = new Intent();
+                    result.putExtra("UPDATED_CUSTOMER_NAME", name);
+                    setResult(RESULT_OK, result);
 
                     finish();
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

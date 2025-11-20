@@ -193,30 +193,72 @@ public class AddTransactionActivity extends AppCompatActivity {
         ).show();
     }
 
-    private void handleIntent() {
-        editTransaction = (Transaction) getIntent().getSerializableExtra("EDIT_TRANSACTION");
-        if (editTransaction != null) {
-            getSupportActionBar().setTitle("Edit Transaction");
-            btnSave.setText("Update");
+//    private void handleIntent() {
+//        editTransaction = (Transaction) getIntent().getSerializableExtra("EDIT_TRANSACTION");
+//        if (editTransaction != null) {
+//            getSupportActionBar().setTitle("Edit Transaction");
+//            btnSave.setText("Update");
+//
+//            etDate.setText(editTransaction.getDate());
+//            etAmount.setText(String.valueOf(editTransaction.getAmount()));
+//            etNote.setText(editTransaction.getNote());
+//
+//            autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
+//            autoCustomer.setEnabled(false);
+//
+//            if ("gave".equals(editTransaction.getType())) {
+//                toggleButtonGroup.check(R.id.btn_gave);
+//            } else {
+//                toggleButtonGroup.check(R.id.btn_got);
+//            }
+//            containerFields.setVisibility(android.view.View.VISIBLE);
+//        } else {
+//            getSupportActionBar().setTitle("Add Transaction");
+//            containerFields.setVisibility(android.view.View.GONE);
+//        }
+//    }
+private void handleIntent() {
+    editTransaction = (Transaction) getIntent().getSerializableExtra("EDIT_TRANSACTION");
 
-            etDate.setText(editTransaction.getDate());
-            etAmount.setText(String.valueOf(editTransaction.getAmount()));
-            etNote.setText(editTransaction.getNote());
+    // Check for directly passed customer data to pre-fill the form for new transaction
+    String prefillCustomerPhone = getIntent().getStringExtra("edit_customer_phone");
+    String prefillCustomerName = getIntent().getStringExtra("edit_customer_name");
 
-            autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
-            autoCustomer.setEnabled(false);
+    if (editTransaction != null) {
+        getSupportActionBar().setTitle("Edit Transaction");
+        btnSave.setText("Update");
 
-            if ("gave".equals(editTransaction.getType())) {
-                toggleButtonGroup.check(R.id.btn_gave);
-            } else {
-                toggleButtonGroup.check(R.id.btn_got);
-            }
-            containerFields.setVisibility(android.view.View.VISIBLE);
+        // Existing edit setup ...
+        etDate.setText(editTransaction.getDate());
+        etAmount.setText(String.valueOf(editTransaction.getAmount()));
+        etNote.setText(editTransaction.getNote());
+
+        autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
+        autoCustomer.setEnabled(false);  // editing transaction, so disable changing customer
+
+        if ("gave".equals(editTransaction.getType())) {
+            toggleButtonGroup.check(R.id.btn_gave);
         } else {
-            getSupportActionBar().setTitle("Add Transaction");
-            containerFields.setVisibility(android.view.View.GONE);
+            toggleButtonGroup.check(R.id.btn_got);
         }
+        containerFields.setVisibility(android.view.View.VISIBLE);
+    } else if (prefillCustomerPhone != null && prefillCustomerName != null) {
+        // Pre-fill customer details for new transaction
+        getSupportActionBar().setTitle("Add Transaction");
+        btnSave.setText("Save Transaction");
+
+        autoCustomer.setText(prefillCustomerName + " (" + prefillCustomerPhone + ")");
+        containerFields.setVisibility(android.view.View.GONE);  // user must first select type
+
+        // Optionally disable editing customer if desired:
+        // autoCustomer.setEnabled(false);
+    } else {
+        getSupportActionBar().setTitle("Add Transaction");
+        btnSave.setText("Save Transaction");
+        containerFields.setVisibility(android.view.View.GONE);
+        autoCustomer.setEnabled(true);
     }
+}
 
     private void saveTransaction() {
         String amountStr = etAmount.getText().toString().trim();

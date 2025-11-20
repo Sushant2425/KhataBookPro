@@ -5,12 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="true"
     tools:context=".activities.CustomerDetailsActivity">
 
-    <!-- Professional App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,13 +17,14 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_details"
-            android:background="@drawable/dashboard_header_background"
             android:layout_width="match_parent"
-            app:navigationIconTint="@color/white"
             android:layout_height="?attr/actionBarSize"
-            app:titleTextColor="?attr/colorOnPrimary"/>
+            android:background="@drawable/dashboard_header_background"
+            app:navigationIconTint="@color/white"
+            app:titleTextColor="@color/white"
+            app:subtitleTextColor="@color/white" />
 
-        <!-- Header Content -->
+        <!-- Header Card with Balance -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,7 +50,7 @@
                     android:alpha="0.9"
                     android:gravity="start"
                     android:textColor="@color/black"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     tools:text="You will get" />
 
                 <TextView
@@ -64,12 +63,10 @@
                     tools:text="₹1,500.00" />
 
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
-
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Scrolling Content -->
+    <!-- Rest of your scrolling content remains SAME -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -77,11 +74,11 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:background="@color/white"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@color/white">
 
-            <!-- Action Icons -->
+            <!-- Action Buttons (Report, WhatsApp, SMS) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,17 +91,14 @@
                     android:background="@color/white"
                     android:orientation="horizontal"
                     android:padding="12dp">
-                    
+
                     <LinearLayout android:id="@+id/btn_report" style="@style/DetailsActionItem">
                         <ImageView style="@style/DetailsActionIcon" android:src="@drawable/pdf"/>
                         <TextView style="@style/DetailsActionLabel" android:text="Report"/>
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/btn_whatsapp"
-                        style="@style/DetailsActionItem">
-                        <ImageView style="@style/DetailsActionIcon"
-                            android:src="@drawable/whatsapp"/>
-                        <TextView style="@style/DetailsActionLabel"
-                            android:text="WhatsApp"/>
+                    <LinearLayout android:id="@+id/btn_whatsapp" style="@style/DetailsActionItem">
+                        <ImageView style="@style/DetailsActionIcon" android:src="@drawable/whatsapp"/>
+                        <TextView style="@style/DetailsActionLabel" android:text="WhatsApp"/>
                     </LinearLayout>
                     <LinearLayout android:id="@+id/btn_sms" style="@style/DetailsActionItem">
                         <ImageView style="@style/DetailsActionIcon" android:src="@drawable/ic_sms"/>
@@ -122,38 +116,23 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginBottom="8dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/DetailsSummaryCard">
-                    <LinearLayout style="@style/DetailsSummaryContent"
-                        android:background="@color/white">
-
-                        <TextView style="@style/DetailsSummaryLabel"
-                            android:text="Total You Give"
-                            android:textColor="@color/green"/>
-
-                        <TextView android:id="@+id/tv_total_got"
-                            style="@style/DetailsSummaryAmount"
-                            tools:text="₹5000.00"/>
+                <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
+                    <LinearLayout style="@style/DetailsSummaryContent" android:background="@color/white">
+                        <TextView style="@style/DetailsSummaryLabel" android:text="Total You Give" android:textColor="@color/green"/>
+                        <TextView android:id="@+id/tv_total_got" style="@style/DetailsSummaryAmount" tools:text="₹5000.00"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <View android:layout_width="12dp"
-                    android:layout_height="0dp"/>
 
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/DetailsSummaryCard">
-                    <LinearLayout style="@style/DetailsSummaryContent"
-                        android:background="@color/white">
-                        <TextView style="@style/DetailsSummaryLabel"
-                            android:text="Total You Get"
-                            android:textColor="@color/red"/>
-                        <TextView android:id="@+id/tv_total_gave"
-                            style="@style/DetailsSummaryAmount"
-                            tools:text="₹3500.00"/>
+                <View android:layout_width="12dp" android:layout_height="0dp"/>
+
+                <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
+                    <LinearLayout style="@style/DetailsSummaryContent" android:background="@color/white">
+                        <TextView style="@style/DetailsSummaryLabel" android:text="Total You Get" android:textColor="@color/red"/>
+                        <TextView android:id="@+id/tv_total_gave" style="@style/DetailsSummaryAmount" tools:text="₹3500.00"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Transaction List Header -->
             <TextView
                 style="@style/TextAppearance.MaterialComponents.Overline"
                 android:layout_width="wrap_content"
@@ -161,28 +140,25 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="6dp"
                 android:text="TRANSACTION HISTORY"/>
-            
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_customer_transactions"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@color/white"
                 android:padding="2dp"
-                android:layout_height="match_parent"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_transaction"/>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- FAB for adding transactions -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_specific_transaction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:backgroundTint="@color/primary_dark"
         android:layout_margin="16dp"
+        android:backgroundTint="@color/primary_dark"
         app:tint="@color/white"
         android:src="@drawable/ic_add"/>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
