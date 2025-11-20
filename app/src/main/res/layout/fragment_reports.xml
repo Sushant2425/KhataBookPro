@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
     android:background="@color/white"
     android:fitsSystemWindows="true">
 
@@ -14,13 +19,13 @@
         <!-- Section Title -->
         <TextView
             android:id="@+id/tx_reports_title"
-            android:textSize="22sp"
+            android:text="Reports"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/text_dark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-          />
+            android:layout_marginBottom="16dp"/>
 
         <!-- Customer Reports Row -->
         <LinearLayout
@@ -29,11 +34,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="16dp"
+            android:background="@drawable/bg_card_rounded"
             android:clickable="true"
-            android:background="@color/gray"
             android:focusable="true"
-            android:layout_marginBottom="8dp"
-            android:elevation="2dp">
+            android:layout_marginBottom="12dp"
+            android:elevation="4dp">
 
             <ImageView
                 android:src="@drawable/custreport"
@@ -46,7 +51,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_dark"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="16dp"
                 android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -59,12 +64,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="16dp"
-            android:background="@color/gray"
+            android:background="@drawable/bg_card_rounded"
             android:clickable="true"
             android:focusable="true"
-            android:layout_marginBottom="8dp"
-            android:elevation="2dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp">
 
             <ImageView
                 android:src="@drawable/custlist"
@@ -77,13 +81,96 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_dark"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="16dp"
                 android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- Additional categories can be added similarly -->
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"/>
+
+        <!-- Monthly Overview Section -->
+        <TextView
+            android:text="Monthly Overview"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barChartMonthly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Net Balance Trend Section -->
+        <TextView
+            android:text="Net Balance Trend"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/lineChartTrend"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Total Distribution Section -->
+        <TextView
+            android:text="Total Distribution"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="370dp"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChartGaveGot"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"/>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>
