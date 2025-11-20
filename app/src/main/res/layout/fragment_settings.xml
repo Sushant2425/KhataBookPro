@@ -436,7 +436,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="About Us"
+                        android:text="Backup Information"
                         android:textSize="15sp"
                         android:textColor="#2C3E50" />
 

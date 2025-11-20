@@ -24,4 +24,5 @@
     <string name="no_transactions_yet">No transactions yet</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_app_description">My Khata Pro is a simple, secure, and fast digital ledger app designed for small businesses, shopkeepers, and individuals to manage udhar (credit) and len-den (transactions) effortlessly.\n\nTrack who owes you, who you owe, send reminders via WhatsApp and SMS, generate PDF reports, and keep your accounts organized — all in one place.</string>
 </resources>

@@ -1,73 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll_view"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="@color/background"
-    android:fitsSystemWindows="true"
-    android:fillViewport="true">
+    android:background="@android:color/white">
 
-    <LinearLayout
+    <!-- Toolbar with Back Arrow -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="?attr/colorPrimary">
 
-        <!-- App Name -->
-        <TextView
-            android:id="@+id/tv_app_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="MyKhata Pro"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Backup Information"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="?attr/homeAsUpIndicator" />
 
-        <!-- Version -->
-        <TextView
-            android:id="@+id/tv_app_version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Version: 1.0"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="24dp"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Company Name -->
-        <TextView
-            android:id="@+id/tv_company_name"
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:padding="20dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sandhya Soft Tech"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginBottom="12dp"/>
+            android:orientation="vertical">
 
-        <!-- Description -->
-        <TextView
-            android:id="@+id/tv_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="We develop innovative Android applications..."
-            android:textSize="16sp"
-            android:textColor="@color/text_dark"
-            android:lineSpacingExtra="4dp"
-            android:layout_marginBottom="24dp"/>
 
-        <!-- Contact Info -->
-        <TextView
-            android:id="@+id/tv_contact_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Contact Us: \nPhone: +91 9527537131\nEmail: sandhyacomputer1@gmail.com\nWebsite: www.sandhyasofttechh.com"
-            android:textSize="16sp"
-            android:textColor="@color/text_dark"
-            android:lineSpacingExtra="4dp" />
 
-    </LinearLayout>
-</ScrollView>
+            <TextView
+                android:id="@+id/tv_app_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Version 1.0"
+                android:textColor="#666666"
+                android:visibility="gone"
+                android:textSize="16sp"
+                android:layout_marginBottom="32dp" />
+
+            <!-- Customer-Friendly Backup Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+
+                android:elevation="6dp">
+
+                <!-- Heading -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Data is 100% Safe"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Simple & Friendly Message -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your full Data is saved automatically.\nWhenever your phone gets internet, all customers and transactions are saved safely \nEven if you delete the app or change your phone — just login with the same number and your entire Data will come back.\nYou can use the app fully offline too — everything saves automatically when internet returns."
+                    android:textColor="#333333"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="8dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Last Saved -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Last Backup At"
+                    android:textSize="15sp"
+                    android:textColor="#555555"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_last_backup_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="#141414"
+                    android:layout_gravity="center_horizontal" />
+
+            </LinearLayout>
+
+            <!-- Company Info -->
+
+
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,52 +1,51 @@
 package com.sandhyasofttechh.mykhatapro.activities;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.widget.TextView;
-
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.appcompat.widget.Toolbar;
 import com.sandhyasofttechh.mykhatapro.R;
 
 public class AboutUsActivity extends AppCompatActivity {
 
-    private TextView tvAppName, tvAppVersion, tvCompanyName, tvDescription, tvContactInfo;
+    private TextView tvLastBackupTime;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about_us);
 
-        initViews();
-        setAppInfo();
-        setCompanyInfo();
-    }
-
-    private void initViews() {
-        tvAppName = findViewById(R.id.tv_app_name);
-        tvAppVersion = findViewById(R.id.tv_app_version);
-        tvCompanyName = findViewById(R.id.tv_company_name);
-        tvDescription = findViewById(R.id.tv_description);
-        tvContactInfo = findViewById(R.id.tv_contact_info);
-    }
-
-    private void setAppInfo() {
-        tvAppName.setText(getString(R.string.app_name));
-
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String version = pInfo.versionName;
-            tvAppVersion.setText("Version: " + version);
-        } catch (PackageManager.NameNotFoundException e) {
-            tvAppVersion.setText("Version: N/A");
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        tvLastBackupTime = findViewById(R.id.tv_last_backup_time);
+
+        showRealTimeNow(); // This will show current date & time immediately
     }
 
-    private void setCompanyInfo() {
-        tvCompanyName.setText("Sandhya Soft Tech");
-        tvDescription.setText("At Sandhya Soft Tech, we develop innovative, user-friendly Android applications focused on improving productivity and delivering seamless experiences. Our commitment to quality and continuous improvement drives everything we do.");
-        tvContactInfo.setText("Contact Us:\nPhone: +91 9527537131\nEmail: sandhyacomputer1@gmail.com\nWebsite: www.sandhyasofttechh.com");
+    private void showRealTimeNow() {
+        long currentTime = System.currentTimeMillis();
+
+        String date = DateFormat.format("dd MMM yyyy", currentTime).toString();
+        String time = DateFormat.format("hh:mm a", currentTime).toString();
+
+        tvLastBackupTime.setText(date + "\n" + time);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showRealTimeNow(); // Always shows latest time when you open the screen
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

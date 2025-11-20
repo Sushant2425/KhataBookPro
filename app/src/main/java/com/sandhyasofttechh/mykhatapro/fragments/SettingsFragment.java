@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.sandhyasofttechh.mykhatapro.R;
+import com.sandhyasofttechh.mykhatapro.activities.AboutAppActivity;
 import com.sandhyasofttechh.mykhatapro.activities.ChangePasswordActivity;
 import com.sandhyasofttechh.mykhatapro.activities.PaymentSettingsActivity;
 import com.sandhyasofttechh.mykhatapro.activities.RecycleBinActivity;
@@ -76,7 +77,7 @@ public class SettingsFragment extends Fragment {
 
         optAboutApp.setOnClickListener(v -> {
             // Uncomment and implement AboutAppActivity when available
-            // startActivity(new Intent(requireContext(), AboutAppActivity.class));
+             startActivity(new Intent(requireContext(), AboutAppActivity.class));
         });
 
         optAboutUs.setOnClickListener(v -> {
