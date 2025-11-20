@@ -4,7 +4,9 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.telephony.SmsManager;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -71,6 +74,9 @@ public class AddTransactionActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST_CODE = 201;
     private static final int PICK_FILE_REQUEST_CODE = 202;
 
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 300;
+    private static final int REQUEST_CODE_PICK_CONTACT = 301;
+
     private Uri attachedFileUri = null;
 
     @Override
@@ -92,16 +98,20 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         checkSmsPermission();
 
-        // Show/hide fields container based on toggle selection
         toggleButtonGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (isChecked) {
-                containerFields.setVisibility(android.view.View.VISIBLE);
-            } else {
-                containerFields.setVisibility(android.view.View.GONE);
-            }
+            containerFields.setVisibility(isChecked ? android.view.View.VISIBLE : android.view.View.GONE);
         });
 
         etDate.setOnClickListener(v -> showDatePicker());
+
+        // Setup contact picker on end icon of customer input
+        layoutCustomer.setEndIconOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+            } else {
+                openContactPicker();
+            }
+        });
 
         btnAttachFile.setOnClickListener(v -> showFilePickerOptions());
 
@@ -261,38 +271,37 @@ public class AddTransactionActivity extends AppCompatActivity {
         transaction.setNote(note);
         transaction.setDate(date);
         transaction.setTimestamp(System.currentTimeMillis());
-        // TODO: Add support for attachedFileUri to upload & save file URL as needed
 
         transactionsRef.child(selectedPhone).child(idToSave).setValue(transaction)
                 .addOnSuccessListener(aVoid -> {
                     if (sendSms) {
                         calculateBalanceAndSendSms(selectedPhone, selectedName, amount, isGave, date);
                     }
-                    finishWithSuccess(editTransaction != null ? "Updated" : "Saved");
+                    // Launch success animation screen
+                    Intent intent = new Intent(this, TransactionSuccessActivity.class);
+                    intent.putExtra(TransactionSuccessActivity.EXTRA_AMOUNT, amount);
+                    intent.putExtra(TransactionSuccessActivity.EXTRA_CUSTOMER, selectedName);
+                    startActivity(intent);
+                    finish();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
-    private void finishWithSuccess(String msg) {
+        private void finishWithSuccess(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
     }
 
     private void checkSmsPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.SEND_SMS},
-                    SMS_PERMISSION_CODE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
         }
     }
 
+    // Permissions result handling
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == SMS_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -300,7 +309,82 @@ public class AddTransactionActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "SMS permission denied. SMS will not be sent.", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openContactPicker();
+            } else {
+                Toast.makeText(this, "Contacts permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    // Open contact picker
+    private void openContactPicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT);
+    }
+
+    // Handle activity results including contact picker
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && data != null) {
+            if (requestCode == REQUEST_CODE_PICK_CONTACT) {
+                Uri contactUri = data.getData();
+                try (Cursor cursor = getContentResolver().query(contactUri,
+                        new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER},
+                        null, null, null)) {
+                    if (cursor != null && cursor.moveToFirst()) {
+                        String name = cursor.getString(0);
+                        String number = cursor.getString(1);
+                        number = number.replaceAll("[^0-9+]", "");
+
+                        String finalNumber = number;
+                        new AlertDialog.Builder(this)
+                                .setTitle("Add Customer")
+                                .setMessage("Add " + name + " (" + number + ") as a customer?")
+                                .setPositiveButton("Yes", (dialog, which) -> addCustomerFromContact(name, finalNumber))
+                                .setNegativeButton("No", null)
+                                .show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(this, "Error reading contact", Toast.LENGTH_SHORT).show();
+                }
+            }
+            // Handle other results if needed for files etc.
+        }
+    }
+
+    // Save new customer to Firebase and update UI
+    private void addCustomerFromContact(String name, String phone) {
+        String userEmail = prefManager.getUserEmail();
+        if (TextUtils.isEmpty(userEmail)) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String userNode = userEmail.replace(".", ",");
+        Customer newCustomer = new Customer();
+        newCustomer.setName(name);
+        newCustomer.setPhone(phone);
+        newCustomer.setEmail(""); // No email info here but can be extended
+
+        DatabaseReference customerRef = FirebaseDatabase.getInstance().getReference("Khatabook")
+                .child(userNode)
+                .child("customers")
+                .child(phone);
+
+        customerRef.setValue(newCustomer)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Customer added successfully", Toast.LENGTH_SHORT).show();
+
+                    customerList.add(newCustomer);
+                    customerNames.add(name + " (" + phone + ")");
+                    customerAdapter.notifyDataSetChanged();
+
+                    // Set the newly added customer as selected
+                    autoCustomer.setText(name + " (" + phone + ")");
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to add customer: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void calculateBalanceAndSendSms(String phone, String name, double amount, boolean isGave, String date) {
@@ -350,18 +434,13 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void showFilePickerOptions() {
         String[] options = {"Camera", "Gallery"};
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle("Select option");
-        builder.setItems(options, (dialog, which) -> {
-            if (which == 0) {
-                // Camera
-                openCamera();
-            } else if (which == 1) {
-                // Gallery
-                openGallery();
-            }
-        });
-        builder.show();
+        new AlertDialog.Builder(this)
+                .setTitle("Select option")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) openCamera();
+                    else if (which == 1) openGallery();
+                })
+                .show();
     }
 
     private void openCamera() {
@@ -374,27 +453,6 @@ public class AddTransactionActivity extends AppCompatActivity {
     private void openGallery() {
         Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(pickPhoto, PICK_FILE_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == PICK_FILE_REQUEST_CODE) {
-                if (data != null) {
-                    attachedFileUri = data.getData();
-                    Toast.makeText(this, "File selected: " + attachedFileUri.getLastPathSegment(), Toast.LENGTH_SHORT).show();
-                    // TODO: Upload or handle file URI
-                }
-            } else if (requestCode == PICK_IMAGE_REQUEST_CODE) {
-                if (data != null && data.getExtras() != null) {
-                    // Get bitmap or URI from camera data
-                    // For simplicity just notify user here, extend as needed
-                    Toast.makeText(this, "Photo captured", Toast.LENGTH_SHORT).show();
-                    // TODO: Save photo bitmap or URI and upload or handle accordingly
-                }
-            }
-        }
     }
 
     @Override
