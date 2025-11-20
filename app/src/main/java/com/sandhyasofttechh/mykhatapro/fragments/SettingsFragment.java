@@ -57,10 +57,10 @@ public class SettingsFragment extends Fragment {
             startActivity(new Intent(requireContext(), SmsSettingsActivity.class));
         });
 
-        optPaymentSettings.setOnClickListener(v -> {
-            // Uncomment and implement PaymentSettingsActivity when available
-           startActivity(new Intent(requireContext(), PaymentSettingsActivity.class));
-        });
+//        optPaymentSettings.setOnClickListener(v -> {
+//            // Uncomment and implement PaymentSettingsActivity when available
+//            startActivity(new Intent(requireContext(), PaymentSettingsActivity.class));
+//        });
 
         optRecycleBin.setOnClickListener(v -> {
             startActivity(new Intent(requireContext(), RecycleBinActivity.class));

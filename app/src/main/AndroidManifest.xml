@@ -47,6 +47,10 @@
             android:name=".activities.HelpAndSupportActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.AppLockActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".activities.AboutUsActivity"
             android:exported="false" />
         <activity

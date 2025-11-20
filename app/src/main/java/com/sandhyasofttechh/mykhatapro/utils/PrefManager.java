@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class PrefManager {
+    private static final String KEY_APP_LOCK = "app_lock_enabled";
 
     private static final String PREF_NAME = "mykhata_pref";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
-
     private static final String KEY_USER_EMAIL = "user_email";
+
+    // New keys for App Lock
+    private static final String KEY_APP_LOCK_ENABLED = "app_lock_enabled";
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -38,6 +41,16 @@ public class PrefManager {
         return sharedPreferences.getString(KEY_USER_EMAIL, "");
     }
 
+    // App Lock getters/setters
+    public void setAppLockEnabled(boolean enabled) {
+        editor.putBoolean(KEY_APP_LOCK_ENABLED, enabled);
+        editor.apply();
+    }
+
+//    public boolean isAppLockEnabled() {
+//        return sharedPreferences.getBoolean(KEY_APP_LOCK_ENABLED, false);
+//    }
+
     // Clear all preferences (on logout)
     public void clear() {
         editor.clear();
@@ -64,4 +77,16 @@ public class PrefManager {
     public boolean getBoolean(String key) {
         return sharedPreferences.getBoolean(key, false);
     }
+
+
+    public void setAppLock(boolean enabled) {
+        editor.putBoolean(KEY_APP_LOCK, enabled);
+        editor.apply();
+    }
+
+    public boolean isAppLockEnabled() {
+        return sharedPreferences.getBoolean(KEY_APP_LOCK, false);
+    }
+
+
 }
