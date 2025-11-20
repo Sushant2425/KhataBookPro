@@ -1,26 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCustomerList"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
+        android:orientation="vertical"
         android:paddingStart="16dp"
+        android:background="@color/white"
         android:paddingEnd="16dp"
         android:paddingTop="16dp"
-        android:paddingBottom="120dp" /> <!-- Leave padding so FAB doesn't cover content -->
+        android:paddingBottom="0dp">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:queryHint="Search by name or mobile number"
+            app:iconifiedByDefault="false"
+            android:layout_marginHorizontal="10dp"
+            android:background="@drawable/search_background"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCustomerList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp" />
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabExportAll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="124dp"
-        android:src="@drawable/ic_download" />
+        android:layout_marginBottom="90dp"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/ic_download"
+        app:backgroundTint="@color/colorPrimary"
+        app:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
