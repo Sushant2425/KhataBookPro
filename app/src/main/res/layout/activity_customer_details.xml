@@ -128,20 +128,27 @@
                         android:background="@color/white">
 
                         <TextView style="@style/DetailsSummaryLabel"
-                            android:text="Total You Gave"
-                            android:textColor="@color/error"/>
+                            android:text="Total You Give"
+                            android:textColor="@color/green"/>
 
-                        <TextView android:id="@+id/tv_total_gave"
+                        <TextView android:id="@+id/tv_total_got"
                             style="@style/DetailsSummaryAmount"
                             tools:text="₹5000.00"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <View android:layout_width="12dp" android:layout_height="0dp"/>
-                <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
+                <View android:layout_width="12dp"
+                    android:layout_height="0dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/DetailsSummaryCard">
                     <LinearLayout style="@style/DetailsSummaryContent"
                         android:background="@color/white">
-                        <TextView style="@style/DetailsSummaryLabel" android:text="Total You Got" android:textColor="@color/green"/>
-                        <TextView android:id="@+id/tv_total_got" style="@style/DetailsSummaryAmount" tools:text="₹3500.00"/>
+                        <TextView style="@style/DetailsSummaryLabel"
+                            android:text="Total You Get"
+                            android:textColor="@color/red"/>
+                        <TextView android:id="@+id/tv_total_gave"
+                            style="@style/DetailsSummaryAmount"
+                            tools:text="₹3500.00"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
@@ -160,7 +167,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:padding="2dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_transaction"/>
 

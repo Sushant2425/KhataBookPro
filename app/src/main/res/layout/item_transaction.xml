@@ -28,7 +28,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_amount"
             tools:text="You Gave" />
-            
+
         <TextView
             android:id="@+id/tv_note"
             style="@style/TextAppearance.MaterialComponents.Body2"

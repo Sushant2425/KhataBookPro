@@ -215,10 +215,10 @@ public class CustomerDetailsActivity extends AppCompatActivity implements Report
         tvBalance.setText(balanceText);
         if (netBalance > 0) {
             tvLabel.setText("You will get");
-            tvBalance.setTextColor(ContextCompat.getColor(this, R.color.green));
+            tvBalance.setTextColor(ContextCompat.getColor(this, R.color.red));
         } else if (netBalance < 0) {
             tvLabel.setText("You will give");
-            tvBalance.setTextColor(ContextCompat.getColor(this, R.color.error));
+            tvBalance.setTextColor(ContextCompat.getColor(this, R.color.green));
         } else {
             tvLabel.setText("Settled Up");
             tvBalance.setTextColor(ContextCompat.getColor(this, R.color.black));

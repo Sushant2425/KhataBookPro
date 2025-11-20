@@ -63,12 +63,12 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
 
         if (balance > 0) {
             holder.tvStatusLabel.setText(String.format("You will get: ₹%,.2f", balance));
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.green));
-            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_get);
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.red));
+            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_give);
         } else if (balance < 0) {
             holder.tvStatusLabel.setText(String.format("You will give: ₹%,.2f", Math.abs(balance)));
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.error));
-            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_give);
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.green));
+            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_get);
         } else {
             holder.tvStatusLabel.setText("Settled Up");
             holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.black));
