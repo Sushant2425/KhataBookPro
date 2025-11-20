@@ -4,56 +4,179 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:padding="24dp">
+    android:background="@color/white">
 
+    <!-- Success Content Container -->
     <LinearLayout
+        android:id="@+id/container_success"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:paddingHorizontal="32dp">
 
-        <!-- Success Checkmark -->
-        <ImageView
-            android:id="@+id/img_success"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:src="@drawable/animated_check"
-        android:contentDescription="Success"
-        android:tint="@color/green"
-        android:layout_marginBottom="16dp" />
+        <!-- Success Checkmark with Circle Background -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_success_icon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            app:cardCornerRadius="60dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="#E8F5E9">
 
-        <!-- Success message with amount and customer info -->
+            <ImageView
+                android:id="@+id/img_success"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center"
+                android:src="@drawable/animated_check"
+                android:contentDescription="Success"
+                app:tint="@color/green" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Success Title -->
         <TextView
-            android:id="@+id/tv_message"
+            android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Transaction Successful!"
-            android:textSize="18sp"
-            android:textColor="@color/black"
+            android:text="Payment Successful!"
+            android:textSize="24sp"
+            android:textColor="#1A1A1A"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:padding="8dp"/>
+            android:layout_marginBottom="8dp"/>
 
-        <!-- Buttons for next actions -->
-        <Button
-            android:id="@+id/btn_add_another"
+        <!-- Transaction Details Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add Another Transaction"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="#F5F5F5">
 
-        <Button
-            android:id="@+id/btn_view_history"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:gravity="center">
+
+                <!-- Amount -->
+                <TextView
+                    android:id="@+id/tv_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹1,500.00"
+                    android:textSize="36sp"
+                    android:textColor="@color/green"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="4dp"/>
+
+                <!-- To label -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="to"
+                    android:textSize="13sp"
+                    android:textColor="#757575"
+                    android:layout_marginBottom="4dp"/>
+
+                <!-- Customer Name -->
+                <TextView
+                    android:id="@+id/tv_customer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Customer Name"
+                    android:textSize="18sp"
+                    android:textColor="#1A1A1A"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:gravity="center"/>
+
+                <!-- Transaction ID -->
+                <TextView
+                    android:id="@+id/tv_transaction_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Transaction ID: #TXN123456789"
+                    android:textSize="11sp"
+                    android:textColor="#9E9E9E"
+                    android:layout_marginTop="12dp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:id="@+id/container_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="View Transaction History"/>
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <Button
-            android:id="@+id/btn_close"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Close"/>
+            <!-- Add Another Transaction Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_add_another"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Add Another Transaction"
+                android:textSize="15sp"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                app:elevation="2dp"
+                android:layout_marginBottom="12dp"
+                app:backgroundTint="@color/green"/>
+
+            <!-- View History Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_view_history"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="View Transaction History"
+                android:textSize="15sp"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="@color/green"
+                app:cornerRadius="12dp"
+                app:strokeColor="@color/green"
+                app:strokeWidth="2dp"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Close Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_close"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Close"
+                android:textSize="15sp"
+                android:textAllCaps="false"
+                android:textColor="#757575"
+                android:paddingHorizontal="32dp"/>
+
+        </LinearLayout>
+
     </LinearLayout>
+
+    <!-- Confetti Animation Overlay (Optional) -->
+    <View
+        android:id="@+id/confetti_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
