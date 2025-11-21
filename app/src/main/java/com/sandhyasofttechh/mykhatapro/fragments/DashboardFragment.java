@@ -12,6 +12,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,7 +44,6 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     private SearchView searchView;
     private ImageView ivFilterButton, ivPdfReport;
 
-
     private List<CustomerSummary> allCustomerSummaries = new ArrayList<>();
     private List<CustomerSummary> displayedCustomerSummaries = new ArrayList<>();
     private CustomerSummaryAdapter adapter;
@@ -51,8 +51,8 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     private DatabaseReference transactionRef;
     private ValueEventListener transactionListener;
     private PrefManager prefManager;
-    
-    // --- State Variables for Filtering & Sorting ---
+
+    // State Variables for Filtering & Sorting
     private FilterBottomSheetFragment.FilterType currentFilter = FilterBottomSheetFragment.FilterType.ALL;
     private FilterBottomSheetFragment.SortType currentSort = FilterBottomSheetFragment.SortType.MOST_RECENT;
     private String currentSearchQuery = "";
@@ -63,6 +63,7 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         initViews(view);
         setupRecyclerView();
         setupClickListeners();
+        setupFabScrollBehavior();
         return view;
     }
 
@@ -72,8 +73,7 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         initFirebase();
         loadTransactionData();
     }
-    
-    // --- THIS IS THE CORRECT, IMPLEMENTED METHOD ---
+
     @Override
     public void onFiltersApplied(FilterBottomSheetFragment.FilterType filter, FilterBottomSheetFragment.SortType sort) {
         this.currentFilter = filter;
@@ -87,10 +87,10 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         // 1. Search Filter
         if (!currentSearchQuery.isEmpty()) {
             filteredList = filteredList.stream()
-                .filter(s -> s.getCustomerName().toLowerCase().contains(currentSearchQuery.toLowerCase()))
-                .collect(Collectors.toList());
+                    .filter(s -> s.getCustomerName().toLowerCase().contains(currentSearchQuery.toLowerCase()))
+                    .collect(Collectors.toList());
         }
-        
+
         // 2. Status Filter
         switch (currentFilter) {
             case YOU_WILL_GET:
@@ -128,8 +128,6 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         adapter.notifyDataSetChanged();
         updateEmptyState();
     }
-    
-    // --- Unchanged Methods ---
 
     private void initViews(View view) {
         tvBalance = view.findViewById(R.id.tv_balance_amount);
@@ -143,27 +141,54 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         ivFilterButton = view.findViewById(R.id.iv_filter_button);
         ivPdfReport = view.findViewById(R.id.iv_pdf_report);
     }
-    
+
     private void setupRecyclerView() {
         adapter = new CustomerSummaryAdapter(displayedCustomerSummaries);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        // Enable nested scrolling for proper scroll event propagation
+        ViewCompat.setNestedScrollingEnabled(recyclerView, true);
     }
-    
+
+    // NEW METHOD: Setup FAB scroll behavior manually
+    private void setupFabScrollBehavior() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                // dy > 0: scrolling down
+                // dy < 0: scrolling up
+                if (dy > 10 && fabAddTransaction.isShown()) {
+                    fabAddTransaction.hide();
+                    fabAddCustomer.hide();
+                } else if (dy < -10 && !fabAddTransaction.isShown()) {
+                    fabAddTransaction.show();
+                    fabAddCustomer.show();
+                }
+            }
+        });
+    }
+
     private void loadTransactionData() {
         if (transactionRef == null) return;
         removeFirebaseListener();
         transactionListener = new ValueEventListener() {
-            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!isAdded()) return;
                 processTransactions(snapshot);
                 applyFilters();
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) { if (isAdded()) Toast.makeText(getContext(), "Failed to load.", Toast.LENGTH_SHORT).show(); }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                if (isAdded()) Toast.makeText(getContext(), "Failed to load.", Toast.LENGTH_SHORT).show();
+            }
         };
         transactionRef.addValueEventListener(transactionListener);
     }
-    
+
     private void processTransactions(DataSnapshot snapshot) {
         Map<String, CustomerSummary> summaryMap = new HashMap<>();
         for (DataSnapshot customerSnapshot : snapshot.getChildren()) {
@@ -183,7 +208,7 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         }
         updateHeaderSummary(headerTotalToGet, headerTotalToGive);
     }
-    
+
     private void updateHeaderSummary(double totalToGet, double totalToGive) {
         if (!isAdded() || getContext() == null) return;
         double finalBalance = totalToGet - totalToGive;
@@ -198,7 +223,7 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
         tvEmpty.setVisibility(displayedCustomerSummaries.isEmpty() ? View.VISIBLE : View.GONE);
         recyclerView.setVisibility(displayedCustomerSummaries.isEmpty() ? View.GONE : View.VISIBLE);
     }
-    
+
     private void initFirebase() {
         if (getContext() == null) return;
         prefManager = new PrefManager(getContext());
@@ -210,28 +235,41 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
     private void setupClickListeners() {
         fabAddTransaction.setOnClickListener(v -> startActivity(new Intent(getContext(), AddTransactionActivity.class)));
         fabAddCustomer.setOnClickListener(v -> startActivity(new Intent(getContext(), AddCustomerActivity.class)));
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override public boolean onQueryTextSubmit(String q) { return false; }
-            @Override public boolean onQueryTextChange(String newText) {
+            @Override
+            public boolean onQueryTextSubmit(String q) { return false; }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
                 currentSearchQuery = newText;
                 applyFilters();
                 return true;
             }
         });
+
         ivFilterButton.setOnClickListener(v -> {
             FilterBottomSheetFragment bottomSheet = FilterBottomSheetFragment.newInstance(currentFilter, currentSort);
             bottomSheet.show(getChildFragmentManager(), bottomSheet.getTag());
         });
+
         ivPdfReport.setOnClickListener(v -> {
             ReportsFragment reportsFragment = new ReportsFragment();
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, reportsFragment) // Replace with your actual container ID
+                    .replace(R.id.fragment_container, reportsFragment)
                     .addToBackStack(null)
                     .commit();
         });
     }
-    
+
     private void removeFirebaseListener() {
-        if (transactionRef != null && transactionListener != null) transactionRef.removeEventListener(transactionListener);
+        if (transactionRef != null && transactionListener != null)
+            transactionRef.removeEventListener(transactionListener);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        removeFirebaseListener();
     }
 }

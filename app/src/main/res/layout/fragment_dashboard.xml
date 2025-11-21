@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context=".fragments.DashboardFragment">
 
-    <!-- AppBar: Contains the main header card (Unchanged) -->
+    <!-- AppBar: Contains the main header card -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -36,7 +36,6 @@
                     android:background="@drawable/rounded_input"
                     android:padding="10dp">
 
-                    <!-- All header content remains unchanged -->
                     <TextView
                         android:id="@+id/tv_balance_label"
                         style="@style/TextAppearance.MaterialComponents.Subtitle1"
@@ -75,7 +74,6 @@
                         android:layout_height="20dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="10dp"
-
                         android:backgroundTint="@color/black"
                         android:src="@drawable/ic_arrow_downward"
                         app:layout_constraintStart_toStartOf="parent"
@@ -193,8 +191,7 @@
                         app:queryHint="Search by customer name..."
                         android:background="@color/white"
                         app:iconifiedByDefault="false"
-                        app:searchIcon="@null"
-                       />
+                        app:searchIcon="@null" />
 
                     <ImageView
                         android:id="@+id/iv_filter_button"
@@ -238,7 +235,7 @@
             android:visibility="gone"/>
     </LinearLayout>
 
-    <!-- Floating Action Buttons (Unchanged) -->
+    <!-- Floating Action Buttons with Blue Background and White Icons -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_transaction"
         android:layout_width="wrap_content"
@@ -247,7 +244,9 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="100dp"
         android:src="@drawable/ic_add"
-        app:layout_behavior="com.sandhyasofttechh.mykhatapro.utils.FabScrollBehavior"/>
+        app:tint="@android:color/white"
+        app:backgroundTint="#3F51B5"
+        app:layout_behavior="com.sandhyasofttechh.mykhatapro.utils.ScrollAwareFabBehavior"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_customer"
@@ -257,5 +256,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="100dp"
         android:src="@drawable/ic_person_add"
-        app:layout_behavior="com.sandhyasofttechh.mykhatapro.utils.FabScrollBehavior"/>
+        app:tint="@android:color/white"
+        app:backgroundTint="#3F51B5"
+        app:layout_behavior="com.sandhyasofttechh.mykhatapro.utils.ScrollAwareFabBehavior"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
