@@ -179,6 +179,7 @@
 
                 <!-- Payment Settings -->
                 <LinearLayout
+                    android:visibility="gone"
                     android:id="@+id/opt_payment_settings"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

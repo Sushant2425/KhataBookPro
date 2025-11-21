@@ -6,108 +6,288 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-    android:padding="16dp">
+    android:background="@drawable/bottom_sheet_background">
 
-    <!-- Header -->
+    <!-- Drag Handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bottom_sheet_handle"/>
+
+    <!-- Header Section -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
-        <TextView
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp">
+
+        <!-- Title with Icon -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Filter &amp; Sort"/>
-        <Button
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_filter"
+                android:contentDescription="Filter icon"
+                app:tint="?attr/colorPrimary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Filter &amp; Sort"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"/>
+        </LinearLayout>
+
+        <!-- Reset Button -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_reset"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_alignParentEnd="true"
-            android:text="Reset"/>
+            android:layout_centerVertical="true"
+            android:text="Reset"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary"
+            style="@style/Widget.Material3.Button.TextButton"
+            app:icon="@drawable/ic_refresh"
+            app:iconSize="18dp"
+            app:iconTint="?attr/colorPrimary"/>
     </RelativeLayout>
 
-    <!-- Filter by Status -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="STATUS"/>
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_color"
+        android:layout_marginBottom="16dp"/>
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_filter"
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:singleSelection="true">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_all"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="All Customers" />
+            android:orientation="vertical">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_you_will_get"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="You Will Get" />
+            <!-- Filter by Status Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_you_will_give"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="You Will Give" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_settled_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Settled Up" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_status"
+                        android:contentDescription="Status icon"
+                        app:tint="?attr/colorPrimary" />
 
-    </com.google.android.material.chip.ChipGroup>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="STATUS"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
 
-    <!-- Sort By -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="SORT BY"/>
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_sort"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="4dp">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="All Customers"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_you_will_get"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="You Will Get"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"
+                        app:chipIconTint="@color/green"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_you_will_give"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="You Will Give"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"
+                        app:chipIconTint="@color/red"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_settled_up"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Settled Up"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"
+                        app:chipIconTint="@color/green"/>
+
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <!-- Sort By Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_sort"
+                        android:contentDescription="Sort icon"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="SORT BY"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:letterSpacing="0.05"/>
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_sort"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="4dp">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_most_recent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Most Recent"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_highest_amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Highest Amount"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_lowest_amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lowest Amount"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_name_az"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Name (A-Z)"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_name_za"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Name (Z-A)"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconSize="18dp"/>
+
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Apply Button Section -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:singleSelection="true">
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_most_recent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Most Recent" />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_highest_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Highest Amount" />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_lowest_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lowest Amount" />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_name_az"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Name (A-Z)" />
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_name_za"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Name (Z-A)" />
-    </com.google.android.material.chip.ChipGroup>
+        android:orientation="vertical"
+        android:background="@drawable/button_section_background"
+        android:elevation="8dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="20dp">
 
-    <!-- Apply Button -->
-    <Button
-        android:id="@+id/btn_apply_filters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Apply"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_apply_filters"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Apply Filters"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            style="@style/Widget.Material3.Button"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/animated_check"
+            app:iconSize="20dp"
+            app:iconGravity="textStart"/>
+    </LinearLayout>
 
 </LinearLayout>

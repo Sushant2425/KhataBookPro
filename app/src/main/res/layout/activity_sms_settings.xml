@@ -14,7 +14,7 @@
         style="@style/Widget.MaterialComponents.Toolbar.Primary"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@drawable/dashboard_header_background"
         android:elevation="4dp"
         app:title="SMS Settings"
         app:titleTextColor="@android:color/white"
