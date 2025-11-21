@@ -35,6 +35,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:padding="16dp"
             android:layout_width="match_parent"
+            android:background="@color/gray"
+            android:layout_margin="20dp"
             android:layout_height="wrap_content">
 
             <!-- Date -->
