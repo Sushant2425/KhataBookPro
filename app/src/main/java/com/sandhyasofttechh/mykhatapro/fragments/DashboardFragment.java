@@ -222,7 +222,13 @@ public class DashboardFragment extends Fragment implements FilterBottomSheetFrag
             FilterBottomSheetFragment bottomSheet = FilterBottomSheetFragment.newInstance(currentFilter, currentSort);
             bottomSheet.show(getChildFragmentManager(), bottomSheet.getTag());
         });
-        ivPdfReport.setOnClickListener(v -> Toast.makeText(getContext(), "PDF Report Clicked!", Toast.LENGTH_SHORT).show());
+        ivPdfReport.setOnClickListener(v -> {
+            ReportsFragment reportsFragment = new ReportsFragment();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, reportsFragment) // Replace with your actual container ID
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
     
     private void removeFirebaseListener() {
