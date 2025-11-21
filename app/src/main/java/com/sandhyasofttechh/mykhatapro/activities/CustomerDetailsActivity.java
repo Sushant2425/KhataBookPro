@@ -76,7 +76,6 @@ public class CustomerDetailsActivity extends AppCompatActivity
         }
     }
 
-    // Format phone number nicely: 98765 43210
     private String formatPhoneNumber(String phone) {
         String clean = phone.replaceAll("[^\\d]", "");
         if (clean.startsWith("91") && clean.length() == 12) {
