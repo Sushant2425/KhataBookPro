@@ -159,14 +159,14 @@
             android:id="@+id/register_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
             android:text="Don't have an account? Register"
             android:textColor="@color/purple_700"
-            android:textStyle="bold"
             android:textSize="15sp"
-            app:layout_constraintTop_toBottomOf="@id/or_tv"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/or_tv" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
