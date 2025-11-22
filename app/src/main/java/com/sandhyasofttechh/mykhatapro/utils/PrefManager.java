@@ -229,4 +229,8 @@ public class PrefManager {
         editor.remove(KEY_GSTIN);
         editor.apply();
     }
+
+    public void clearAll() {
+
+    }
 }
