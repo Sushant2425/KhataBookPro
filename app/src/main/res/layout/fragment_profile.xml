@@ -4,12 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8FAFC"
-    android:fillViewport="true">
+    android:fitsSystemWindows="true"
+    android:fillViewport="true"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="80dp">
 
         <!-- Header with Gradient & Profile Picture -->
         <RelativeLayout
@@ -24,7 +27,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="30dp"
                 android:src="@drawable/img"
-                app:civ_border_width="5dp"
+                app:civ_border_width="2dp"
                 app:civ_border_color="#FFFFFF"
                 app:civ_circle_background_color="#EEEEEE" />
 
@@ -37,10 +40,11 @@
                 android:layout_alignBottom="@id/ivProfileLogo"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/img_3"
+
+                android:background="@drawable/img_4"
                 android:padding="10dp"
                 android:src="@drawable/ic_camera"
-                app:tint="#FFFFFF" />
+                />
 
             <TextView
                 android:id="@+id/tvChangePhoto"
@@ -63,7 +67,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="-60dp"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="20dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="12dp"
             app:cardBackgroundColor="#FFFFFF">
