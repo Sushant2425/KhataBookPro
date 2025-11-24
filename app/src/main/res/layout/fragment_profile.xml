@@ -18,7 +18,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:background="@drawable/gradient_header">
+            android:background="?attr/colorPrimary"
+            >
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivProfileLogo"
@@ -193,7 +194,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textAllCaps="false"
-                    android:backgroundTint="#3B82F6"
+                    android:backgroundTint="#3F51B5"
                     android:textColor="#FFFFFF"
                     app:cornerRadius="12dp"
                     android:stateListAnimator="@null"/>
