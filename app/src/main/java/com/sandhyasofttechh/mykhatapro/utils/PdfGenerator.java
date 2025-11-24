@@ -42,7 +42,7 @@ public class PdfGenerator {
                 .filter(t -> "got".equalsIgnoreCase(t.getType()))
                 .mapToDouble(Transaction::getAmount)
                 .sum();
-        double openingBalance = 0; // Set from your data
+        double openingBalance = 0; // Set this from your data source if available
         double netBalance = openingBalance + totalCredit - totalDebit;
 
         // --- Paint Styles ---
@@ -65,10 +65,10 @@ public class PdfGenerator {
         canvas.drawText("Account Summary", 32, y, headingPaint);
         y += 18;
 
-        int col1 = 32, col2 = 250, col3 = 450;
+        int col1 = 32, col3 = 450;
 
         canvas.drawText("Opening Balance", col1, y, labelPaint);
-        canvas.drawText("₹0.00", col1, y + 14, valuePaint);
+        canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", openingBalance), col1, y + 14, valuePaint);
         y += 30;
 
         canvas.drawText("Total Debit (You Gave)", col1, y, labelPaint);
@@ -81,12 +81,11 @@ public class PdfGenerator {
 
         // Net Balance colored box
         boolean isPositive = netBalance >= 0;
-        int statusColor = isPositive ? COLOR_SUCCESS : COLOR_DANGER;
         Paint statusBgPaint = new Paint();
         statusBgPaint.setColor(isPositive ? Color.parseColor("#ECFDF5") : Color.parseColor("#FEF2F2"));
 
-        canvas.drawRect(col1, y - 8, 595 - 32, y + 28, statusBgPaint);
-        Paint statusPaint = createPaint(statusColor, 13, Typeface.BOLD, true);
+        canvas.drawRect(col1, y - 8, pageWidth - 32, y + 28, statusBgPaint);
+        Paint statusPaint = createPaint(isPositive ? COLOR_SUCCESS : COLOR_DANGER, 13, Typeface.BOLD, true);
         String statusLabel = isPositive ? "Net Balance (Customer gives to you)" : "Net Balance (You give to customer)";
         canvas.drawText(statusLabel, col1 + 8, y + 6, statusPaint);
         canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", Math.abs(netBalance)), col3, y + 6, statusPaint);
@@ -119,19 +118,16 @@ public class PdfGenerator {
         for (String month : transactionsByMonth.keySet()) {
             List<Transaction> monthTransactions = transactionsByMonth.get(month);
 
-            // Check if page break needed
             if (y > pageHeight - 150) {
                 document.finishPage(page);
                 pageNum++;
                 page = document.startPage(pageInfo);
                 canvas = page.getCanvas();
                 y = 32;
-                // Redraw header
                 drawHeader(canvas, customerName, customerPhone, dateRangeLabel, brandPaint, labelPaint, valuePaint, 32);
                 y += 150;
             }
 
-            // Month header
             Paint monthPaint = createPaint(COLOR_PRIMARY, 12, Typeface.BOLD, true);
             canvas.drawText(month, 32, y, monthPaint);
             y += 14;
@@ -141,7 +137,6 @@ public class PdfGenerator {
             }});
             y += 8;
 
-            // Transactions for this month
             for (Transaction t : monthTransactions) {
                 if (y > pageHeight - 50) {
                     document.finishPage(page);
@@ -164,20 +159,11 @@ public class PdfGenerator {
 
                 canvas.drawText(t.getDate(), 32, y, tableTextPaint);
                 canvas.drawText(truncate(t.getNote(), 25), 110, y, tableTextPaint);
-                if (debitAmount > 0) {
-                    canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", debitAmount), 340, y, tableTextPaint);
-                } else {
-                    canvas.drawText("-", 340, y, tableTextPaint);
-                }
-                if (creditAmount > 0) {
-                    canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", creditAmount), 430, y, tableTextPaint);
-                } else {
-                    canvas.drawText("-", 430, y, tableTextPaint);
-                }
+                canvas.drawText(debitAmount > 0 ? String.format(Locale.getDefault(), "₹%.2f", debitAmount) : "-", 340, y, tableTextPaint);
+                canvas.drawText(creditAmount > 0 ? String.format(Locale.getDefault(), "₹%.2f", creditAmount) : "-", 430, y, tableTextPaint);
                 canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", runningBalance), 520, y, tableTextPaint);
                 y += 16;
             }
-
             y += 6;
         }
 
@@ -220,7 +206,6 @@ public class PdfGenerator {
         return file;
     }
 
-    // --- Helper Methods ---
     private static int drawHeader(Canvas canvas, String customerName, String customerPhone,
                                   String dateRange, Paint brandPaint, Paint labelPaint, Paint valuePaint, int margin) {
         int y = margin;
