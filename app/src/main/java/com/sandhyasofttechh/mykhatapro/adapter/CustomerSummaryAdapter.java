@@ -7,11 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.sandhyasofttechh.mykhatapro.R;
 import com.sandhyasofttechh.mykhatapro.activities.CustomerDetailsActivity;
 import com.sandhyasofttechh.mykhatapro.model.CustomerSummary;
@@ -72,10 +74,11 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         } else {
             holder.tvStatusLabel.setText("Settled Up");
             holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.black));
-            holder.balanceContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.gray)); // Assuming a light_grey color exists
+            holder.balanceContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.gray));
         }
     }
-    
+
+
     private String getCustomRelativeTime(String dateString) {
         if (dateString == null || dateString.isEmpty()) return "";
         try {
@@ -84,7 +87,7 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
             if (DateUtils.isToday(date.getTime())) return "(Today)";
             long now = System.currentTimeMillis();
             long diff = now - date.getTime();
-            if(diff < 0) return "";
+            if (diff < 0) return "";
             long days = TimeUnit.MILLISECONDS.toDays(diff);
             if (days < 7) return "(" + days + (days == 1 ? " day ago)" : " days ago)");
             long weeks = days / 7;
@@ -92,7 +95,8 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
             Calendar start = Calendar.getInstance();
             start.setTime(date);
             Calendar end = Calendar.getInstance();
-            int monthDiff = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 + (end.get(Calendar.MONTH) - start.get(Calendar.MONTH));
+            int monthDiff = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 +
+                    (end.get(Calendar.MONTH) - start.get(Calendar.MONTH));
             if (monthDiff < 12) return "(" + monthDiff + (monthDiff == 1 ? " month ago)" : " months ago)");
             int yearDiff = monthDiff / 12;
             return "(" + yearDiff + (yearDiff == 1 ? " year ago)" : " years ago)");
@@ -108,8 +112,9 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView tvCustomerName, tvNetBalance, tvStatusLabel, tvLastDate, tvRelativeTime;
-        ConstraintLayout balanceContainer;
+        LinearLayout balanceContainer;  // <<<<<< IMPORTANT change
 
         ViewHolder(View v) {
             super(v);
@@ -118,7 +123,7 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
             tvStatusLabel = v.findViewById(R.id.summary_status_label);
             tvLastDate = v.findViewById(R.id.summary_last_date);
             tvRelativeTime = v.findViewById(R.id.summary_relative_time);
-            balanceContainer = v.findViewById(R.id.balance_container);
+            balanceContainer = v.findViewById(R.id.balance_container); // LinearLayout now
         }
     }
 }

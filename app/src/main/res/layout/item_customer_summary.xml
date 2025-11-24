@@ -1,86 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/gray"
     android:fitsSystemWindows="true"
+    android:layout_marginVertical="1dp"
     android:layout_marginHorizontal="3dp"
-    android:layout_marginVertical="5dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="1dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+  >
+
+    <!-- MAIN LinearLayout -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:background="@color/white"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white">
 
-        <!-- PART 1: Information Section -->
-        <TextView
-            android:id="@+id/summary_customer_name"
-            style="@style/TextAppearance.MaterialComponents.Subtitle1"
+        <!-- LEFT SIDE -->
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/balance_container"
-            tools:text="Customer Name" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/summary_status_label"
-            style="@style/TextAppearance.MaterialComponents.Body2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toStartOf="@id/summary_customer_name"
-            app:layout_constraintTop_toBottomOf="@id/summary_customer_name"
-            app:layout_constraintEnd_toEndOf="@id/summary_customer_name"
-            tools:text="You will get: ₹1500.00" />
+            <TextView
+                android:id="@+id/summary_customer_name"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="13dp"
+                tools:text="Customer Name" />
 
-        <TextView
-            android:id="@+id/summary_last_date"
-            style="@style/TextAppearance.MaterialComponents.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toStartOf="@id/summary_customer_name"
-            app:layout_constraintTop_toBottomOf="@id/summary_status_label"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="14 Nov 2025" />
+            <TextView
+                android:id="@+id/summary_status_label"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                tools:text="You will get: ₹1500.00" />
 
-        <TextView
-            android:id="@+id/summary_relative_time"
-            style="@style/TextAppearance.MaterialComponents.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toEndOf="@id/summary_last_date"
-            app:layout_constraintBaseline_toBaselineOf="@id/summary_last_date"
-            tools:text="(2 days ago)" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
 
-        <!-- PART 2: Balance Section -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+                <TextView
+                    android:id="@+id/summary_last_date"
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="14 Nov 2025" />
+
+                <TextView
+                    android:id="@+id/summary_relative_time"
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="(2 days ago)" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- RIGHT SIDE BALANCE SECTION -->
+        <LinearLayout
             android:id="@+id/balance_container"
             android:layout_width="120dp"
-            android:layout_height="0dp"
-            app:strokeWidth="1dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
             tools:background="@drawable/background_balance_get">
 
             <TextView
@@ -89,14 +90,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 tools:text="₹1500"
                 tools:textColor="@color/green" />
+        </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>
