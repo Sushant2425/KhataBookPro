@@ -14,6 +14,8 @@ import android.text.TextUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -47,33 +49,30 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+
+
 public class AddTransactionActivity extends AppCompatActivity {
 
     private TextInputEditText etDate, etAmount, etNote;
     private AutoCompleteTextView autoCustomer;
     private TextInputLayout layoutCustomer;
     private MaterialButtonToggleGroup toggleButtonGroup;
-    private MaterialButton btnSave;
+    private MaterialButton btnSave, btnAddCustomer;
     private MaterialCheckBox checkboxSendMessage;
     private Button btnAttachFile;
-
     private androidx.constraintlayout.widget.ConstraintLayout containerFields;
-
     private PrefManager prefManager;
-    private DatabaseReference transactionsRef;
+    private DatabaseReference transactionsRef, customersRef;
     private List<Customer> customerList = new ArrayList<>();
     private List<String> customerNames = new ArrayList<>();
     private ArrayAdapter<String> customerAdapter;
-
     private Transaction editTransaction;
-
     private final Calendar calendar = Calendar.getInstance();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
     private static final int SMS_PERMISSION_CODE = 101;
     private static final int PICK_IMAGE_REQUEST_CODE = 201;
     private static final int PICK_FILE_REQUEST_CODE = 202;
-
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 300;
     private static final int REQUEST_CODE_PICK_CONTACT = 301;
 
@@ -99,12 +98,11 @@ public class AddTransactionActivity extends AppCompatActivity {
         checkSmsPermission();
 
         toggleButtonGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            containerFields.setVisibility(isChecked ? android.view.View.VISIBLE : android.view.View.GONE);
+            containerFields.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
         etDate.setOnClickListener(v -> showDatePicker());
 
-        // Setup contact picker on end icon of customer input
         layoutCustomer.setEndIconOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
@@ -114,8 +112,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         });
 
         btnAttachFile.setOnClickListener(v -> showFilePickerOptions());
-
         btnSave.setOnClickListener(v -> saveTransaction());
+        btnAddCustomer.setOnClickListener(v -> showAddCustomerDialog());
     }
 
     private void initViews() {
@@ -129,6 +127,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         checkboxSendMessage = findViewById(R.id.checkbox_send_message);
         btnAttachFile = findViewById(R.id.btn_attach_file);
         containerFields = findViewById(R.id.container_fields);
+        btnAddCustomer = findViewById(R.id.btn_add_customer);
 
         etDate.setText(dateFormat.format(calendar.getTime()));
 
@@ -151,35 +150,73 @@ public class AddTransactionActivity extends AppCompatActivity {
                 .getReference("Khatabook")
                 .child(userNode)
                 .child("transactions");
+        customersRef = FirebaseDatabase.getInstance()
+                .getReference("Khatabook")
+                .child(userNode)
+                .child("customers");
     }
 
     private void loadCustomers() {
-        String userEmail = prefManager.getUserEmail();
-        String userNode = userEmail.replace(".", ",");
-        FirebaseDatabase.getInstance().getReference("Khatabook")
-                .child(userNode)
-                .child("customers")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        customerList.clear();
-                        customerNames.clear();
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            Customer c = ds.getValue(Customer.class);
-                            if (c != null) {
-                                customerList.add(c);
-                                customerNames.add(c.getName() + " (" + c.getPhone() + ")");
-                            }
-                        }
-                        customerAdapter.notifyDataSetChanged();
-                        if (editTransaction != null) {
-                            autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
-                        }
+        customersRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                customerList.clear();
+                customerNames.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Customer c = ds.getValue(Customer.class);
+                    if (c != null) {
+                        customerList.add(c);
+                        customerNames.add(c.getName() + " (" + c.getPhone() + ")");
                     }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(AddTransactionActivity.this, "Failed to load customers", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                }
+                customerAdapter.notifyDataSetChanged();
+                if (editTransaction != null) {
+                    autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
+                }
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AddTransactionActivity.this, "Failed to load customers", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    // ---- ADD CUSTOMER FUNCTIONALITY ----
+    private void showAddCustomerDialog() {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_customer, null);
+        TextInputEditText etName = dialogView.findViewById(R.id.et_dialog_customer_name);
+        TextInputEditText etPhone = dialogView.findViewById(R.id.et_dialog_customer_phone);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Add Customer")
+                .setView(dialogView)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String name = etName.getText().toString().trim();
+                    String phone = etPhone.getText().toString().trim();
+                    if (name.isEmpty() || phone.isEmpty()) {
+                        Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    addCustomerToFirebase(name, phone);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void addCustomerToFirebase(String name, String phone) {
+        Customer newCustomer = new Customer();
+        newCustomer.setName(name);
+        newCustomer.setPhone(phone);
+        newCustomer.setEmail("");
+        customersRef.child(phone).setValue(newCustomer)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Customer added successfully", Toast.LENGTH_SHORT).show();
+                    customerList.add(newCustomer);
+                    customerNames.add(name + " (" + phone + ")");
+                    customerAdapter.notifyDataSetChanged();
+                    autoCustomer.setText(name + " (" + phone + ")");
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to add customer: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+    // ---- END ADD CUSTOMER FUNCTIONALITY ----
 
     private void showDatePicker() {
         new DatePickerDialog(this,
@@ -193,72 +230,37 @@ public class AddTransactionActivity extends AppCompatActivity {
         ).show();
     }
 
-//    private void handleIntent() {
-//        editTransaction = (Transaction) getIntent().getSerializableExtra("EDIT_TRANSACTION");
-//        if (editTransaction != null) {
-//            getSupportActionBar().setTitle("Edit Transaction");
-//            btnSave.setText("Update");
-//
-//            etDate.setText(editTransaction.getDate());
-//            etAmount.setText(String.valueOf(editTransaction.getAmount()));
-//            etNote.setText(editTransaction.getNote());
-//
-//            autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
-//            autoCustomer.setEnabled(false);
-//
-//            if ("gave".equals(editTransaction.getType())) {
-//                toggleButtonGroup.check(R.id.btn_gave);
-//            } else {
-//                toggleButtonGroup.check(R.id.btn_got);
-//            }
-//            containerFields.setVisibility(android.view.View.VISIBLE);
-//        } else {
-//            getSupportActionBar().setTitle("Add Transaction");
-//            containerFields.setVisibility(android.view.View.GONE);
-//        }
-//    }
-private void handleIntent() {
-    editTransaction = (Transaction) getIntent().getSerializableExtra("EDIT_TRANSACTION");
+    private void handleIntent() {
+        editTransaction = (Transaction) getIntent().getSerializableExtra("EDIT_TRANSACTION");
+        String prefillCustomerPhone = getIntent().getStringExtra("edit_customer_phone");
+        String prefillCustomerName = getIntent().getStringExtra("edit_customer_name");
 
-    // Check for directly passed customer data to pre-fill the form for new transaction
-    String prefillCustomerPhone = getIntent().getStringExtra("edit_customer_phone");
-    String prefillCustomerName = getIntent().getStringExtra("edit_customer_name");
-
-    if (editTransaction != null) {
-        getSupportActionBar().setTitle("Edit Transaction");
-        btnSave.setText("Update");
-
-        // Existing edit setup ...
-        etDate.setText(editTransaction.getDate());
-        etAmount.setText(String.valueOf(editTransaction.getAmount()));
-        etNote.setText(editTransaction.getNote());
-
-        autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
-        autoCustomer.setEnabled(false);  // editing transaction, so disable changing customer
-
-        if ("gave".equals(editTransaction.getType())) {
-            toggleButtonGroup.check(R.id.btn_gave);
+        if (editTransaction != null) {
+            getSupportActionBar().setTitle("Edit Transaction");
+            btnSave.setText("Update");
+            etDate.setText(editTransaction.getDate());
+            etAmount.setText(String.valueOf(editTransaction.getAmount()));
+            etNote.setText(editTransaction.getNote());
+            autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
+            autoCustomer.setEnabled(false);
+            if ("gave".equals(editTransaction.getType())) {
+                toggleButtonGroup.check(R.id.btn_gave);
+            } else {
+                toggleButtonGroup.check(R.id.btn_got);
+            }
+            containerFields.setVisibility(View.VISIBLE);
+        } else if (prefillCustomerPhone != null && prefillCustomerName != null) {
+            getSupportActionBar().setTitle("Add Transaction");
+            btnSave.setText("Save Transaction");
+            autoCustomer.setText(prefillCustomerName + " (" + prefillCustomerPhone + ")");
+            containerFields.setVisibility(View.GONE);
         } else {
-            toggleButtonGroup.check(R.id.btn_got);
+            getSupportActionBar().setTitle("Add Transaction");
+            btnSave.setText("Save Transaction");
+            containerFields.setVisibility(View.GONE);
+            autoCustomer.setEnabled(true);
         }
-        containerFields.setVisibility(android.view.View.VISIBLE);
-    } else if (prefillCustomerPhone != null && prefillCustomerName != null) {
-        // Pre-fill customer details for new transaction
-        getSupportActionBar().setTitle("Add Transaction");
-        btnSave.setText("Save Transaction");
-
-        autoCustomer.setText(prefillCustomerName + " (" + prefillCustomerPhone + ")");
-        containerFields.setVisibility(android.view.View.GONE);  // user must first select type
-
-        // Optionally disable editing customer if desired:
-        // autoCustomer.setEnabled(false);
-    } else {
-        getSupportActionBar().setTitle("Add Transaction");
-        btnSave.setText("Save Transaction");
-        containerFields.setVisibility(android.view.View.GONE);
-        autoCustomer.setEnabled(true);
     }
-}
 
     private void saveTransaction() {
         String amountStr = etAmount.getText().toString().trim();
@@ -271,12 +273,10 @@ private void handleIntent() {
             Toast.makeText(this, "Please select 'You Give' or 'You Get'", Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (TextUtils.isEmpty(amountStr)) {
             etAmount.setError("Enter amount");
             return;
         }
-
         double amount;
         try {
             amount = Double.parseDouble(amountStr);
@@ -284,10 +284,8 @@ private void handleIntent() {
             etAmount.setError("Invalid amount");
             return;
         }
-
         String selectedPhone;
         String selectedName;
-
         if (editTransaction != null) {
             selectedPhone = editTransaction.getCustomerPhone();
             selectedName = editTransaction.getCustomerName();
@@ -299,12 +297,9 @@ private void handleIntent() {
             selectedName = customerInfo.substring(0, customerInfo.lastIndexOf(" (")).trim();
             selectedPhone = customerInfo.substring(customerInfo.lastIndexOf(" (") + 2, customerInfo.length() - 1);
         }
-
         boolean isGave = toggleButtonGroup.getCheckedButtonId() == R.id.btn_gave;
-
         Transaction transaction = new Transaction();
         String idToSave = editTransaction != null ? editTransaction.getId() : transactionsRef.child(selectedPhone).push().getKey();
-
         transaction.setId(idToSave);
         transaction.setCustomerPhone(selectedPhone);
         transaction.setCustomerName(selectedName);
@@ -313,13 +308,11 @@ private void handleIntent() {
         transaction.setNote(note);
         transaction.setDate(date);
         transaction.setTimestamp(System.currentTimeMillis());
-
         transactionsRef.child(selectedPhone).child(idToSave).setValue(transaction)
                 .addOnSuccessListener(aVoid -> {
                     if (sendSms) {
                         calculateBalanceAndSendSms(selectedPhone, selectedName, amount, isGave, date);
                     }
-                    // Launch success animation screen
                     Intent intent = new Intent(this, TransactionSuccessActivity.class);
                     intent.putExtra(TransactionSuccessActivity.EXTRA_AMOUNT, amount);
                     intent.putExtra(TransactionSuccessActivity.EXTRA_CUSTOMER, selectedName);
@@ -329,21 +322,15 @@ private void handleIntent() {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
-        private void finishWithSuccess(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        setResult(RESULT_OK);
-        finish();
-    }
-
     private void checkSmsPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
         }
     }
 
-    // Permissions result handling
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == SMS_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -360,16 +347,13 @@ private void handleIntent() {
         }
     }
 
-    // Open contact picker
     private void openContactPicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
         startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT);
     }
 
-    // Handle activity results including contact picker
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data != null) {
             if (requestCode == REQUEST_CODE_PICK_CONTACT) {
                 Uri contactUri = data.getData();
@@ -380,12 +364,11 @@ private void handleIntent() {
                         String name = cursor.getString(0);
                         String number = cursor.getString(1);
                         number = number.replaceAll("[^0-9+]", "");
-
                         String finalNumber = number;
                         new AlertDialog.Builder(this)
                                 .setTitle("Add Customer")
                                 .setMessage("Add " + name + " (" + number + ") as a customer?")
-                                .setPositiveButton("Yes", (dialog, which) -> addCustomerFromContact(name, finalNumber))
+                                .setPositiveButton("Yes", (dialog, which) -> addCustomerToFirebase(name, finalNumber))
                                 .setNegativeButton("No", null)
                                 .show();
                     }
@@ -393,40 +376,9 @@ private void handleIntent() {
                     Toast.makeText(this, "Error reading contact", Toast.LENGTH_SHORT).show();
                 }
             }
-            // Handle other results if needed for files etc.
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    // Save new customer to Firebase and update UI
-    private void addCustomerFromContact(String name, String phone) {
-        String userEmail = prefManager.getUserEmail();
-        if (TextUtils.isEmpty(userEmail)) {
-            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String userNode = userEmail.replace(".", ",");
-        Customer newCustomer = new Customer();
-        newCustomer.setName(name);
-        newCustomer.setPhone(phone);
-        newCustomer.setEmail(""); // No email info here but can be extended
-
-        DatabaseReference customerRef = FirebaseDatabase.getInstance().getReference("Khatabook")
-                .child(userNode)
-                .child("customers")
-                .child(phone);
-
-        customerRef.setValue(newCustomer)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Customer added successfully", Toast.LENGTH_SHORT).show();
-
-                    customerList.add(newCustomer);
-                    customerNames.add(name + " (" + phone + ")");
-                    customerAdapter.notifyDataSetChanged();
-
-                    // Set the newly added customer as selected
-                    autoCustomer.setText(name + " (" + phone + ")");
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to add customer: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void calculateBalanceAndSendSms(String phone, String name, double amount, boolean isGave, String date) {
@@ -435,7 +387,6 @@ private void handleIntent() {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double totalGave = 0;
                 double totalGot = 0;
-
                 for (DataSnapshot txSnapshot : snapshot.getChildren()) {
                     Transaction tx = txSnapshot.getValue(Transaction.class);
                     if (tx != null) {
@@ -446,16 +397,12 @@ private void handleIntent() {
                         }
                     }
                 }
-
                 double balance = totalGot - totalGave;
-
                 String txnType = isGave ? "debit" : "credit";
                 String msg = "Dear " + name + ", your account has been " + txnType + "ed by ₹" + amount +
                         " on " + date + ". Current balance: ₹" + balance + ". - MyKhataPro";
-
                 sendSms(phone, msg);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(AddTransactionActivity.this, "Failed to fetch transactions for balance", Toast.LENGTH_SHORT).show();

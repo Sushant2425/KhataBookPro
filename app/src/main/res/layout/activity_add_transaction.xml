@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-
     android:fitsSystemWindows="true"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
@@ -81,6 +80,16 @@
                     android:imeOptions="actionDone" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Add Customer Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_add_customer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Customer"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_customer"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <!-- Transaction Type Label -->
             <TextView
                 android:id="@+id/tv_type_label"
@@ -89,7 +98,7 @@
                 android:text="Transaction Type"
                 android:layout_marginTop="24dp"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                app:layout_constraintTop_toBottomOf="@id/layout_customer"
+                app:layout_constraintTop_toBottomOf="@id/btn_add_customer"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <!-- Transaction Type Toggle -->
@@ -120,7 +129,7 @@
                     android:text="You Get" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
-            <!-- Fields container to show/hide -->
+            <!-- Transaction Fields Container -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_fields"
                 android:layout_width="0dp"
@@ -169,7 +178,7 @@
                         android:inputType="textCapSentences" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Send SMS Checkbox -->
+                <!-- Send SMS -->
                 <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/checkbox_send_message"
                     android:layout_width="wrap_content"
@@ -180,7 +189,7 @@
                     app:layout_constraintTop_toBottomOf="@id/layout_note"
                     app:layout_constraintStart_toStartOf="parent" />
 
-                <!-- Attach File Button -->
+                <!-- Attach file button -->
                 <Button
                     android:id="@+id/btn_attach_file"
                     android:layout_width="wrap_content"
@@ -190,7 +199,7 @@
                     app:layout_constraintTop_toBottomOf="@id/checkbox_send_message"
                     app:layout_constraintStart_toStartOf="parent" />
 
-                <!-- Save Button -->
+                <!-- Save Transaction -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_save"
                     android:layout_width="0dp"
