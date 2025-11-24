@@ -3,7 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="green1">#B8FFB8</color>
-
+    <color name="black1">#656A6A</color>
 
     <color name="primary_color">#1976D2</color> <!-- Blue -->
     <color name="secondary_color">#03A9F4</color> <!-- Light Blue -->

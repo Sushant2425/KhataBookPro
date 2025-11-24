@@ -5,15 +5,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
+    android:background="@color/white"
     android:fitsSystemWindows="true"
     tools:context=".activities.CustomerDetailsActivity">
 
+    <!-- App Bar with Toolbar and Balance Card -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/colorPrimary"
+        android:fitsSystemWindows="true">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_details"
@@ -24,8 +26,10 @@
             app:titleTextColor="@color/white"
             app:subtitleTextColor="@color/white" />
 
-        <!-- Header Card with Balance -->
+
+        <!-- Compact Balance Card -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/card_balance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
@@ -36,38 +40,37 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp"
-                android:background="@android:color/white">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/tv_details_balance_label"
-                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_gravity="center"
                     android:alpha="0.9"
-                    android:gravity="start"
                     android:textColor="@color/black"
                     android:textSize="16sp"
+                    android:textStyle="bold"
                     tools:text="You will get" />
 
                 <TextView
                     android:id="@+id/tv_details_net_balance"
-                    style="@style/TextAppearance.MaterialComponents.Headline4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
                     android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     tools:text="₹1,500.00" />
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Rest of your scrolling content remains SAME -->
+    <!-- Scrollable Content -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -75,83 +78,238 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white">
+            android:orientation="vertical">
 
-            <!-- Action Buttons (Report, WhatsApp, SMS) -->
+            <!-- Action Buttons Row -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_actions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="12dp">
+                android:layout_margin="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:paddingVertical="5dp"
+                    android:paddingHorizontal="8dp">
 
-                    <LinearLayout android:id="@+id/btn_report" style="@style/DetailsActionItem">
-                        <ImageView style="@style/DetailsActionIcon" android:src="@drawable/pdf"/>
-                        <TextView style="@style/DetailsActionLabel" android:text="Report"/>
+                    <LinearLayout
+                        android:id="@+id/btn_report"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/pdf"
+                            android:contentDescription="Report" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Report"
+                            android:textSize="12sp" />
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/btn_whatsapp" style="@style/DetailsActionItem">
-                        <ImageView style="@style/DetailsActionIcon" android:src="@drawable/whatsapp"/>
-                        <TextView style="@style/DetailsActionLabel" android:text="WhatsApp"/>
+
+                    <LinearLayout
+                        android:id="@+id/btn_whatsapp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/whatsapp"
+                            android:contentDescription="WhatsApp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="WhatsApp"
+                            android:textSize="12sp" />
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/btn_sms" style="@style/DetailsActionItem">
-                        <ImageView style="@style/DetailsActionIcon" android:src="@drawable/ic_sms"/>
-                        <TextView style="@style/DetailsActionLabel" android:text="SMS"/>
+
+                    <LinearLayout
+                        android:id="@+id/btn_sms"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_sms"
+                            android:contentDescription="SMS" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="SMS"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Summary Cards -->
+            <!-- Summary Cards Row -->
             <LinearLayout
+                android:id="@+id/layout_summary_cards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="5dp"
                 android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
 
-                <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
-                    <LinearLayout style="@style/DetailsSummaryContent" android:background="@color/white">
-                        <TextView style="@style/DetailsSummaryLabel" android:text="Total You Give" android:textColor="@color/green"/>
-                        <TextView android:id="@+id/tv_total_got" style="@style/DetailsSummaryAmount" tools:text="₹5000.00"/>
+                <!-- You Give Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_total_give"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total You Give"
+                            android:textColor="@color/green"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_total_got"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            tools:text="₹5000.00" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <View android:layout_width="12dp" android:layout_height="0dp"/>
+                <!-- You Get Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_total_get"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
 
-                <com.google.android.material.card.MaterialCardView style="@style/DetailsSummaryCard">
-                    <LinearLayout style="@style/DetailsSummaryContent" android:background="@color/white">
-                        <TextView style="@style/DetailsSummaryLabel" android:text="Total You Get" android:textColor="@color/red"/>
-                        <TextView android:id="@+id/tv_total_gave" style="@style/DetailsSummaryAmount" tools:text="₹3500.00"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total You Get"
+                            android:textColor="@color/red"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_total_gave"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            tools:text="₹3500.00" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <TextView
-                style="@style/TextAppearance.MaterialComponents.Overline"
-                android:layout_width="wrap_content"
+            <!-- Transaction Header -->
+            <LinearLayout
+                android:id="@+id/layout_transaction_header"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="6dp"
-                android:text="TRANSACTION HISTORY"/>
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="TRANSACTION"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/darker_gray" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="YOU GIVE"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/darker_gray" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="YOU GET"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/darker_gray" />
+            </LinearLayout>
+
+            <!-- Transaction RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_customer_transactions"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:padding="2dp"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_transaction"/>
+                android:paddingHorizontal="8dp"
+                android:paddingBottom="80dp"
+                tools:listitem="@layout/item_transaction" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_specific_transaction"
         android:layout_width="wrap_content"
@@ -159,6 +317,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:backgroundTint="@color/primary_dark"
-        app:tint="@color/white"
-        android:src="@drawable/ic_add"/>
+        android:contentDescription="Add Transaction"
+        android:src="@drawable/ic_add"
+        app:tint="@color/white" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

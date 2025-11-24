@@ -1,85 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:fitsSystemWindows="true"
-    android:background="@color/white"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <!-- DATE HEADER -->
+    <TextView
+        android:id="@+id/tv_top_header"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:padding="8dp">
+        android:layout_gravity="center"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="3dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:background="@drawable/bg_date_chip"
+        android:textColor="@color/black1"
+      />
 
-        <TextView
-            android:id="@+id/tv_transaction_type"
-            style="@style/TextAppearance.MaterialComponents.Subtitle1"
+    <!-- ROW (3 COLUMNS) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/white">
+
+        <!-- 🟦 COLUMN 40% -->
+        <LinearLayout
+            android:id="@+id/left_section"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tv_amount"
-            tools:text="You Gave" />
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingStart="4dp">
 
-        <TextView
-            android:id="@+id/tv_note"
-            style="@style/TextAppearance.MaterialComponents.Body2"
+            <TextView
+                android:id="@+id/tv_left_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DATE"
+                android:textSize="11sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_left_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TIME"
+                android:textSize="11sp"/>
+        </LinearLayout>
+
+        <!-- 🟥 COLUMN 30% (GAVE) -->
+        <LinearLayout
+            android:id="@+id/middle_amount"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:layout_marginStart="5dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:background="@drawable/background_balance_give">
 
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_transaction_type"
-            app:layout_constraintEnd_toEndOf="@id/tv_transaction_type"
-            tools:text="Note for the transaction" />
+            <TextView
+                android:id="@+id/tv_middle_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GAVE"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_date"
-            style="@style/TextAppearance.MaterialComponents.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+        <!-- 🟩 COLUMN 30% (GOT) -->
+        <LinearLayout
+            android:id="@+id/end_amount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:background="@drawable/background_balance_get"
+            android:layout_marginStart="4dp">
 
-            android:layout_marginTop="8dp"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_note"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="14 Nov 2025" />
+            <TextView
+                android:id="@+id/tv_end_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GOT"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_relative_time"
-            style="@style/TextAppearance.MaterialComponents.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+    </LinearLayout>
 
-            android:layout_marginStart="8dp"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toEndOf="@id/tv_date"
-            app:layout_constraintBaseline_toBaselineOf="@id/tv_date"
-            tools:text="(2 days ago)" />
-
-        <TextView
-            android:id="@+id/tv_amount"
-            style="@style/TextAppearance.MaterialComponents.Headline6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="₹500.00"
-            tools:textColor="@color/error" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>

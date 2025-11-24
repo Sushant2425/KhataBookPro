@@ -27,8 +27,10 @@ import com.sandhyasofttechh.mykhatapro.utils.ImageGenerator;
 import com.sandhyasofttechh.mykhatapro.utils.PdfGenerator;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -69,8 +71,16 @@ public class CustomerDetailsActivity extends AppCompatActivity
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar_details);
         setSupportActionBar(toolbar);
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            // Back Arrow White
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+
+            // 3 Dots (overflow menu) White
+            toolbar.setOverflowIcon(ContextCompat.getDrawable(this, R.drawable.ic_more_white));
+
             getSupportActionBar().setTitle(customerName);
             getSupportActionBar().setSubtitle(formatPhoneNumber(customerPhone));
         }
@@ -323,20 +333,40 @@ public class CustomerDetailsActivity extends AppCompatActivity
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Transaction t = ds.getValue(Transaction.class);
                     if (t != null) {
+
                         transactionList.add(t);
-                        if ("gave".equals(t.getType())) totalGave += t.getAmount();
-                        else totalGot += t.getAmount();
+
+                        if ("gave".equalsIgnoreCase(t.getType()))
+                            totalGave += t.getAmount();
+                        else
+                            totalGot += t.getAmount();
                     }
                 }
 
-                Collections.sort(transactionList, (a, b) -> Long.compare(b.getTimestamp(), a.getTimestamp()));
+                // 🔥 SORT BY FIREBASE DATE STRING (dd MMM yyyy)
+                Collections.sort(transactionList, (t1, t2) -> {
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+                        Date d1 = sdf.parse(t1.getDate());
+                        Date d2 = sdf.parse(t2.getDate());
+
+                        if (d1 != null && d2 != null)
+                            return d2.compareTo(d1);   // NEWEST DATE FIRST
+                    } catch (Exception e) {
+                        // fallback to timestamp if parsing fails
+                        return Long.compare(t2.getTimestamp(), t1.getTimestamp());
+                    }
+                    return 0;
+                });
+
                 adapter.notifyDataSetChanged();
                 updateSummary(totalGave, totalGot);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(CustomerDetailsActivity.this, "Failed to load data", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CustomerDetailsActivity.this,
+                        "Failed to load data", Toast.LENGTH_SHORT).show();
             }
         });
     }

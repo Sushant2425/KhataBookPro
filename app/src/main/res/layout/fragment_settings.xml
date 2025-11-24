@@ -1,476 +1,432 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="#F5F7FA"
-    android:padding="16dp">
+    android:background="#F5F7FA">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <!-- Collapsing Header -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header">
 
-        <!-- Profile Card -->
-        <com.google.android.material.card.MaterialCardView
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="3dp"
-            app:cardBackgroundColor="@android:color/white"
-            android:layout_marginBottom="20dp">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:contentScrim="@color/colorPrimary"
+            app:titleEnabled="false">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:padding="24dp">
+                android:padding="20dp"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7">
 
-                <!-- Logo with circular background -->
-                <FrameLayout
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginBottom="12dp">
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/img_logo_big"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:src="@drawable/img"
+                    app:civ_border_width="2dp"
+                    app:civ_border_color="@android:color/white"
+                    android:elevation="12dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tv_business_name_big"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="My Business"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:text="Tap photo to view full size"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Collapsed Toolbar - Small Icon + Name (Appears only when scrolled) -->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <LinearLayout
+                    android:id="@+id/collapsed_title_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:alpha="0">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/img_logo_small"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/img"
+                        app:civ_border_width="1dp"
+                        app:civ_border_color="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_business_name_small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:text="My Business"
+                        android:textColor="@android:color/white"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- ACCOUNT SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ACCOUNT"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:textColor="#7F8C8D"
+                android:letterSpacing="0.1"
+                android:paddingStart="8dp"
+                android:paddingBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/opt_change_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_lock_lock"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="18dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Change Password"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:tint="#95A5A6"
+                            android:rotation="270"/>
+                    </LinearLayout>
 
                     <View
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:backgroundTint="#E3F2FD"/>
-
-                    <ImageView
-                        android:id="@+id/img_logo"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:src="@drawable/img"
-                        android:padding="10dp"/>
-                </FrameLayout>
+                        android:layout_height="1dp"
+                        android:background="#F0F0F0"
+                        android:layout_marginStart="60dp"/>
 
-                <TextView
-                    android:id="@+id/tv_business_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="My Business"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="#2C3E50"
-                    android:layout_gravity="center" />
+                    <LinearLayout
+                        android:id="@+id/opt_sms_settings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Manage your account and app settings"
-                    android:textSize="13sp"
-                    android:textColor="#7F8C8D"
-                    android:layout_marginTop="4dp"
-                    android:layout_gravity="center" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_dialog_email"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="18dp"/>
 
-        <!-- ========================== ACCOUNT SECTION =========================== -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="SMS Settings"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ACCOUNT"
-            android:textStyle="bold"
-            android:textSize="12sp"
-            android:textColor="#7F8C8D"
-            android:letterSpacing="0.05"
-            android:paddingStart="4dp"
-            android:paddingBottom="8dp" />
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:tint="#95A5A6"
+                            android:rotation="270"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="@android:color/white"
-            android:layout_marginBottom="20dp">
-
-            <LinearLayout
-                android:orientation="vertical"
+            <!-- APP SECTION -->
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:text="APP"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:textColor="#7F8C8D"
+                android:letterSpacing="0.1"
+                android:paddingStart="8dp"
+                android:paddingBottom="12dp" />
 
-                <!-- Change Password -->
-                <LinearLayout
-                    android:id="@+id/opt_change_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_lock_lock"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="Change Password"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#ECEFF1"
-                    android:layout_marginStart="56dp"/>
-
-                <!-- SMS Settings -->
-                <LinearLayout
-                    android:id="@+id/opt_sms_settings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_dialog_email"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="SMS Settings"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#ECEFF1"
-                    android:layout_marginStart="56dp"/>
-
-                <!-- Payment Settings -->
-                <LinearLayout
-                    android:visibility="gone"
-                    android:id="@+id/opt_payment_settings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_today"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="Payment Settings"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
-                </LinearLayout>
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- ========================== APP SECTION =========================== -->
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="APP"
-            android:textStyle="bold"
-            android:textSize="12sp"
-            android:textColor="#7F8C8D"
-            android:letterSpacing="0.05"
-            android:paddingStart="4dp"
-            android:paddingBottom="8dp" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="@android:color/white"
-            android:layout_marginBottom="20dp">
-
-            <LinearLayout
-                android:orientation="vertical"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:layout_marginBottom="20dp">
 
-                <!-- Recycle Bin -->
                 <LinearLayout
-                    android:id="@+id/opt_recycle_bin"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="2dp"
+                    android:layout_height="wrap_content">
 
-                    android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_delete"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <LinearLayout
+                        android:id="@+id/opt_recycle_bin"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Recycle Bin"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_menu_delete"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="18dp"/>
 
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#ECEFF1"
-                    android:layout_marginStart="56dp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Recycle Bin"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
 
-                <!-- App Lock -->
-                <LinearLayout
-                    android:id="@+id/opt_app_lock"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="2dp"
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:tint="#95A5A6"
+                            android:rotation="270"/>
+                    </LinearLayout>
 
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="60dp"/>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_secure"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <LinearLayout
+                        android:id="@+id/opt_app_lock"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="App Lock"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_secure"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="18dp"/>
 
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#ECEFF1"
-                    android:layout_marginStart="56dp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="App Lock"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
 
-                <!-- Help And Support -->
-                <LinearLayout
-                    android:id="@+id/opt_help_support"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="2dp"
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:tint="#95A5A6"
+                            android:rotation="270"/>
+                    </LinearLayout>
 
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="60dp"/>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_help"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <LinearLayout
+                        android:id="@+id/opt_help_support"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Help And Support"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_menu_help"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="18dp"/>
 
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#ECEFF1"
-                    android:layout_marginStart="56dp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Help &amp; Support"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
 
-                <!-- About App -->
-                <LinearLayout
-                    android:id="@+id/opt_about_app"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="2dp"
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:tint="#95A5A6"
+                            android:rotation="270"/>
+                    </LinearLayout>
 
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="60dp"/>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_info_details"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <LinearLayout
+                        android:id="@+id/opt_about_app"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="About App"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_menu_info_details"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="18dp"/>
 
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#ECEFF1"
-                    android:layout_marginStart="56dp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="About App"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
 
-                <!-- About Us -->
-                <LinearLayout
-                    android:id="@+id/opt_about_us"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:layout_marginTop="2dp"
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:tint="#95A5A6"
+                            android:rotation="270"/>
+                    </LinearLayout>
 
-                    android:clickable="true"
-                    android:focusable="true">
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="60dp"/>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_view"
-                        android:tint="?attr/colorPrimary"
-                        android:layout_marginEnd="16dp"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <LinearLayout
+                        android:id="@+id/opt_about_us"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Backup Information"
-                        android:textSize="15sp"
-                        android:textColor="#2C3E50" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_more"
-                        android:tint="#95A5A6"
-                        android:rotation="270"/>
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_menu_view"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="18dp"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Backup Information"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:tint="#95A5A6"
+                            android:rotation="270"/>
+                    </LinearLayout>
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Hidden RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_settings_options"
-            android:layout_width="match_parent"
-            android:visibility="gone"
-            android:layout_height="match_parent"
-            android:overScrollMode="never" />
-
-        <!-- App Version Footer -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Version 1.0.0"
-            android:textSize="12sp"
-            android:textColor="#95A5A6"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
-
-    </LinearLayout>
-
-</ScrollView>
+            <!-- App Version -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MyKhata Pro v1.0.0"
+                android:textSize="13sp"
+                android:textColor="#95A5A6"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
