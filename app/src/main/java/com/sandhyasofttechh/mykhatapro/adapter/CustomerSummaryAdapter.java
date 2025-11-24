@@ -60,7 +60,7 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         holder.tvRelativeTime.setText(getCustomRelativeTime(summary.getLastTransactionDate()));
 
         double balance = summary.getNetBalance();
-        String balanceText = String.format(Locale.getDefault(), "₹%,.0f", Math.abs(balance));
+        String balanceText = String.format(Locale.getDefault(), "₹ %,.0f", Math.abs(balance));
         holder.tvNetBalance.setText(balanceText);
 
         if (balance > 0) {
