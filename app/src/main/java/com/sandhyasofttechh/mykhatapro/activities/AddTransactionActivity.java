@@ -97,6 +97,24 @@ public class AddTransactionActivity extends AppCompatActivity {
 
         checkSmsPermission();
 
+        autoCustomer.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedCustomer = (String) parent.getItemAtPosition(position);
+            // येथे तुम्ही तसेच प्रोसेस करू शकता, उदा. निवडलेला ग्राहक स्टोअर करणे
+        });
+        autoCustomer.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                customerAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+
         toggleButtonGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             containerFields.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
@@ -110,6 +128,10 @@ public class AddTransactionActivity extends AppCompatActivity {
                 openContactPicker();
             }
         });
+        customerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, customerNames);
+        autoCustomer.setAdapter(customerAdapter);
+        autoCustomer.setThreshold(1);
+
 
         btnAttachFile.setOnClickListener(v -> showFilePickerOptions());
         btnSave.setOnClickListener(v -> saveTransaction());
@@ -158,7 +180,8 @@ public class AddTransactionActivity extends AppCompatActivity {
 
     private void loadCustomers() {
         customersRef.addValueEventListener(new ValueEventListener() {
-            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 customerList.clear();
                 customerNames.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
@@ -169,10 +192,12 @@ public class AddTransactionActivity extends AppCompatActivity {
                     }
                 }
                 customerAdapter.notifyDataSetChanged();
+
                 if (editTransaction != null) {
                     autoCustomer.setText(editTransaction.getCustomerName() + " (" + editTransaction.getCustomerPhone() + ")");
                 }
             }
+
             @Override public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(AddTransactionActivity.this, "Failed to load customers", Toast.LENGTH_SHORT).show();
             }

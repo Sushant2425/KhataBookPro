@@ -70,4 +70,8 @@
     <color name="negative_balance">#B71C1C</color>
     <color name="zero_balance">#424242</color>
 
+    <color name="red_700">#D32F2F</color>
+    <color name="red_100">#FFCDD2</color>
+    <color name="green_700">#388E3C</color>
+    <color name="green_100">#C8E6C9</color>
 </resources>
