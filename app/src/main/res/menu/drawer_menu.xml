@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
 
-    <!-- Main Sections -->
-    <group
-        android:id="@+id/group_main_sections"
-        android:checkableBehavior="single">
+    <!-- Main Navigation Section -->
+    <group android:checkableBehavior="single">
 
         <item
             android:id="@+id/nav_dashboard"
@@ -27,36 +27,38 @@
             android:title="@string/settings" />
     </group>
 
-    <!-- Divider Item -->
-    <item
-        android:id="@+id/nav_divider"
-        android:title=" "
-    android:enabled="false" />
+    <!-- Account Section with Header -->
+    <item android:title="Account">
+        <menu>
+            <group android:checkableBehavior="none">
+                <item
+                    android:id="@+id/nav_profile"
+                    android:icon="@drawable/ic_person"
+                    android:title="@string/profile" />
+            </group>
+        </menu>
+    </item>
 
-    <!-- App Actions -->
-    <group
-        android:id="@+id/group_app_actions"
-        android:checkableBehavior="none">
+    <!-- More Options Section with Header -->
+    <item android:title="More">
+        <menu>
+            <group android:checkableBehavior="none">
+                <item
+                    android:id="@+id/nav_share"
+                    android:icon="@drawable/ic_share"
+                    android:title="@string/share_app" />
 
-        <item
-            android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_person"
-            android:title="@string/profile" />
+                <item
+                    android:id="@+id/nav_rate"
+                    android:icon="@drawable/ic_star"
+                    android:title="@string/rate_us" />
 
-        <item
-            android:id="@+id/nav_share"
-            android:icon="@drawable/ic_share"
-            android:title="@string/share_app" />
-
-        <item
-            android:id="@+id/nav_rate"
-            android:icon="@drawable/ic_star"
-            android:title="@string/rate_us" />
-
-        <item
-            android:id="@+id/nav_about"
-            android:icon="@drawable/ic_info"
-            android:title="@string/about" />
-    </group>
+                <item
+                    android:id="@+id/nav_about"
+                    android:icon="@drawable/ic_info"
+                    android:title="@string/about" />
+            </group>
+        </menu>
+    </item>
 
 </menu>

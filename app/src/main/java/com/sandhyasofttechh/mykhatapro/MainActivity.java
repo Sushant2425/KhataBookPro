@@ -13,8 +13,17 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttechh.mykhatapro.fragments.*;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 import androidx.appcompat.widget.Toolbar;
@@ -25,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private BottomNavigationView bottomNav;
     private NavigationView navigationView;
-
     private Toolbar toolbar;
 
     private static final String TAG_DASHBOARD = "dashboard";
@@ -36,6 +44,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG_ABOUT = "about";
 
     private PrefManager prefManager;
+    private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
+
+    // Header views
+    private CircleImageView ivUserPhoto;
+    private TextView tvUserName;
+    private TextView tvUserEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +58,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
         prefManager = new PrefManager(this);
+        mAuth = FirebaseAuth.getInstance();
 
         initViews();
         setupToolbar();
         setupDrawer();
         setupBottomNav();
         setupDrawerHeader();
+        loadUserProfile();
 
         if (savedInstanceState == null) {
             loadFragmentSafe(new DashboardFragment(), TAG_DASHBOARD);
@@ -66,7 +83,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setupToolbar() {
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("MyKhata Pro");
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("MyKhata Pro");
+        }
     }
 
     private void setupDrawer() {
@@ -80,13 +99,119 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setupDrawerHeader() {
         View header = navigationView.getHeaderView(0);
-        CircleImageView ivPhoto = header.findViewById(R.id.iv_user_photo);
-        TextView tvName = header.findViewById(R.id.tv_user_name);
-        TextView tvEmail = header.findViewById(R.id.tv_user_email);
+        ivUserPhoto = header.findViewById(R.id.iv_user_photo);
+        tvUserName = header.findViewById(R.id.tv_user_name);
+        tvUserEmail = header.findViewById(R.id.tv_user_email);
 
-        // Load from PrefManager or Firebase
-        tvName.setText(prefManager.getUserEmail());
-        tvEmail.setText(prefManager.getUserEmail());
+        // Set default values
+        tvUserName.setText("Loading...");
+        tvUserEmail.setText("");
+    }
+
+    private void loadUserProfile() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userEmail = currentUser.getEmail();
+
+            if (userEmail != null) {
+                // Replace '.' with ',' for Firebase key
+                String firebaseKey = userEmail.replace(".", ",");
+
+                // Reference to user's profile in Firebase
+                databaseReference = FirebaseDatabase.getInstance()
+                        .getReference("Khatabook")
+                        .child(firebaseKey)
+                        .child("profile");
+
+                // Listen for profile data
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            // Get profile data
+                            String businessName = snapshot.child("businessName").getValue(String.class);
+                            String email = snapshot.child("email").getValue(String.class);
+                            String logoUrl = snapshot.child("logoUrl").getValue(String.class);
+                            String name = snapshot.child("name").getValue(String.class);
+
+                            // Update header views
+                            updateDrawerHeader(businessName, email, logoUrl, name);
+
+                            // Save to PrefManager for offline access
+                            if (businessName != null) {
+                                prefManager.saveBusinessName(businessName);
+                            }
+                            if (logoUrl != null) {
+                                prefManager.saveLogoUrl(logoUrl);
+                            }
+                        } else {
+                            // Profile doesn't exist, show email
+                            tvUserName.setText(userEmail);
+                            tvUserEmail.setText(userEmail);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        // Handle error - show cached data if available
+                        String cachedBusinessName = prefManager.getBusinessName();
+                        String cachedEmail = prefManager.getUserEmail();
+                        String cachedLogoUrl = prefManager.getLogoUrl();
+
+                        if (cachedBusinessName != null) {
+                            tvUserName.setText(cachedBusinessName);
+                            tvUserEmail.setText(cachedEmail != null ? cachedEmail : "");
+
+                            if (cachedLogoUrl != null && !cachedLogoUrl.isEmpty()) {
+                                loadProfileImage(cachedLogoUrl);
+                            }
+                        } else {
+                            tvUserName.setText("Error loading profile");
+                            tvUserEmail.setText("");
+                        }
+                    }
+                });
+            }
+        } else {
+            // No user logged in
+            tvUserName.setText("Guest");
+            tvUserEmail.setText("Please login");
+        }
+    }
+
+    private void updateDrawerHeader(String businessName, String email, String logoUrl, String name) {
+        // Priority: Business Name > Name > Email
+        if (businessName != null && !businessName.isEmpty()) {
+            tvUserName.setText(businessName);
+        } else if (name != null && !name.isEmpty()) {
+            tvUserName.setText(name);
+        } else {
+            tvUserName.setText("MyKhata User");
+        }
+
+        // Set email
+        if (email != null && !email.isEmpty()) {
+            tvUserEmail.setText(email);
+            tvUserEmail.setVisibility(View.VISIBLE);
+        } else {
+            tvUserEmail.setVisibility(View.GONE);
+        }
+
+        // Load profile image with Glide
+        if (logoUrl != null && !logoUrl.isEmpty()) {
+            loadProfileImage(logoUrl);
+        }
+    }
+
+    private void loadProfileImage(String imageUrl) {
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.ic_person)
+                .error(R.drawable.ic_person)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .circleCrop()
+                .into(ivUserPhoto);
     }
 
     private void setupBottomNav() {
@@ -123,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loadFragmentSafe(new SettingsFragment(), TAG_SETTINGS);
             bottomNav.setSelectedItemId(id);
         }
-
         // Drawer-only items
         else if (id == R.id.nav_profile) {
             loadFragmentSafe(new ProfileFragment(), TAG_PROFILE);
@@ -132,8 +256,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_rate) {
             rateApp();
         } else if (id == R.id.nav_about) {
-//            loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
+            // loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
         }
+
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -150,28 +275,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setToolbarTitle(String tag) {
-        switch (tag) {
-            case TAG_DASHBOARD:
-                getSupportActionBar().setTitle("Dashboard");
-                break;
-            case TAG_CUSTOMERS:
-                getSupportActionBar().setTitle("Customers");
-                break;
-            case TAG_REPORTS:
-                getSupportActionBar().setTitle("Reports");
-                break;
-            case TAG_SETTINGS:
-                getSupportActionBar().setTitle("Settings");
-                break;
-            case TAG_PROFILE:
-                getSupportActionBar().setTitle("Profile");
-                break;
-            case TAG_ABOUT:
-                getSupportActionBar().setTitle("About");
-                break;
-            default:
-                getSupportActionBar().setTitle("MyKhata Pro");
-                break;
+        if (getSupportActionBar() != null) {
+            switch (tag) {
+                case TAG_DASHBOARD:
+                    getSupportActionBar().setTitle("Dashboard");
+                    break;
+                case TAG_CUSTOMERS:
+                    getSupportActionBar().setTitle("Customers");
+                    break;
+                case TAG_REPORTS:
+                    getSupportActionBar().setTitle("Reports");
+                    break;
+                case TAG_SETTINGS:
+                    getSupportActionBar().setTitle("Settings");
+                    break;
+                case TAG_PROFILE:
+                    getSupportActionBar().setTitle("Profile");
+                    break;
+                case TAG_ABOUT:
+                    getSupportActionBar().setTitle("About");
+                    break;
+                default:
+                    getSupportActionBar().setTitle("MyKhata Pro");
+                    break;
+            }
         }
     }
 
@@ -185,7 +312,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void rateApp() {
         String appId = getPackageName();
         Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appId));
-        startActivity(rateIntent);
+        try {
+            startActivity(rateIntent);
+        } catch (Exception e) {
+            // If Play Store not available, open in browser
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + appId)));
+        }
     }
 
     @Override
@@ -194,6 +327,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remove Firebase listener to prevent memory leaks
+        if (databaseReference != null) {
+            databaseReference.removeEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {}
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
         }
     }
 }
