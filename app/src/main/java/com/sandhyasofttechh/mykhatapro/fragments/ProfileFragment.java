@@ -8,6 +8,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -37,6 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class ProfileFragment extends Fragment {
+    private ProgressBar progressBarProfile;
 
     private CircleImageView ivProfileLogo;
     private TextInputEditText etName, etBusinessName, etMobile, etAddress, etGstin, etEmail;
@@ -91,6 +93,7 @@ public class ProfileFragment extends Fragment {
         etAddress = view.findViewById(R.id.etAddress);
         etGstin = view.findViewById(R.id.etGstin);
         etEmail = view.findViewById(R.id.etEmail);
+        progressBarProfile = view.findViewById(R.id.progressBarProfile);
 
         view.findViewById(R.id.btnSaveProfile).setOnClickListener(v -> saveProfile());
 
@@ -241,7 +244,7 @@ public class ProfileFragment extends Fragment {
             etName.requestFocus();
             return;
         }
-
+        progressBarProfile.setVisibility(View.VISIBLE);
         if (logoUri != null) {
             uploadLogoAndSave(name);
         } else {
@@ -254,8 +257,10 @@ public class ProfileFragment extends Fragment {
                 .addOnSuccessListener(taskSnapshot -> logoRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     saveProfileToDatabase(uri.toString(), name);
                 }))
-                .addOnFailureListener(e -> Toast.makeText(getContext(),
-                        "Upload failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                .addOnFailureListener(e -> {
+                    progressBarProfile.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 
     private void saveTextOnly(String name) {
@@ -277,9 +282,13 @@ public class ProfileFragment extends Fragment {
         }
 
         userRef.updateChildren(updates)
-                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(),
-                        "Profile saved successfully!", Toast.LENGTH_LONG).show())
-                .addOnFailureListener(e -> Toast.makeText(getContext(),
-                        "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                .addOnSuccessListener(aVoid -> {
+                    progressBarProfile.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Profile saved successfully!", Toast.LENGTH_LONG).show();
+                })
+                .addOnFailureListener(e -> {
+                    progressBarProfile.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 }
