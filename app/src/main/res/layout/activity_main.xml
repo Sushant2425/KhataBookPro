@@ -36,16 +36,36 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <!-- Bottom Navigation -->
+        <!-- Bottom Navigation with cutout for FAB -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:background="@color/gray"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:background="@color/gray"
             app:itemIconTint="@color/bottom_nav_selector"
             app:itemTextColor="@color/bottom_nav_selector"
-            app:menu="@menu/bottom_nav_menu" />
+            app:menu="@menu/bottom_nav_menu"
+            app:labelVisibilityMode="labeled"
+            app:fabCradleMargin="8dp"
+            app:fabCradleRoundedCornerRadius="16dp"
+            app:fabCradleVerticalOffset="8dp" />
+
+        <!-- Stylish FAB for Add Transaction -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_transaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="32dp"
+            android:src="@drawable/ic_add"
+            app:borderWidth="0dp"
+            app:elevation="8dp"
+            app:fabSize="normal"
+            app:rippleColor="@android:color/white"
+            app:backgroundTint="@color/fab_background"
+            app:tint="@android:color/white"
+            app:useCompatPadding="true" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -55,8 +75,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:elevation="8dp"
         android:background="@color/white"
+        app:elevation="8dp"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu" />
 

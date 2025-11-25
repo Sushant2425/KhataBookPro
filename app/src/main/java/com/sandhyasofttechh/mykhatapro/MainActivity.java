@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,7 +29,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sandhyasofttechh.mykhatapro.activities.AboutUsActivity;
 import com.sandhyasofttechh.mykhatapro.fragments.*;
 import com.sandhyasofttechh.mykhatapro.register.LoginActivity;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BottomNavigationView bottomNav;
     private NavigationView navigationView;
     private Toolbar toolbar;
+    private FloatingActionButton fabAddTransaction;
 
     private static final String TAG_DASHBOARD = "dashboard";
     private static final String TAG_CUSTOMERS = "customers";
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupToolbar();
         setupDrawer();
         setupBottomNav();
+        setupFAB();
         setupDrawerHeader();
         loadUserProfile();
 
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bottomNav = findViewById(R.id.bottom_navigation);
         navigationView = findViewById(R.id.nav_view);
         toolbar = findViewById(R.id.toolbar);
+        fabAddTransaction = findViewById(R.id.fab_add_transaction);
     }
 
     private void setupToolbar() {
@@ -233,9 +236,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 loadFragmentSafe(new ReportsFragment(), TAG_REPORTS);
             } else if (id == R.id.nav_settings) {
                 loadFragmentSafe(new SettingsFragment(), TAG_SETTINGS);
+            } else if (id == R.id.placeholder) {
+                // Ignore placeholder click
+                return false;
             }
             navigationView.setCheckedItem(id);
             return true;
+        });
+    }
+
+    private void setupFAB() {
+        fabAddTransaction.setOnClickListener(v -> {
+            // TODO: Create and navigate to AddTransactionActivity
+            // Intent intent = new Intent(MainActivity.this, AddTransactionActivity.class);
+            // startActivity(intent);
+
+            // Temporary: Show Toast until AddTransactionActivity is created
+            Toast.makeText(this, "Add Transaction - Coming Soon!", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -264,9 +281,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             shareApp();
         } else if (id == R.id.nav_rate) {
             rateApp();
-        }else if (id == R.id.nav_about) {
-            Intent intent = new Intent(this, AboutUsActivity.class);
-            startActivity(intent);
+        } else if (id == R.id.nav_about) {
+            // loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
         } else if (id == R.id.nav_logout) {
             showLogoutDialog();
         }

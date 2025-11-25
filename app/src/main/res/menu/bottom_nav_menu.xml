@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/nav_dashboard"
-
         android:icon="@drawable/ic_dashboard"
         android:title="@string/dashboard" />
+
     <item
         android:id="@+id/nav_customers"
         android:icon="@drawable/ic_customers"
         android:title="@string/customers" />
+
+    <!-- Empty placeholder for FAB in the middle -->
+    <item
+        android:id="@+id/placeholder"
+        android:enabled="false"
+        android:title="" />
+
     <item
         android:id="@+id/nav_reports"
         android:icon="@drawable/ic_reports"
         android:title="@string/reports" />
+
     <item
         android:id="@+id/nav_settings"
         android:icon="@drawable/ic_settings"
         android:title="@string/settings" />
+
 </menu>

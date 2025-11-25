@@ -63,6 +63,11 @@
     <color name="bottom_nav_selected">#3F51B5</color>
     <color name="bottom_nav_unselected">#757575</color>
 
+    <!-- FAB Colors - Choose your preferred gradient colors -->
+    <color name="fab_background">#4CAF50</color> <!-- Green -->
+    <color name="fab_background_start">#43A047</color>
+    <color name="fab_background_end">#66BB6A</color>
+
     <color name="colorPrimaryDark">#0D47A1</color>
     <color name="card_bg">#FFFFFF</color>
     <color name="divider">#E0E0E0</color>
