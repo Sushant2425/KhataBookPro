@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sandhyasofttechh.mykhatapro.activities.AddTransactionActivity;
 import com.sandhyasofttechh.mykhatapro.fragments.*;
 import com.sandhyasofttechh.mykhatapro.register.LoginActivity;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
@@ -248,11 +249,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setupFAB() {
         fabAddTransaction.setOnClickListener(v -> {
             // TODO: Create and navigate to AddTransactionActivity
-            // Intent intent = new Intent(MainActivity.this, AddTransactionActivity.class);
-            // startActivity(intent);
+             Intent intent = new Intent(MainActivity.this, AddTransactionActivity.class);
+             startActivity(intent);
 
             // Temporary: Show Toast until AddTransactionActivity is created
-            Toast.makeText(this, "Add Transaction - Coming Soon!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Add Transaction - Coming Soon!", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -277,11 +278,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Drawer-only items
         else if (id == R.id.nav_profile) {
             loadFragmentSafe(new ProfileFragment(), TAG_PROFILE);
-        } else if (id == R.id.nav_share) {
-            shareApp();
-        } else if (id == R.id.nav_rate) {
-            rateApp();
-        } else if (id == R.id.nav_about) {
+        }
+//        else if (id == R.id.nav_share) {
+//            shareApp();
+//        } else if (id == R.id.nav_rate) {
+//            rateApp();
+//        }
+        else if (id == R.id.nav_about) {
             // loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
         } else if (id == R.id.nav_logout) {
             showLogoutDialog();

@@ -271,6 +271,7 @@
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="90dp"
         app:fabSize="normal"
+        android:visibility="gone"
         android:src="@drawable/ic_add"
         app:tint="@android:color/white"
         app:backgroundTint="#3F51B5"

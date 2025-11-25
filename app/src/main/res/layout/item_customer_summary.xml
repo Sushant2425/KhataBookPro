@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/gray"
-    android:fitsSystemWindows="true"
+    android:background="@color/gray"    android:fitsSystemWindows="true"
     android:layout_marginVertical="1dp"
     android:layout_marginHorizontal="3dp"
 
@@ -17,14 +16,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/white">
+        android:background="@color/gray">
 
         <!-- LEFT SIDE -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="8dp"
+            android:padding="10dp"
+            android:background="@color/gray"
             android:layout_height="wrap_content">
 
             <TextView
@@ -103,11 +103,13 @@
                 android:layout_height="wrap_content"
                 android:text="Reminder"
                 android:textColor="@color/red"
-                android:textSize="12sp"
-                android:paddingHorizontal="12dp"
+                android:textSize="10sp"
                 android:paddingVertical="6dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/bg_clickable"
-                android:visibility="gone"/>
+                android:layout_gravity="end"
+                android:layout_marginEnd="20dp"
+               />
 
         </LinearLayout>
 

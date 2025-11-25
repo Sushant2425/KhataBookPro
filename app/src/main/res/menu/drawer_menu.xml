@@ -48,15 +48,15 @@
     <item android:title="More">
         <menu>
             <group android:checkableBehavior="none">
-                <item
-                    android:id="@+id/nav_share"
-                    android:icon="@drawable/ic_share"
-                    android:title="@string/share_app" />
+<!--                <item-->
+<!--                    android:id="@+id/nav_share"-->
+<!--                    android:icon="@drawable/ic_share"-->
+<!--                    android:title="@string/share_app" />-->
 
-                <item
-                    android:id="@+id/nav_rate"
-                    android:icon="@drawable/ic_star"
-                    android:title="@string/rate_us" />
+<!--                <item-->
+<!--                    android:id="@+id/nav_rate"-->
+<!--                    android:icon="@drawable/ic_star"-->
+<!--                    android:title="@string/rate_us" />-->
 
                 <item
                     android:id="@+id/nav_about"
