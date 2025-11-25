@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_edit_customer"
         android:title="Edit"
         android:icon="@drawable/ic_edit"
-        android:iconTint="@color/white"
-        android:showAsAction="always" />
+        app:showAsAction="never"
+        android:iconTint="@color/black1" />
+
+    <item
+        android:id="@+id/action_share_pdf"
+        android:title="Share PDF"
+        android:icon="@drawable/ic_share"
+        app:showAsAction="never"
+        android:iconTint="@color/black1" />
+
 </menu>

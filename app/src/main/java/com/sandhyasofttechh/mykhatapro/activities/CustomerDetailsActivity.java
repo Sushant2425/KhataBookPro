@@ -27,6 +27,7 @@ import com.sandhyasofttechh.mykhatapro.utils.ImageGenerator;
 import com.sandhyasofttechh.mykhatapro.utils.PdfGenerator;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -104,16 +105,40 @@ public class CustomerDetailsActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.menu_customer_details, menu);
         return true;
     }
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu != null) {
+            try {
+                Method method = menu.getClass().getDeclaredMethod(
+                        "setOptionalIconsVisible", Boolean.TYPE);
+                method.setAccessible(true);
+                method.invoke(menu, true);
+            } catch (Exception ignored) {}
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
             finish();
             return true;
-        } else if (item.getItemId() == R.id.action_edit_customer) {
+        }
+
+        if (id == R.id.action_edit_customer) {
             editCustomer();
             return true;
         }
+
+        if (id == R.id.action_share_pdf) {
+            shareFullPdfDirect();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -124,6 +149,37 @@ public class CustomerDetailsActivity extends AppCompatActivity
         intent.putExtra("CUSTOMER_NAME", customerName);
         startActivity(intent);
     }
+
+
+
+    private void shareFullPdfDirect() {
+        if (transactionList.isEmpty()) {
+            Toast.makeText(this, "No transactions found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Full report range label
+        String dateRange = "Full Report";
+
+        // Opening balance (0 by default)
+        double openingBalance = 0;
+
+        File pdfFile = PdfGenerator.generatePdf(
+                this,
+                customerName,
+                customerPhone,
+                transactionList,
+                dateRange,
+                openingBalance
+        );
+
+        if (pdfFile != null) {
+            sharePdfIntent(pdfFile);
+        } else {
+            Toast.makeText(this, "Failed to generate PDF.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     // Refresh name & phone when user returns after editing
     @Override
