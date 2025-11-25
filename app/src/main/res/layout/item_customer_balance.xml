@@ -47,6 +47,7 @@
             android:textSize="16sp"
             android:textColor="@color/green"
             android:text="₹0.00"
+            android:visibility="gone"
             android:layout_marginTop="6dp"
             android:textStyle="bold"/>
 
