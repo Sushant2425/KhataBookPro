@@ -232,7 +232,19 @@ public class CustomerDetailsActivity extends AppCompatActivity
             Toast.makeText(this, "No transactions for the selected period.", Toast.LENGTH_SHORT).show();
             return;
         }
-        File pdfFile = PdfGenerator.generatePdf(this, customerName, customerPhone, transactions, dateRangeLabel);
+
+        // Opening balance (if you do not have opening balance, keep 0)
+        double openingBalance = 0;
+
+        File pdfFile = PdfGenerator.generatePdf(
+                this,
+                customerName,
+                customerPhone,
+                transactions,
+                dateRangeLabel,
+                openingBalance
+        );
+
         if (pdfFile != null) {
             showPdfOptionsDialog(pdfFile);
         } else {
