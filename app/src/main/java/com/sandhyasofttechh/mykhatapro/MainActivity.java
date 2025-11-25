@@ -6,13 +6,17 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -25,8 +29,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttechh.mykhatapro.fragments.*;
+import com.sandhyasofttechh.mykhatapro.register.LoginActivity;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
+
 import androidx.appcompat.widget.Toolbar;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -241,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_customers) {
             loadFragmentSafe(new CustomersFragment(), TAG_CUSTOMERS);
             bottomNav.setSelectedItemId(id);
+
         } else if (id == R.id.nav_reports) {
             loadFragmentSafe(new ReportsFragment(), TAG_REPORTS);
             bottomNav.setSelectedItemId(id);
@@ -257,6 +265,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             rateApp();
         } else if (id == R.id.nav_about) {
             // loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
+        } else if (id == R.id.nav_logout) {
+            showLogoutDialog();
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -319,6 +329,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(new Intent(Intent.ACTION_VIEW,
                     Uri.parse("https://play.google.com/store/apps/details?id=" + appId)));
         }
+    }
+
+    private void showLogoutDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> performLogout())
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
+    }
+
+    private void performLogout() {
+        // Sign out from Firebase
+        mAuth.signOut();
+
+        // Clear all saved data from PrefManager
+        prefManager.clear();
+
+        // Show logout message
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+
+        // Navigate to LoginActivity
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override
