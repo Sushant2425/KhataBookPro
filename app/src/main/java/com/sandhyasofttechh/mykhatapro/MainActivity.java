@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sandhyasofttechh.mykhatapro.activities.AboutUsActivity;
 import com.sandhyasofttechh.mykhatapro.fragments.*;
 import com.sandhyasofttechh.mykhatapro.register.LoginActivity;
 import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
@@ -263,8 +264,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             shareApp();
         } else if (id == R.id.nav_rate) {
             rateApp();
-        } else if (id == R.id.nav_about) {
-            // loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
+        }else if (id == R.id.nav_about) {
+            Intent intent = new Intent(this, AboutUsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_logout) {
             showLogoutDialog();
         }
