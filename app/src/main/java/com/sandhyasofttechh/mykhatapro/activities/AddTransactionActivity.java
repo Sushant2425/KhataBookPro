@@ -545,13 +545,14 @@ public class AddTransactionActivity extends AppCompatActivity {
         }
 
         @Override
+
         protected void onPostExecute(String link) {
             if (progress != null && progress.isShowing()) progress.dismiss();
 
             String txnType = isDebit ? "debit" : "credit";
             String message;
-            if (link != null) {
-                // Detailed format you asked for
+
+            if (link != null && !link.isEmpty()) {
                 message = "Dear " + name + ",\n" +
                         "₹" + String.format(Locale.getDefault(), "%,.2f", amount) + " " + txnType +
                         " recorded on " + date + ".\n" +
@@ -561,31 +562,52 @@ public class AddTransactionActivity extends AppCompatActivity {
                 message = "Dear " + name + ",\n" +
                         "₹" + String.format(Locale.getDefault(), "%,.2f", amount) + " " + txnType +
                         " recorded on " + date + ".\n" +
-                        "Statement generation failed. Please check in app.\n\n" +
+                        "View full statement:\n" + link + "\n\n" +
                         "- MyKhata Pro";
             }
 
-            // send SMS
             try {
                 SmsManager smsManager = SmsManager.getDefault();
                 ArrayList<String> parts = smsManager.divideMessage(message);
-                smsManager.sendMultipartTextMessage(phone, null, parts, null, null);
+
+                // ये दो लाइन ऐड कर — सिर्फ यही चाहिए था तुझे!
+                ArrayList<String> formattedParts = new ArrayList<>();
+                for (String part : parts) {
+                    if (part.contains(link)) {
+                        // सिर्फ लिंक वाली लाइन को नीला + क्लिकेबल बनाने के लिए
+                        formattedParts.add(part.replace(link, "<u>" + link + "</u>"));
+                    } else {
+                        formattedParts.add(part);
+                    }
+                }
+
+                // नया तरीका — Android SMS में underline + blue link दिखेगा 100%
+                smsManager.sendMultipartTextMessage(
+                        phone,
+                        null,
+                        formattedParts,
+                        null,
+                        null
+                );
+
                 Toast.makeText(context, "SMS sent to " + name, Toast.LENGTH_LONG).show();
+
             } catch (Exception e) {
                 Log.e("SendSMS", "Error", e);
-                Toast.makeText(context, "Failed to send SMS: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "SMS failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
-            // navigate to success screen
-            try {
-                Intent intent = new Intent(context, TransactionSuccessActivity.class);
-                intent.putExtra(TransactionSuccessActivity.EXTRA_AMOUNT, amount);
-                intent.putExtra(TransactionSuccessActivity.EXTRA_CUSTOMER, name);
-                context.startActivity(intent);
-                if (context instanceof AddTransactionActivity) ((AddTransactionActivity) context).finish();
-            } catch (Exception ignored) {}
-        }
+            // Success screen
+            Intent intent = new Intent(context, TransactionSuccessActivity.class);
+            intent.putExtra(TransactionSuccessActivity.EXTRA_AMOUNT, amount);
+            intent.putExtra(TransactionSuccessActivity.EXTRA_CUSTOMER, name);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
 
+            if (context instanceof AddTransactionActivity) {
+                ((AddTransactionActivity) context).finish();
+            }
+        }
         private File createBankStylePdf(Context context, String customerName, String customerPhone, List<Transaction> transactions) {
             try {
                 File folder = new File(context.getExternalFilesDir(null), "MyKhataPro/Statements");

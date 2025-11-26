@@ -14,7 +14,7 @@ public class User {
         this.uid = uid;
         this.email = email;
         this.password = password;
-        this.status = true;
+        this.status = false ;
     }
     public boolean isStatus() { return status; }
     public void setStatus(boolean status) { this.status = status; }
