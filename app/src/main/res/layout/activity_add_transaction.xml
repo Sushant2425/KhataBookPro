@@ -51,7 +51,6 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
                 android:backgroundTint="@color/gray"
-
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
@@ -143,55 +142,52 @@
                         android:layout_marginTop="24dp"
                         android:layout_marginBottom="12dp" />
 
-                    <!-- Transaction Type Toggle -->
+                    <!-- Transaction Type Toggle with Enhanced Selection States -->
                     <com.google.android.material.button.MaterialButtonToggleGroup
                         android:id="@+id/toggle_button_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:singleSelection="true"
-                        app:selectionRequired="false">
+                        app:selectionRequired="true">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_gave"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="56dp"
-                            android:text="You Give"
-                            android:textColor="@color/red_700"
-                            android:textSize="15sp"
+                            android:layout_height="64dp"
+                            android:text="You Give ↑"
+                            android:textSize="16sp"
                             android:textStyle="bold"
-                            app:cornerRadius="12dp"
                             app:strokeColor="@color/red_700"
-                            app:strokeWidth="2dp"
-                            app:backgroundTint="@color/red_100" />
+                            android:elevation="2dp"
+                            app:cornerRadius="12dp"
+                            app:strokeWidth="1dp" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_got"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:layout_height="56dp"
-                            android:text="You Get"
-                            android:textColor="@color/green_700"
-                            android:textSize="15sp"
+                            android:layout_height="64dp"
+                            android:text="You Get ↓"
+                            android:textSize="16sp"
+                            app:strokeColor="@color/green"
                             android:textStyle="bold"
+                            android:elevation="2dp"
                             app:cornerRadius="12dp"
-                            app:strokeColor="@color/green_700"
-                            app:strokeWidth="2dp"
-                            app:backgroundTint="@color/green_100" />
+                            app:strokeWidth="1dp" />
                     </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Transaction Details Card (Shows after type selection) -->
+            <!-- Transaction Details Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:backgroundTint="@color/gray"
-
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -201,7 +197,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/gray"
-
                     android:visibility="gone"
                     android:padding="20dp"
                     tools:visibility="visible">
@@ -217,7 +212,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
-                    <!-- Amount with larger input -->
+                    <!-- Amount -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/layout_amount"
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
