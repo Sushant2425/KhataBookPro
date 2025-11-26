@@ -6,14 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="?attr/colorSurface"
+    android:background="@color/gray"
     tools:context=".activities.AddTransactionActivity"
-    android:name=".activities.AddTransactionActivity"
-    android:windowSoftInputMode="adjustResize|stateHidden" >
+    android:windowSoftInputMode="adjustResize|stateHidden">
 
+    <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:elevation="0dp"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -26,220 +28,289 @@
             app:navigationIconTint="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Main Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:fillViewport="true"
+        android:background="@color/gray"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:background="@color/gray"
-            android:layout_margin="20dp">
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
-            <!-- Date -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_date"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
+            <!-- Basic Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Date"
-                app:startIconDrawable="@drawable/ic_calendar"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                android:backgroundTint="@color/gray"
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_date"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:clickable="true" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:backgroundTint="@color/gray"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-            <!-- Customer Selection -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_customer"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Basic Information"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Date -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_date"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Date"
+                        app:startIconDrawable="@drawable/ic_calendar"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:textColor="@color/black" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Customer Selection -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_customer"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="Select Customer"
+                        app:startIconDrawable="@drawable/ic_person"
+                        app:endIconDrawable="@drawable/baseline_contact_mail_24"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/auto_customer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:imeOptions="actionDone"
+                            android:textColor="@color/black" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Add Customer Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_add_customer"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add Customer"
+                        android:textAllCaps="false"
+                        android:textColor="@color/teal_700"
+                        android:layout_marginTop="4dp"
+                        app:icon="@drawable/ic_add"
+                        app:iconTint="@color/teal_700"
+                        app:iconGravity="textStart" />
+
+                    <!-- Transaction Type Label -->
+                    <TextView
+                        android:id="@+id/tv_type_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Transaction Type"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Transaction Type Toggle -->
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggle_button_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:selectionRequired="false">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_gave"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="56dp"
+                            android:text="You Give"
+                            android:textColor="@color/red_700"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp"
+                            app:strokeColor="@color/red_700"
+                            app:strokeWidth="2dp"
+                            app:backgroundTint="@color/red_100" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_got"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="56dp"
+                            android:text="You Get"
+                            android:textColor="@color/green_700"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp"
+                            app:strokeColor="@color/green_700"
+                            app:strokeWidth="2dp"
+                            app:backgroundTint="@color/green_100" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Transaction Details Card (Shows after type selection) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Select Customer"
-                app:startIconDrawable="@drawable/ic_person"
-                app:endIconDrawable="@drawable/baseline_contact_mail_24"
-                app:layout_constraintTop_toBottomOf="@id/layout_date"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:boxStrokeColor="@color/gray"
-                app:boxStrokeWidthFocused="2dp">
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/gray"
 
-                <AutoCompleteTextView
-                    android:id="@+id/auto_customer"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/container_fields"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:imeOptions="actionDone"
-                    android:textColor="@color/black"
-                    app:boxStrokeColor="@color/gray"
-                    />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:backgroundTint="@color/gray"
 
-            <!-- Add Customer Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_add_customer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add Customer"
-                android:textAllCaps="false"
-                android:textColor="@color/teal_700"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@android:color/transparent"
-                android:padding="0dp"
-                app:icon="@drawable/ic_add"
-                app:iconTint="@color/teal_700"
-                app:iconGravity="textStart"
-                app:layout_constraintTop_toBottomOf="@id/layout_customer"
-                app:layout_constraintStart_toStartOf="parent" />
+                    android:visibility="gone"
+                    android:padding="20dp"
+                    tools:visibility="visible">
 
-            <!-- Transaction Type Label -->
-            <TextView
-                android:id="@+id/tv_type_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Transaction Type"
-                android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:layout_marginTop="24dp"
-                android:textColor="@color/black"
-                app:layout_constraintTop_toBottomOf="@id/btn_add_customer"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <!-- Transaction Type Toggle -->
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/toggle_button_group"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:singleSelection="true"
-                app:layout_constraintTop_toBottomOf="@id/tv_type_label"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_gave"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="You Give"
-                    android:textColor="@color/red_700"
-                    android:backgroundTint="@color/red_100"
-                    app:cornerRadius="8dp"
-                    app:strokeWidth="0dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_got"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="You Get"
-                    android:textColor="@color/green_700"
-                    android:backgroundTint="@color/green_100"
-                    app:cornerRadius="8dp"
-                    app:strokeWidth="0dp" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
-
-            <!-- Transaction Input Fields Container -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/container_fields"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/toggle_button_group"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <!-- Amount -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layout_amount"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Amount"
-                    app:startIconDrawable="@drawable/ic_rupee"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_amount"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tv_details_header"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:textColor="@color/black" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:text="Transaction Details"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
 
-                <!-- Note -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/layout_note"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Note (optional)"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/layout_amount"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_note"
-                        android:layout_width="match_parent"
+                    <!-- Amount with larger input -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_amount"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:inputType="textCapSentences"
-                        android:textColor="@color/black" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginTop="16dp"
+                        android:hint="Amount"
+                        app:startIconDrawable="@drawable/ic_rupee"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:layout_constraintTop_toBottomOf="@id/tv_details_header"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- Send SMS Checkbox -->
-                <com.google.android.material.checkbox.MaterialCheckBox
-                    android:id="@+id/checkbox_send_message"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Send SMS notification"
-                    android:checked="true"
-                    android:layout_marginTop="16dp"
-                    android:textColor="@color/black"
-                    app:layout_constraintTop_toBottomOf="@id/layout_note"
-                    app:layout_constraintStart_toStartOf="parent" />
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_amount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:textColor="@color/black"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Attach File Button -->
-                <Button
-                    android:id="@+id/btn_attach_file"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Attach File/Photo"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/checkbox_send_message"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    <!-- Note -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_note"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Note (optional)"
+                        android:layout_marginTop="16dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:layout_constraintTop_toBottomOf="@id/layout_amount"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- Save Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_save"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Save Transaction"
-                    android:layout_marginTop="32dp"
-                    android:paddingVertical="14dp"
-                    app:icon="@drawable/ic_save"
-                    app:iconGravity="textStart"
-                    app:layout_constraintTop_toBottomOf="@id/btn_attach_file"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_note"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapSentences|textMultiLine"
+                            android:maxLines="3"
+                            android:textColor="@color/black" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <!-- Send SMS Checkbox -->
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/checkbox_send_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Send SMS notification"
+                        android:checked="true"
+                        android:layout_marginTop="16dp"
+                        android:textColor="@color/black"
+                        app:layout_constraintTop_toBottomOf="@id/layout_note"
+                        app:layout_constraintStart_toStartOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <!-- Attach File Button -->
+                    <Button
+                        android:id="@+id/btn_attach_file"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Attach File/Photo"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintTop_toBottomOf="@id/checkbox_send_message"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <!-- Save Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_save"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Save Transaction"
+                        android:layout_marginTop="32dp"
+                        android:paddingVertical="14dp"
+                        app:icon="@drawable/ic_save"
+                        app:iconGravity="textStart"
+                        app:cornerRadius="12dp"
+                        app:layout_constraintTop_toBottomOf="@id/btn_attach_file"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

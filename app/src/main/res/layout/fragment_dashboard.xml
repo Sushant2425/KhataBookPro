@@ -79,17 +79,17 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:layout_marginTop="10dp"
-                        android:src="@drawable/ic_arrow_downward"
+                        android:src="@drawable/ic_arrow_upward"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider"
-                        app:tint="@color/red" />
+                        app:tint="@color/green" />
 
                     <TextView
                         android:id="@+id/tv_income_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="You will get"
+                        android:text="You will Give"
                         android:textSize="10sp"
                         android:fontFamily="sans-serif"
                         android:textColor="@color/black"
@@ -107,7 +107,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-black"
-                        android:textColor="@color/red"
+                        android:textColor="@color/green"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/iv_income_arrow" />
 
@@ -126,17 +126,17 @@
                         android:layout_height="16dp"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="10dp"
-                        android:src="@drawable/ic_arrow_upward"
+                        android:src="@drawable/ic_arrow_downward"
                         app:layout_constraintStart_toEndOf="@id/guideline_vertical"
                         app:layout_constraintTop_toBottomOf="@id/divider"
-                        app:tint="@color/green" />
+                        app:tint="@color/red" />
 
                     <TextView
                         android:id="@+id/tv_expense_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="You will give"
+                        android:text="You will GET"
                         android:textSize="10sp"
                         android:fontFamily="sans-serif"
                         android:textColor="@color/black"
@@ -154,7 +154,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-black"
-                        android:textColor="@color/green"
+                        android:textColor="@color/red_700"
                         app:layout_constraintStart_toStartOf="@id/iv_expense_arrow"
                         app:layout_constraintTop_toBottomOf="@id/iv_expense_arrow" />
 

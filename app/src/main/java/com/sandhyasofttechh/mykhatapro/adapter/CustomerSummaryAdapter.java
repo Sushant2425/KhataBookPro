@@ -58,9 +58,49 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
                 .inflate(R.layout.item_customer_summary, parent, false);
         return new ViewHolder(v);
     }
+//
+//    @Override
+//    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+//        CustomerSummary summary = customerSummaries.get(position);
+//        Context context = holder.itemView.getContext();
+//
+//        holder.itemView.setOnClickListener(v -> {
+//            Intent intent = new Intent(context, CustomerDetailsActivity.class);
+//            intent.putExtra("CUSTOMER_PHONE", summary.getCustomerPhone());
+//            intent.putExtra("CUSTOMER_NAME", summary.getCustomerName());
+//            context.startActivity(intent);
+//        });
+//
+//        holder.tvCustomerName.setText(summary.getCustomerName());
+//        holder.tvLastDate.setText(summary.getLastTransactionDate());
+//        holder.tvRelativeTime.setText(getRelative(summary.getLastTransactionDate()));
+//
+//        double balance = summary.getNetBalance();
+//        holder.tvNetBalance.setText(String.format(Locale.getDefault(), "₹ %,.0f", Math.abs(balance)));
+//
+//        if (balance > 0) {
+//            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.green));
+//            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_get);
+//        } else if (balance < 0) {
+//            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.red));
+//            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_give);
+//        } else {
+//            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.black));
+//            holder.balanceContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.gray));
+//        }
+//
+//        if (balance > 0) {
+//            holder.tvReminderText.setVisibility(View.VISIBLE);
+//            holder.tvReminderText.setText("Reminder");
+//            holder.tvReminderText.setOnClickListener(v -> showReminderBottomSheet(context, summary));
+//        } else {
+//            holder.tvReminderText.setVisibility(View.GONE);
+//        }
+//    }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         CustomerSummary summary = customerSummaries.get(position);
         Context context = holder.itemView.getContext();
 
@@ -78,25 +118,39 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
         double balance = summary.getNetBalance();
         holder.tvNetBalance.setText(String.format(Locale.getDefault(), "₹ %,.0f", Math.abs(balance)));
 
-        if (balance > 0) {
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.red));
-            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_give);
-        } else if (balance < 0) {
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.green));
-            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_get);
-        } else {
-            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.black));
-            holder.balanceContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.gray));
-        }
+        // -----------------------------------------------
+        // CORRECT COLOR + BACKGROUND + REMINDER LOGIC
+        // -----------------------------------------------
 
-        if (balance > 0) {
+        // 🔴 Case 1 — Customer owes YOU (You Will Get) → balance < 0
+        if (balance < 0) {
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.red));
+            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_give);  // your red bg
+
             holder.tvReminderText.setVisibility(View.VISIBLE);
             holder.tvReminderText.setText("Reminder");
             holder.tvReminderText.setOnClickListener(v -> showReminderBottomSheet(context, summary));
-        } else {
+        }
+
+        // 🟢 Case 2 — YOU owe customer (You Will Give) → balance > 0
+        else if (balance > 0) {
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.green));
+            holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_get); // your green bg
+
+            holder.tvReminderText.setVisibility(View.GONE);
+        }
+
+        // ⚪ Case 3 — ZERO balance
+        else {
+            holder.tvNetBalance.setTextColor(ContextCompat.getColor(context, R.color.black));
+            holder.balanceContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.gray));
             holder.tvReminderText.setVisibility(View.GONE);
         }
     }
+
+
+
+
 
     private void showReminderBottomSheet(Context context, CustomerSummary summary) {
         BottomSheetDialog dialog = new BottomSheetDialog(context);
