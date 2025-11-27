@@ -517,8 +517,11 @@ public class DashboardFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true); // enable menu
+        setHasOptionsMenu(true);
+        initFirebase();
+        loadTransactionData();
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -538,9 +541,12 @@ public class DashboardFragment extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initFirebase();
-        loadTransactionData();
+        // No more loading here
+        if (!allCustomerSummaries.isEmpty()) {
+            applyFilterAndSort();
+        }
     }
+
 
     private void initViews(View view) {
         tvBalance = view.findViewById(R.id.tv_balance_amount);
