@@ -621,8 +621,15 @@ public class DashboardFragment extends Fragment
         fabAddCustomer.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), AddCustomerActivity.class)));
 
-        ivPdfReport.setOnClickListener(v ->
-                startActivity(new Intent(getContext(), ReportsFragment.class)));
+        ivPdfReport.setOnClickListener(v -> {
+            Fragment reportsFragment = new ReportsFragment();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, reportsFragment, "reports")
+                    .addToBackStack(null)
+                    .commit();
+        });
+
 
         ivFilterButton.setOnClickListener(v -> {
             FilterBottomSheetFragment sheet =
