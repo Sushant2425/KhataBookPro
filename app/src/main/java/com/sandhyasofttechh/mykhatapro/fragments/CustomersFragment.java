@@ -239,6 +239,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
     }
 
 
+
     private void setupSearch() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
