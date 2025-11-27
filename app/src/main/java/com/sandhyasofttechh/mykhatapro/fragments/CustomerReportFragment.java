@@ -1,4 +1,3 @@
-//
 //package com.sandhyasofttechh.mykhatapro.fragments;
 //
 //import android.content.Intent;
@@ -121,7 +120,7 @@
 //                }
 //            }
 //        }
-//        adapter.notifyDataSetChanged();
+//        if (adapter != null) adapter.notifyDataSetChanged();
 //    }
 //
 //    private void loadCustomersWithBalances() {
@@ -143,6 +142,8 @@
 //
 //                if (phone == null || name == null) {
 //                    Log.w(TAG, "Invalid customer data: " + c.getKey());
+//                    // still count as loaded to avoid hanging
+//                    loadedCount++;
 //                    continue;
 //                }
 //
@@ -167,15 +168,21 @@
 //                String note = t.child("note").getValue(String.class);
 //
 //                if (amt == null) amt = 0.0;
-//                if ("gave".equalsIgnoreCase(type)) gave += amt;
-//                else if ("received".equalsIgnoreCase(type)) received += amt;
+//                if (type == null) type = "";
+//
+//                // ---- FIX: Expecting exactly "gave" and "got" (case-insensitive) ----
+//                if (type.equalsIgnoreCase("gave")) {
+//                    gave += amt;
+//                } else if (type.equalsIgnoreCase("got")) {
+//                    received += amt;
+//                }
 //
 //                txns.add(new Transaction(date, type, amt, note));
 //            }
 //
 //            double balance = received - gave;
 //            customerReports.add(new CustomerReport(name, phone, balance, txns, gave, received));
-//            Log.d(TAG, "Loaded: " + name + " | Balance: ₹" + balance);
+//            Log.d(TAG, "Loaded: " + name + " | Balance: ₹" + balance + " | Gave: " + gave + " | Received: " + received);
 //
 //            loadedCount++;
 //            if (loadedCount == totalCustomers) {
@@ -447,30 +454,33 @@
 //            currentX += col2Width;
 //
 //            // Type with badge
-//            String type = (t.type != null) ? t.type.toUpperCase() : "N/A";
-//            if ("GAVE".equals(type)) {
+//            String typeLower = (t.type != null) ? t.type.toLowerCase() : "";
+//            if ("gave".equals(typeLower)) {
 //                paint.setStyle(Paint.Style.FILL);
 //                paint.setColor(Color.parseColor("#FFEBEE"));
 //                canvas.drawRoundRect(currentX + 5, yPos + 8, currentX + 65, yPos + 24, 3, 3, paint);
 //                paint.setColor(Color.parseColor("#C62828"));
+//                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 //                canvas.drawText("GAVE", currentX + 15, textY, paint);
-//            } else if ("RECEIVED".equals(type)) {
+//            } else if ("got".equals(typeLower)) {
 //                paint.setStyle(Paint.Style.FILL);
 //                paint.setColor(Color.parseColor("#E8F5E9"));
 //                canvas.drawRoundRect(currentX + 5, yPos + 8, currentX + 75, yPos + 24, 3, 3, paint);
 //                paint.setColor(Color.parseColor("#2E7D32"));
+//                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 //                canvas.drawText("RECEIVED", currentX + 10, textY, paint);
 //            } else {
 //                paint.setColor(Color.parseColor("#757575"));
-//                canvas.drawText(type, currentX + 8, textY, paint);
+//                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+//                canvas.drawText((t.type != null ? t.type.toUpperCase() : "N/A"), currentX + 8, textY, paint);
 //            }
 //            currentX += col3Width;
 //
 //            // Amount
 //            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-//            if ("GAVE".equals(type)) {
+//            if ("gave".equals(typeLower)) {
 //                paint.setColor(Color.parseColor("#C62828"));
-//            } else if ("RECEIVED".equals(type)) {
+//            } else if ("got".equals(typeLower)) {
 //                paint.setColor(Color.parseColor("#2E7D32"));
 //            } else {
 //                paint.setColor(Color.parseColor("#424242"));
@@ -598,7 +608,6 @@
 //}
 
 
-
 package com.sandhyasofttechh.mykhatapro.fragments;
 
 import android.content.Intent;
@@ -626,6 +635,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sandhyasofttechh.mykhatapro.R;
@@ -640,6 +650,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Complete CustomerReportFragment.java - full file, line-by-line.
+ *
+ * Behavior:
+ * - If no shop selected -> reads from Khatabook/{userKey}/customers and .../transactions
+ * - If a shop is selected  -> reads from Khatabook/{userKey}/shops/{shopId}/customers and .../transactions
+ *
+ * Copy-paste this file to replace your existing CustomerReportFragment.
+ */
 public class CustomerReportFragment extends Fragment {
 
     private static final String TAG = "CustomerReportFragment";
@@ -669,18 +688,48 @@ public class CustomerReportFragment extends Fragment {
 
         PrefManager prefManager = new PrefManager(requireContext());
         String userEmail = prefManager.getUserEmail();
+        String shopId = prefManager.getCurrentShopId();
 
-        if (userEmail.isEmpty()) {
+        if (userEmail == null || userEmail.isEmpty()) {
             Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
             return v;
         }
 
         String emailKey = userEmail.replace(".", ",");
-        String basePath = "Khatabook/" + emailKey;
-        Log.d(TAG, "Fetching data from: " + basePath);
 
-        customerRef = FirebaseDatabase.getInstance().getReference(basePath + "/customers");
-        transRef = FirebaseDatabase.getInstance().getReference(basePath + "/transactions");
+        // ------------------ SHOP LOGIC ------------------
+        if (shopId == null || shopId.isEmpty()) {
+            // NO SHOP SELECTED -> root-level nodes
+            customerRef = FirebaseDatabase.getInstance()
+                    .getReference("Khatabook")
+                    .child(emailKey)
+                    .child("customers");
+
+            transRef = FirebaseDatabase.getInstance()
+                    .getReference("Khatabook")
+                    .child(emailKey)
+                    .child("transactions");
+
+            Log.d(TAG, "Loading customers from ROOT: " + emailKey);
+        } else {
+            // SHOP SELECTED -> shop-specific nodes
+            customerRef = FirebaseDatabase.getInstance()
+                    .getReference("Khatabook")
+                    .child(emailKey)
+                    .child("shops")
+                    .child(shopId)
+                    .child("customers");
+
+            transRef = FirebaseDatabase.getInstance()
+                    .getReference("Khatabook")
+                    .child(emailKey)
+                    .child("shops")
+                    .child(shopId)
+                    .child("transactions");
+
+            Log.d(TAG, "Loading customers from SHOP: " + shopId);
+        }
+        // -------------------------------------------------
 
         fabExportAll.setOnClickListener(view -> exportAllCustomersPdf());
 
@@ -693,17 +742,8 @@ public class CustomerReportFragment extends Fragment {
     private void setupSearchView() {
         searchView.setQueryHint("Search by name or mobile number");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterCustomers(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterCustomers(newText);
-                return true;
-            }
+            @Override public boolean onQueryTextSubmit(String query) { filterCustomers(query); return true; }
+            @Override public boolean onQueryTextChange(String newText) { filterCustomers(newText); return true; }
         });
     }
 
@@ -713,10 +753,10 @@ public class CustomerReportFragment extends Fragment {
             filteredReports.addAll(customerReports);
         } else {
             filteredReports.clear();
-            String lowerQuery = query.toLowerCase();
+            String lowerQuery = query.toLowerCase(Locale.getDefault());
             for (CustomerReport r : customerReports) {
-                if (r.getName().toLowerCase().contains(lowerQuery)
-                        || r.getPhone().toLowerCase().contains(lowerQuery)) {
+                if (r.getName().toLowerCase(Locale.getDefault()).contains(lowerQuery)
+                        || r.getPhone().toLowerCase(Locale.getDefault()).contains(lowerQuery)) {
                     filteredReports.add(r);
                 }
             }
@@ -743,8 +783,9 @@ public class CustomerReportFragment extends Fragment {
 
                 if (phone == null || name == null) {
                     Log.w(TAG, "Invalid customer data: " + c.getKey());
-                    // still count as loaded to avoid hanging
+                    // count as loaded so finalization still occurs
                     loadedCount++;
+                    if (loadedCount == totalCustomers) updateAdapter();
                     continue;
                 }
 
@@ -771,7 +812,6 @@ public class CustomerReportFragment extends Fragment {
                 if (amt == null) amt = 0.0;
                 if (type == null) type = "";
 
-                // ---- FIX: Expecting exactly "gave" and "got" (case-insensitive) ----
                 if (type.equalsIgnoreCase("gave")) {
                     gave += amt;
                 } else if (type.equalsIgnoreCase("got")) {
@@ -815,7 +855,6 @@ public class CustomerReportFragment extends Fragment {
     private void generateSingleCustomerPdf(CustomerReport cr) {
         PdfDocument pdfDocument = new PdfDocument();
 
-        // Calculate pages needed based on transactions
         int maxTransactionsPerPage = 18;
         int totalPages = Math.max(1, (int) Math.ceil((double) cr.getTransactions().size() / maxTransactionsPerPage));
 
@@ -877,51 +916,43 @@ public class CustomerReportFragment extends Fragment {
         float margin = 40f;
         float contentWidth = pageWidth - (2 * margin);
 
-        // ===== HEADER SECTION =====
+        // ===== HEADER =====
         float yPos = margin;
 
-        // Header background with gradient effect
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.parseColor("#1A237E")); // Deep blue
+        paint.setColor(Color.parseColor("#1A237E"));
         canvas.drawRect(0, 0, pageWidth, 100, paint);
 
-        // Accent bar
-        paint.setColor(Color.parseColor("#FFC107")); // Amber
+        paint.setColor(Color.parseColor("#FFC107"));
         canvas.drawRect(0, 95, pageWidth, 100, paint);
 
-        // Title
         paint.setColor(Color.WHITE);
         paint.setTextSize(22);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         canvas.drawText("CUSTOMER TRANSACTION REPORT", margin, 45, paint);
 
-        // Report type indicator
         paint.setTextSize(10);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
         canvas.drawText("Detailed Statement", margin, 70, paint);
 
-        // Page number
         String pageInfo = "Page " + currentPage + " of " + totalPages;
         float pageInfoWidth = paint.measureText(pageInfo);
         canvas.drawText(pageInfo, pageWidth - margin - pageInfoWidth, 70, paint);
 
         yPos = 120;
 
-        // ===== CUSTOMER INFO CARD (Only on first page) =====
+        // ===== CUSTOMER INFO CARD (first page only) =====
         if (currentPage == 1) {
-            // Card background
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#F8F9FA"));
             canvas.drawRoundRect(margin, yPos, pageWidth - margin, yPos + 110, 8, 8, paint);
 
-            // Card border
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(1.5f);
             paint.setColor(Color.parseColor("#E0E0E0"));
             canvas.drawRoundRect(margin, yPos, pageWidth - margin, yPos + 110, 8, 8, paint);
             paint.setStyle(Paint.Style.FILL);
 
-            // Customer details
             float infoY = yPos + 25;
             paint.setColor(Color.parseColor("#424242"));
             paint.setTextSize(11);
@@ -950,10 +981,8 @@ public class CustomerReportFragment extends Fragment {
             paint.setTextSize(12);
             canvas.drawText(String.valueOf(cr.getTransactions().size()), margin + 130, infoY, paint);
 
-            // Financial summary box (right side)
             float summaryX = pageWidth - margin - 180;
 
-            // Total Gave
             paint.setTextSize(9);
             paint.setColor(Color.parseColor("#757575"));
             canvas.drawText("Total Given:", summaryX, yPos + 25, paint);
@@ -962,7 +991,6 @@ public class CustomerReportFragment extends Fragment {
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             canvas.drawText(String.format("₹%.2f", cr.getTotalGave()), summaryX, yPos + 42, paint);
 
-            // Total Received
             paint.setTextSize(9);
             paint.setColor(Color.parseColor("#757575"));
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
@@ -972,7 +1000,6 @@ public class CustomerReportFragment extends Fragment {
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             canvas.drawText(String.format("₹%.2f", cr.getTotalReceived()), summaryX, yPos + 77, paint);
 
-            // Net Balance (highlighted)
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(cr.getBalance() >= 0 ? Color.parseColor("#E8F5E9") : Color.parseColor("#FFEBEE"));
             canvas.drawRoundRect(summaryX - 10, yPos + 85, summaryX + 170, yPos + 107, 5, 5, paint);
@@ -995,19 +1022,16 @@ public class CustomerReportFragment extends Fragment {
         float tableTop = yPos;
         float rowHeight = 32f;
 
-        // Column configuration
         float col1Width = 45f;   // S.No
         float col2Width = 85f;   // Date
         float col3Width = 75f;   // Type
         float col4Width = 85f;   // Amount
         float col5Width = contentWidth - col1Width - col2Width - col3Width - col4Width; // Note
 
-        // Table header background
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.parseColor("#37474F"));
         canvas.drawRect(margin, yPos, pageWidth - margin, yPos + rowHeight, paint);
 
-        // Header text
         paint.setColor(Color.WHITE);
         paint.setTextSize(10);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
@@ -1026,7 +1050,6 @@ public class CustomerReportFragment extends Fragment {
 
         yPos += rowHeight;
 
-        // ===== TRANSACTION ROWS =====
         paint.setTextSize(9);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
 
@@ -1034,7 +1057,6 @@ public class CustomerReportFragment extends Fragment {
         int rowNum = 0;
 
         for (Transaction t : transactions) {
-            // Alternate row background
             if (rowNum % 2 == 0) {
                 paint.setColor(Color.parseColor("#FAFAFA"));
                 canvas.drawRect(margin, yPos, pageWidth - margin, yPos + rowHeight, paint);
@@ -1043,19 +1065,16 @@ public class CustomerReportFragment extends Fragment {
             textY = yPos + 20;
             currentX = margin;
 
-            // Serial number
             paint.setColor(Color.parseColor("#616161"));
             canvas.drawText(String.valueOf(startSerialNo + rowNum), currentX + 8, textY, paint);
             currentX += col1Width;
 
-            // Date
             paint.setColor(Color.parseColor("#424242"));
             String dateStr = (t.date != null && !t.date.isEmpty()) ? t.date : "N/A";
             canvas.drawText(dateStr, currentX + 8, textY, paint);
             currentX += col2Width;
 
-            // Type with badge
-            String typeLower = (t.type != null) ? t.type.toLowerCase() : "";
+            String typeLower = (t.type != null) ? t.type.toLowerCase(Locale.getDefault()) : "";
             if ("gave".equals(typeLower)) {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(Color.parseColor("#FFEBEE"));
@@ -1073,11 +1092,10 @@ public class CustomerReportFragment extends Fragment {
             } else {
                 paint.setColor(Color.parseColor("#757575"));
                 paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-                canvas.drawText((t.type != null ? t.type.toUpperCase() : "N/A"), currentX + 8, textY, paint);
+                canvas.drawText((t.type != null ? t.type.toUpperCase(Locale.getDefault()) : "N/A"), currentX + 8, textY, paint);
             }
             currentX += col3Width;
 
-            // Amount
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             if ("gave".equals(typeLower)) {
                 paint.setColor(Color.parseColor("#C62828"));
@@ -1089,7 +1107,6 @@ public class CustomerReportFragment extends Fragment {
             canvas.drawText(String.format("₹%.2f", t.amount), currentX + 8, textY, paint);
             currentX += col4Width;
 
-            // Note (truncated if too long)
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
             paint.setColor(Color.parseColor("#616161"));
             String note = (t.note != null && !t.note.isEmpty()) ? t.note : "-";
@@ -1098,7 +1115,6 @@ public class CustomerReportFragment extends Fragment {
             }
             canvas.drawText(note, currentX + 8, textY, paint);
 
-            // Row separator
             paint.setColor(Color.parseColor("#E0E0E0"));
             paint.setStrokeWidth(0.5f);
             canvas.drawLine(margin, yPos + rowHeight, pageWidth - margin, yPos + rowHeight, paint);
@@ -1107,13 +1123,11 @@ public class CustomerReportFragment extends Fragment {
             rowNum++;
         }
 
-        // ===== TABLE BORDER =====
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2f);
         paint.setColor(Color.parseColor("#37474F"));
         canvas.drawRect(margin, tableTop, pageWidth - margin, yPos, paint);
 
-        // Vertical grid lines
         paint.setStrokeWidth(1f);
         paint.setColor(Color.parseColor("#BDBDBD"));
         currentX = margin + col1Width;
@@ -1125,7 +1139,6 @@ public class CustomerReportFragment extends Fragment {
         currentX += col4Width;
         canvas.drawLine(currentX, tableTop, currentX, yPos, paint);
 
-        // ===== FOOTER =====
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.parseColor("#F5F5F5"));
         canvas.drawRect(0, pageHeight - 50, pageWidth, pageHeight, paint);
@@ -1153,7 +1166,7 @@ public class CustomerReportFragment extends Fragment {
 
             Uri uri = FileProvider.getUriForFile(
                     requireContext(),
-                    "com.sandhyasofttechh.mykhatapro.fileprovider",  // EXACT MATCH
+                    "com.sandhyasofttechh.mykhatapro.fileprovider",  // must match your manifest/provider
                     file
             );
 
@@ -1169,6 +1182,7 @@ public class CustomerReportFragment extends Fragment {
             Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
+
     // ===================== INNER CLASSES =====================
 
     public static class CustomerReport {

@@ -65,5 +65,15 @@
             </group>
         </menu>
     </item>
+    <item android:title="Shop">
+        <menu>
+
+            <item
+                android:id="@+id/nav_switchshop"
+                android:title="Switch Shop"
+                android:icon="@drawable/ic_switch_account" />
+
+        </menu>
+    </item>
 
 </menu>

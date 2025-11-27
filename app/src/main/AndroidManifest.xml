@@ -84,6 +84,9 @@
             android:name=".activities.EntryDetailsActivity"
             android:exported="false" />
         <activity
+            android:name=".register.SwitchShopActivity"
+            android:exported="false" />
+        <activity
             android:name=".register.LoginActivity"
             android:exported="false" />
         <activity
