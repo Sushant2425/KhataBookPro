@@ -238,7 +238,42 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
         }
     }
 
+    private void loadCustomers() {
+        if (customersRef == null) return;
 
+        if (customerListener != null) {
+            customersRef.removeEventListener(customerListener);
+        }
+
+        customerListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                allCustomers.clear();
+
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Customer customer = ds.getValue(Customer.class);
+                    if (customer != null) {
+                        allCustomers.add(customer);
+                    }
+                }
+
+                adapter.setCustomers(new ArrayList<>(allCustomers));
+                updateEmptyState();
+                updateCustomerCount(allCustomers.size());
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(),
+                        "Error loading customers: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        customersRef.addValueEventListener(customerListener);
+    }
 
     private void setupSearch() {
         searchEditText.addTextChangedListener(new TextWatcher() {
