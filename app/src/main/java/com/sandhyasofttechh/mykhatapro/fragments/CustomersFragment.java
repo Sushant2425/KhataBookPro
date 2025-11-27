@@ -176,6 +176,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
 
     private DatabaseReference customersRef;
     private ValueEventListener customerListener;
+    private TextView tvCustomerCount;  // Add as class member
 
     private final List<Customer> allCustomers = new ArrayList<>();
 
@@ -189,6 +190,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
         fabAddCustomer = view.findViewById(R.id.fab_add_customer);
         searchEditText = view.findViewById(R.id.search_view_customers);
         tvEmpty = view.findViewById(R.id.tv_empty);
+        tvCustomerCount = view.findViewById(R.id.tv_customer_count);
 
         prefManager = new PrefManager(requireContext());
         adapter = new CustomerAdapter(this);
@@ -204,6 +206,9 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
                 startActivity(new Intent(getActivity(), AddCustomerActivity.class)));
 
         return view;
+    }
+    private void updateCustomerCount(int count) {
+        tvCustomerCount.setText("Total Customers: " + count);
     }
 
     /**
@@ -233,40 +238,6 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
         }
     }
 
-    private void loadCustomers() {
-        if (customersRef == null) return;
-
-        if (customerListener != null) {
-            customersRef.removeEventListener(customerListener);
-        }
-
-        customerListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                allCustomers.clear();
-
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    Customer customer = ds.getValue(Customer.class);
-                    if (customer != null) {
-                        allCustomers.add(customer);
-                    }
-                }
-
-                adapter.setCustomers(new ArrayList<>(allCustomers));
-                updateEmptyState();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(),
-                        "Error loading customers: " + error.getMessage(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        customersRef.addValueEventListener(customerListener);
-    }
 
     private void setupSearch() {
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -277,6 +248,8 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
             public void afterTextChanged(Editable s) {
                 adapter.filter(s.toString().trim());
                 updateEmptyStateAfterFilter();
+                updateCustomerCount(adapter.getItemCount());
+
             }
         });
     }

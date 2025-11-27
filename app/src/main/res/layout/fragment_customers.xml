@@ -39,6 +39,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Customer List -->
+        <TextView
+            android:id="@+id/tv_customer_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total Customers: 0"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="8dp"
+            />
 
         <!-- Empty State -->
         <androidx.recyclerview.widget.RecyclerView
