@@ -433,6 +433,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sandhyasofttechh.mykhatapro.activities.AboutAppActivity;
+import com.sandhyasofttechh.mykhatapro.activities.AboutUsActivity;
 import com.sandhyasofttechh.mykhatapro.activities.AddTransactionActivity;
 import com.sandhyasofttechh.mykhatapro.fragments.*;
 import com.sandhyasofttechh.mykhatapro.register.LoginActivity;
@@ -568,25 +570,97 @@ public class MainActivity extends AppCompatActivity
 
     private void setupDrawerHeader() {
         View header = navigationView.getHeaderView(0);
+
         ivUserPhoto = header.findViewById(R.id.iv_user_photo);
         tvUserName = header.findViewById(R.id.tv_user_name);
         tvUserEmail = header.findViewById(R.id.tv_user_email);
+
+        tvUserName.setText("Loading...");
+        tvUserEmail.setText("");
     }
 
     private void loadUserProfile() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) return;
 
-        tvUserEmail.setText(user.getEmail());
-        tvUserName.setText("MyKhata User");
+        String email = user.getEmail();
+        if (email == null) return;
 
-        if (user.getPhotoUrl() != null) {
-            Glide.with(this)
-                    .load(user.getPhotoUrl())
-                    .circleCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(ivUserPhoto);
+        tvUserEmail.setText(email);
+
+        // Convert email to Firebase key
+        String emailKey = email.replace(".", ",");
+
+        // SHOP LOGIC
+        String shopId = prefManager.getCurrentShopId();
+        DatabaseReference ref;
+
+        if (shopId != null && !shopId.isEmpty()) {
+            // 🔥 Load SHOP profile
+            ref = FirebaseDatabase.getInstance()
+                    .getReference("Khatabook")
+                    .child(emailKey)
+                    .child("shops")
+                    .child(shopId)
+                    .child("profile");
+        } else {
+            // 🔥 Load ROOT profile
+            ref = FirebaseDatabase.getInstance()
+                    .getReference("Khatabook")
+                    .child(emailKey)
+                    .child("profile");
         }
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                String businessName = snapshot.child("businessName").getValue(String.class);
+                String name = snapshot.child("name").getValue(String.class);
+                String logoUrl = snapshot.child("logoUrl").getValue(String.class);
+
+                // Name Priority: BusinessName → Name → Email
+                if (businessName != null && !businessName.isEmpty()) {
+                    tvUserName.setText(businessName);
+                } else if (name != null && !name.isEmpty()) {
+                    tvUserName.setText(name);
+                } else {
+                    tvUserName.setText("MyKhata User");
+                }
+
+                // SAVE to PrefManager cache
+                if (businessName != null) prefManager.saveBusinessName(businessName);
+                if (logoUrl != null) prefManager.saveLogoUrl(logoUrl);
+
+                // Load profile picture
+                if (logoUrl != null && !logoUrl.isEmpty()) {
+                    Glide.with(MainActivity.this)
+                            .load(logoUrl)
+                            .placeholder(R.drawable.ic_person)
+                            .error(R.drawable.ic_person)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .circleCrop()
+                            .into(ivUserPhoto);
+
+                } else {
+                    ivUserPhoto.setImageResource(R.drawable.ic_person);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // On error → load cached image
+                String cachedLogo = prefManager.getLogoUrl();
+
+                if (cachedLogo != null && !cachedLogo.isEmpty()) {
+                    Glide.with(MainActivity.this)
+                            .load(cachedLogo)
+                            .circleCrop()
+                            .placeholder(R.drawable.ic_person)
+                            .into(ivUserPhoto);
+                }
+            }
+        });
     }
 
     private void setupBottomNav() {
@@ -620,6 +694,7 @@ public class MainActivity extends AppCompatActivity
         );
     }
 
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
@@ -641,7 +716,21 @@ public class MainActivity extends AppCompatActivity
             loadFragmentSafe(new SettingsFragment(), TAG_SETTINGS);
             bottomNav.setSelectedItemId(id);
 
-        } else if (id == R.id.nav_switchshop) {
+        }
+        // ------------------------
+        // ⭐ OPEN PROFILE FRAGMENT
+        // ------------------------
+        else if (id == R.id.nav_profile) {
+            loadFragmentSafe(new ProfileFragment(), "profile");
+        }
+        // ------------------------
+        // ⭐ OPEN ABOUT ACTIVITY
+        // ------------------------
+        else if (id == R.id.nav_about) {
+            startActivity(new Intent(MainActivity.this, AboutAppActivity.class));
+        }
+
+        else if (id == R.id.nav_switchshop) {
             startActivity(new Intent(MainActivity.this, SwitchShopActivity.class));
 
         } else if (id == R.id.nav_logout) {

@@ -8,22 +8,22 @@
 
         <item
             android:id="@+id/nav_dashboard"
-            android:icon="@drawable/ic_dashboard"
+            android:icon="@drawable/dashboard"
             android:title="@string/dashboard" />
 
         <item
             android:id="@+id/nav_customers"
-            android:icon="@drawable/ic_customers"
+            android:icon="@drawable/customer"
             android:title="@string/customers" />
 
         <item
             android:id="@+id/nav_reports"
-            android:icon="@drawable/ic_reports"
+            android:icon="@drawable/reports"
             android:title="@string/reports" />
 
         <item
             android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_settings"
+            android:icon="@drawable/setting"
             android:title="@string/settings" />
     </group>
 
@@ -33,7 +33,7 @@
             <group android:checkableBehavior="none">
                 <item
                     android:id="@+id/nav_profile"
-                    android:icon="@drawable/ic_person"
+                    android:icon="@drawable/profile"
                     android:title="@string/profile" />
 
                 <item
@@ -60,7 +60,7 @@
 
                 <item
                     android:id="@+id/nav_about"
-                    android:icon="@drawable/ic_info"
+                    android:icon="@drawable/about"
                     android:title="@string/about" />
             </group>
         </menu>
@@ -71,7 +71,7 @@
             <item
                 android:id="@+id/nav_switchshop"
                 android:title="Switch Shop"
-                android:icon="@drawable/ic_switch_account" />
+                android:icon="@drawable/img_2" />
 
         </menu>
     </item>
