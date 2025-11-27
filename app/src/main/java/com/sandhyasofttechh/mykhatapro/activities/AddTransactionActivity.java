@@ -1575,11 +1575,23 @@ public class AddTransactionActivity extends AppCompatActivity {
                     if (cursor != null && cursor.moveToFirst()) {
                         String name = cursor.getString(0);
                         String number = cursor.getString(1);
+                        // Remove all non-digit and non-plus characters
                         number = number.replaceAll("[^0-9+]", "");
+
+                        // Remove country code prefix
+                        if (number.startsWith("+91")) {
+                            number = number.substring(3);
+                        } else if (number.startsWith("91") && number.length() > 10) {
+                            number = number.substring(2);
+                        }
+
+                        // Optionally, remove spaces/dashes
+                        number = number.replaceAll("\\s+", "").replaceAll("-", "");
+
                         String finalNumber = number;
                         new AlertDialog.Builder(this)
                                 .setTitle("Add Customer")
-                                .setMessage("Add " + name + " (" + number + ") as a customer?")
+                                .setMessage("Add " + name + " (" + finalNumber + ") as a customer?")
                                 .setPositiveButton("Yes", (dialog, which) -> addCustomerToFirebase(name, finalNumber))
                                 .setNegativeButton("No", null)
                                 .show();
@@ -1587,7 +1599,9 @@ public class AddTransactionActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Toast.makeText(this, "Error reading contact", Toast.LENGTH_SHORT).show();
                 }
-            } else if (requestCode == PICK_IMAGE_REQUEST_CODE) {
+
+
+        } else if (requestCode == PICK_IMAGE_REQUEST_CODE) {
                 // handle camera response if needed
             } else if (requestCode == PICK_FILE_REQUEST_CODE) {
                 // handle gallery file pick if needed
