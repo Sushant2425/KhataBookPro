@@ -84,8 +84,18 @@ public class CustomerDetailsActivity extends AppCompatActivity
 
             getSupportActionBar().setTitle(customerName);
             getSupportActionBar().setSubtitle(formatPhoneNumber(customerPhone));
+
+            // Set click listener on entire toolbar
+            toolbar.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddCustomerActivity.class);
+                intent.putExtra("EDIT_MODE", true);
+                intent.putExtra("CUSTOMER_PHONE", customerPhone);
+                intent.putExtra("CUSTOMER_NAME", customerName);
+                startActivity(intent);
+            });
         }
     }
+
 
     private String formatPhoneNumber(String phone) {
         String clean = phone.replaceAll("[^\\d]", "");

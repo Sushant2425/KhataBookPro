@@ -51,7 +51,8 @@
     <color name="divider_color">#E0E0E0</color>
 
     <color name="accent">#FF4081</color>
-
+    <!-- res/values/colors.xml -->
+    <color name="bottom_nav_bg">#FFFFFF</color>  <!-- White background -->
 
     <color name="colorAccent">#FF4081</color>
 
