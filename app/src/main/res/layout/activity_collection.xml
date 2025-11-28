@@ -1,10 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.CollectionActivity">
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txtShopTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="माझी दुकान"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:background="#3F51B5"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/summaryLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/txtShopTitle">
+
+        <TextView android:id="@+id/txtTodayDue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="आज येणार\n₹0"
+            android:textColor="#4CAF50"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="#E8F5E8" />
+
+        <TextView android:id="@+id/txtOverdue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="उशीर झालेले\n₹0"
+            android:textColor="#F44336"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="#FFEBEE" />
+
+        <TextView android:id="@+id/txtUpcoming"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="येणारे\n₹0"
+            android:textColor="#FF9800"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="#FFF3E0" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtTotalDue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="एकूण बाकी: ₹0"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:background="#FFF176"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/summaryLayout" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCollection"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/txtTotalDue"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBarCollection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/txtEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="डेटा लोड होत आहे..."
+        android:textSize="18sp"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
