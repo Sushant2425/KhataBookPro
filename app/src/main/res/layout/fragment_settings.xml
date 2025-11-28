@@ -416,6 +416,73 @@
                             android:rotation="270"
                             app:tint="#95A5A6" />
                     </LinearLayout>
+
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- OTHER SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="OTHER"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:textColor="#7F8C8D"
+                android:letterSpacing="0.1"
+                android:paddingStart="8dp"
+                android:paddingBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- BUSINESS CARD OPTION -->
+                    <LinearLayout
+                        android:id="@+id/opt_business_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="18dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@android:drawable/ic_menu_myplaces"
+                            android:layout_marginEnd="18dp"
+                            app:tint="?attr/colorPrimary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="Business Card"
+                            android:textSize="16sp"
+                            android:textColor="#2C3E50" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_more"
+                            android:rotation="270"
+                            app:tint="#95A5A6" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="60dp"/>
+
                     <LinearLayout
                         android:id="@+id/collection"
                         android:layout_width="match_parent"
@@ -453,6 +520,8 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+
 
             <!-- App Version -->
             <TextView

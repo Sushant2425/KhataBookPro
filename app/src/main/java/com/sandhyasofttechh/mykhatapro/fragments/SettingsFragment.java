@@ -255,6 +255,8 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.sandhyasofttechh.mykhatapro.activities.BusinessCardActivity;
 import com.sandhyasofttechh.mykhatapro.activities.CollectionActivity;
 
 import androidx.annotation.NonNull;
@@ -291,7 +293,7 @@ public class SettingsFragment extends Fragment {
 
     // Options
     private LinearLayout optChangePassword, optSmsSettings, optRecycleBin;
-    private LinearLayout optAppLock, optHelpSupport, optAboutApp, optAboutUs,collection;
+    private LinearLayout optAppLock, optHelpSupport, optAboutApp, optAboutUs,collection,optbusinesscard;
 
     // Firebase
     private DatabaseReference profileRef;
@@ -345,6 +347,8 @@ public class SettingsFragment extends Fragment {
         optAboutApp = view.findViewById(R.id.opt_about_app);
         optAboutUs = view.findViewById(R.id.opt_about_us);
         collection = view.findViewById(R.id.collection);
+        optbusinesscard = view.findViewById(R.id.opt_business_card);
+
 
 
         imgLogoBig.setOnClickListener(v -> openFullScreenImage());
@@ -386,6 +390,8 @@ public class SettingsFragment extends Fragment {
 
         optAboutUs.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AboutUsActivity.class)));
+        optbusinesscard.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), BusinessCardActivity.class)));
     }
 
     // -----------------------------------------------------------

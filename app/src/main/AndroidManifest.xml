@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -24,6 +26,9 @@
         android:roundIcon="@drawable/img"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyKhataPro">
+        <activity
+            android:name=".activities.BusinessCardActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.CollectionActivity"
             android:exported="false" />

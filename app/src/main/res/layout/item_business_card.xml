@@ -1,0 +1,91 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp">
+
+    <FrameLayout
+        android:id="@+id/card_bg_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_card_template_1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_business_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Business Name"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:shadowColor="#80000000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4"
+                android:gravity="center"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tv_owner_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Owner Name"
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:shadowColor="#80000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="3"
+                android:gravity="center"
+                android:paddingBottom="16dp" />
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="2dp"
+                android:background="#FFFFFF"
+                android:alpha="0.6"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tv_business_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Business Type"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:shadowColor="#80000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:gravity="center"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tv_business_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Business Location"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:shadowColor="#80000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:gravity="center"
+                android:maxLines="2" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>
+
