@@ -1,100 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.CollectionActivity">
 
-    <TextView
-        android:id="@+id/txtShopTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="माझी दुकान"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:background="#3F51B5"
-        android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    <!-- Header Section -->
     <LinearLayout
-        android:id="@+id/summaryLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#FFFFFF"
-        android:elevation="4dp"
-        android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/txtShopTitle">
+        android:orientation="vertical"
+        android:background="#2196F3"
+        android:padding="16dp">
 
-        <TextView android:id="@+id/txtTodayDue"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/txtShopTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="आज येणार\n₹0"
-            android:textColor="#4CAF50"
+            android:text="Current Shop"
+            android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@android:color/white"
             android:gravity="center"
-            android:background="#E8F5E8" />
+            android:layout_marginBottom="4dp" />
 
-        <TextView android:id="@+id/txtOverdue"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/txtTotalDue"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="उशीर झालेले\n₹0"
-            android:textColor="#F44336"
+            android:text="Total Due: ₹0"
+            android:textSize="24sp"
             android:textStyle="bold"
-            android:gravity="center"
-            android:background="#FFEBEE" />
+            android:textColor="@android:color/white"
+            android:gravity="center" />
 
-        <TextView android:id="@+id/txtUpcoming"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="येणारे\n₹0"
-            android:textColor="#FF9800"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:background="#FFF3E0" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtTotalDue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="एकूण बाकी: ₹0"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:background="#FFF176"
-        android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/summaryLayout" />
+    <!-- Tabs -->
+    <com.google.android.material.tabs.TabLayout
+    android:id="@+id/tabLayout"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    app:tabMode="fixed"
+    app:tabTextColor="#666"
+    app:tabSelectedTextColor="#2196F3"
+    app:tabIndicatorColor="#2196F3"
+    app:tabIndicatorHeight="3dp"
+    app:tabMinWidth="0dp"
+    app:tabPaddingStart="12dp"
+    app:tabPaddingEnd="12dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCollection"
+    <!-- ViewPager -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/txtTotalDue"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_weight="1" />
 
+    <!-- Progress Bar Overlay -->
     <ProgressBar
         android:id="@+id/progressBarCollection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
+    <!-- Empty State Overlay -->
     <TextView
         android:id="@+id/txtEmptyState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="डेटा लोड होत आहे..."
-        android:textSize="18sp"
         android:gravity="center"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:text="No data found"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:padding="32dp"
+        android:visibility="gone" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
