@@ -2,98 +2,304 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:background="@android:color/white"
+    android:background="#F5F7FA"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <!-- Title -->
-    <TextView
-        android:id="@+id/tvTitle"
-        android:text="Switch / Select Shop"
-        android:textSize="22sp"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        android:paddingBottom="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <!-- Create Shop Button -->
+    <!-- Top Back Bar -->
     <LinearLayout
-        android:id="@+id/btnCreateShop"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="12dp"
-        android:background="@drawable/bg_button_gray"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:paddingStart="12dp"
+        android:background="@drawable/dashboard_header_background"
+        android:paddingEnd="12dp"
+        android:elevation="4dp">
 
         <ImageView
-            android:src="@drawable/ic_add"
-            android:tint="#000000"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
+            android:id="@+id/ivBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_arrow_back"
+            android:padding="4dp"
+            android:tint="@color/white"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
-            android:text="Create New Shop"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:paddingStart="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Switch / Select Shop"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginStart="12dp" />
+
+    </LinearLayout>
+
+
+    <!-- Header Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:padding="24dp">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:text="Switch / Select Shop"
+            android:textSize="24sp"
+            android:textColor="#1A237E"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Manage your business locations"
+            android:textSize="14sp"
+            android:textColor="#757575"
+            android:fontFamily="sans-serif"
+            android:layout_marginTop="4dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
 
-    <!-- Use without shop -->
-    <LinearLayout
-        android:id="@+id/btnWithoutShop"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="12dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_button_green"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:src="@drawable/animated_check"
-            android:tint="#FFFFFF"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
-
-        <TextView
-            android:text="Use Without Shop (Direct Save Mode)"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            android:paddingStart="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#DDDDDD"
-        android:layout_marginTop="15dp"/>
-
-    <!-- Shops List Title -->
-    <TextView
-        android:text="Your Shops"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_marginTop="15dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <!-- RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvShops"
-        android:layout_marginTop="10dp"
+    <!-- Scrollable Content Container -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <!-- Create Shop Button (LinearLayout with Card Background) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <LinearLayout
+                    android:id="@+id/btnCreateShop"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Icon Container -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#E8EAF6">
+
+                        <ImageView
+                            android:src="@drawable/ic_add"
+                            android:tint="#3F51B5"
+                            android:padding="12dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Text Container -->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_marginStart="16dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Create New Shop"
+                            android:textSize="16sp"
+                            android:textColor="#212121"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="Add a new business location"
+                            android:textSize="13sp"
+                            android:textColor="#757575"
+                            android:fontFamily="sans-serif"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <!-- Arrow Icon -->
+                    <ImageView
+                        android:src="@android:drawable/ic_menu_add"
+                        android:tint="#BDBDBD"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Use Without Shop Button (LinearLayout with Card Background) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#4CAF50">
+
+                <LinearLayout
+                    android:id="@+id/btnWithoutShop"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Icon Container -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#66BB6A">
+
+                        <ImageView
+                            android:src="@drawable/animated_check"
+                            android:tint="@android:color/white"
+                            android:padding="12dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Text Container -->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_marginStart="16dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Use Without Shop"
+                            android:textSize="16sp"
+                            android:textColor="@android:color/white"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="Direct Save Mode • Quick Access"
+                            android:textSize="13sp"
+                            android:textColor="#E8F5E9"
+                            android:fontFamily="sans-serif"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <!-- Badge Icon -->
+                    <ImageView
+                        android:src="@drawable/animated_check"
+                        android:tint="@android:color/white"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Shops List Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp"
+                android:minHeight="300dp">
+
+                <!-- Section Header -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Your Shops"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content" />
+
+                    <!-- Shop Counter Badge (Optional) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="#E8EAF6">
+
+                        <TextView
+                            android:id="@+id/tvShopCount"
+                            android:text="0"
+                            android:visibility="gone"
+                            android:textSize="14sp"
+                            android:textColor="#3F51B5"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvShops"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="8dp"
+                        android:minHeight="250dp"
+                        android:clipToPadding="false" />
+
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

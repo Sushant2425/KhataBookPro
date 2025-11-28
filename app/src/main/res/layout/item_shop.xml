@@ -1,18 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="15dp"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white">
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@android:color/white"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
-    <TextView
-        android:id="@+id/tvShopName"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Shop Name"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#000000" />
+        android:background="@android:color/white">
 
-</LinearLayout>
+        <!-- Shop Icon Container -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#E8EAF6">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@android:drawable/ic_dialog_info"
+                android:padding="12dp"
+                app:tint="#3F51B5" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Shop Details Container -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/tvShopName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Shop Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tap to switch"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:fontFamily="sans-serif"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- Arrow Indicator -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_more"
+            android:rotation="270"
+            app:tint="#BDBDBD" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

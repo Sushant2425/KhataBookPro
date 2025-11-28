@@ -207,6 +207,8 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.Custo
 
         return view;
     }
+
+
     private void updateCustomerCount(int count) {
         tvCustomerCount.setText("Total Customers: " + count);
     }
