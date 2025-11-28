@@ -1,13 +1,10 @@
 //package com.sandhyasofttechh.mykhatapro;
 //
 //import android.content.Intent;
-//import android.net.Uri;
 //import android.os.Bundle;
 //import android.view.MenuItem;
 //import android.view.View;
 //import android.widget.TextView;
-//import android.widget.Toast;
-//
 //import androidx.annotation.NonNull;
 //import androidx.appcompat.app.ActionBarDrawerToggle;
 //import androidx.appcompat.app.AlertDialog;
@@ -24,21 +21,25 @@
 //import com.google.android.material.navigation.NavigationView;
 //import com.google.firebase.auth.FirebaseAuth;
 //import com.google.firebase.auth.FirebaseUser;
+//
 //import com.google.firebase.database.DataSnapshot;
 //import com.google.firebase.database.DatabaseError;
 //import com.google.firebase.database.DatabaseReference;
 //import com.google.firebase.database.FirebaseDatabase;
 //import com.google.firebase.database.ValueEventListener;
+//import com.sandhyasofttechh.mykhatapro.activities.AboutAppActivity;
+//import com.sandhyasofttechh.mykhatapro.activities.AboutUsActivity;
 //import com.sandhyasofttechh.mykhatapro.activities.AddTransactionActivity;
 //import com.sandhyasofttechh.mykhatapro.fragments.*;
 //import com.sandhyasofttechh.mykhatapro.register.LoginActivity;
+//import com.sandhyasofttechh.mykhatapro.register.SwitchShopActivity;
 //import com.sandhyasofttechh.mykhatapro.utils.PrefManager;
 //
 //import androidx.appcompat.widget.Toolbar;
-//
 //import de.hdodenhof.circleimageview.CircleImageView;
 //
-//public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+//public class MainActivity extends AppCompatActivity
+//        implements NavigationView.OnNavigationItemSelectedListener {
 //
 //    private DrawerLayout drawerLayout;
 //    private BottomNavigationView bottomNav;
@@ -46,21 +47,16 @@
 //    private Toolbar toolbar;
 //    private FloatingActionButton fabAddTransaction;
 //
+//    private PrefManager prefManager;
+//    private FirebaseAuth mAuth;
+//
+//    private CircleImageView ivUserPhoto;
+//    private TextView tvUserName, tvUserEmail;
+//
 //    private static final String TAG_DASHBOARD = "dashboard";
 //    private static final String TAG_CUSTOMERS = "customers";
 //    private static final String TAG_REPORTS = "reports";
 //    private static final String TAG_SETTINGS = "settings";
-//    private static final String TAG_PROFILE = "profile";
-//    private static final String TAG_ABOUT = "about";
-//
-//    private PrefManager prefManager;
-//    private FirebaseAuth mAuth;
-//    private DatabaseReference databaseReference;
-//
-//    // Header views
-//    private CircleImageView ivUserPhoto;
-//    private TextView tvUserName;
-//    private TextView tvUserEmail;
 //
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +73,10 @@
 //        setupFAB();
 //        setupDrawerHeader();
 //        loadUserProfile();
+//        checkIfShopStillExists();
+//        updateToolbarTitle();
+//
+//        updateToolbarTitle(); // set at startup
 //
 //        if (savedInstanceState == null) {
 //            loadFragmentSafe(new DashboardFragment(), TAG_DASHBOARD);
@@ -93,177 +93,211 @@
 //        fabAddTransaction = findViewById(R.id.fab_add_transaction);
 //    }
 //
+//
+//    private void checkIfShopStillExists() {
+//        String shopId = prefManager.getCurrentShopId();
+//        String email = prefManager.getUserEmail();
+//        if (shopId == null || shopId.isEmpty() || email == null) return;
+//
+//        String emailKey = email.replace(".", ",");
+//
+//        DatabaseReference shopRef = FirebaseDatabase.getInstance()
+//                .getReference("Khatabook")
+//                .child(emailKey)
+//                .child("shops")
+//                .child(shopId);
+//
+//        shopRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//                // ❗ If shop node does NOT exist → clear saved shop
+//                if (!snapshot.exists()) {
+//                    prefManager.setCurrentShopId("");
+//                    prefManager.setCurrentShopName("");
+//                    updateToolbarTitle(); // refresh toolbar
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {}
+//        });
+//    }
+//
+//
 //    private void setupToolbar() {
 //        setSupportActionBar(toolbar);
+//    }
+//
+//    private void updateToolbarTitle() {
+//        String shopName = prefManager.getCurrentShopName();
+//
+//        if (shopName == null || shopName.trim().isEmpty()) {
+//            setToolbarTitle("Dashboard");
+//        } else {
+//            setToolbarTitle(shopName);
+//        }
+//    }
+//
+//    public void setToolbarTitle(String title) {
 //        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setTitle("MyKhata Pro");
+//            if (title == null || title.trim().isEmpty()) {
+//                getSupportActionBar().setTitle("Dashboard");
+//            } else {
+//                getSupportActionBar().setTitle(title);
+//            }
 //        }
 //    }
 //
 //    private void setupDrawer() {
 //        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
 //                this, drawerLayout, toolbar,
-//                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//                R.string.navigation_drawer_open,
+//                R.string.navigation_drawer_close
+//        );
+//
 //        drawerLayout.addDrawerListener(toggle);
 //        toggle.syncState();
+//
 //        navigationView.setNavigationItemSelectedListener(this);
 //    }
 //
 //    private void setupDrawerHeader() {
 //        View header = navigationView.getHeaderView(0);
+//
 //        ivUserPhoto = header.findViewById(R.id.iv_user_photo);
 //        tvUserName = header.findViewById(R.id.tv_user_name);
 //        tvUserEmail = header.findViewById(R.id.tv_user_email);
 //
-//        // Set default values
 //        tvUserName.setText("Loading...");
 //        tvUserEmail.setText("");
 //    }
 //
 //    private void loadUserProfile() {
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        FirebaseUser user = mAuth.getCurrentUser();
+//        if (user == null) return;
 //
-//        if (currentUser != null) {
-//            String userEmail = currentUser.getEmail();
+//        String email = user.getEmail();
+//        if (email == null) return;
 //
-//            if (userEmail != null) {
-//                // Replace '.' with ',' for Firebase key
-//                String firebaseKey = userEmail.replace(".", ",");
+//        tvUserEmail.setText(email);
 //
-//                // Reference to user's profile in Firebase
-//                databaseReference = FirebaseDatabase.getInstance()
-//                        .getReference("Khatabook")
-//                        .child(firebaseKey)
-//                        .child("profile");
+//        // Convert email to Firebase key
+//        String emailKey = email.replace(".", ",");
 //
-//                // Listen for profile data
-//                databaseReference.addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        if (snapshot.exists()) {
-//                            // Get profile data
-//                            String businessName = snapshot.child("businessName").getValue(String.class);
-//                            String email = snapshot.child("email").getValue(String.class);
-//                            String logoUrl = snapshot.child("logoUrl").getValue(String.class);
-//                            String name = snapshot.child("name").getValue(String.class);
+//        // SHOP LOGIC
+//        String shopId = prefManager.getCurrentShopId();
+//        DatabaseReference ref;
 //
-//                            // Update header views
-//                            updateDrawerHeader(businessName, email, logoUrl, name);
+//        if (shopId != null && !shopId.isEmpty()) {
+//            // 🔥 Load SHOP profile
+//            ref = FirebaseDatabase.getInstance()
+//                    .getReference("Khatabook")
+//                    .child(emailKey)
+//                    .child("shops")
+//                    .child(shopId)
+//                    .child("profile");
+//        } else {
+//            // 🔥 Load ROOT profile
+//            ref = FirebaseDatabase.getInstance()
+//                    .getReference("Khatabook")
+//                    .child(emailKey)
+//                    .child("profile");
+//        }
 //
-//                            // Save to PrefManager for offline access
-//                            if (businessName != null) {
-//                                prefManager.saveBusinessName(businessName);
-//                            }
-//                            if (logoUrl != null) {
-//                                prefManager.saveLogoUrl(logoUrl);
-//                            }
-//                        } else {
-//                            // Profile doesn't exist, show email
-//                            tvUserName.setText(userEmail);
-//                            tvUserEmail.setText(userEmail);
-//                        }
-//                    }
+//        ref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
 //
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//                        // Handle error - show cached data if available
-//                        String cachedBusinessName = prefManager.getBusinessName();
-//                        String cachedEmail = prefManager.getUserEmail();
-//                        String cachedLogoUrl = prefManager.getLogoUrl();
+//                String businessName = snapshot.child("businessName").getValue(String.class);
+//                String name = snapshot.child("name").getValue(String.class);
+//                String logoUrl = snapshot.child("logoUrl").getValue(String.class);
 //
-//                        if (cachedBusinessName != null) {
-//                            tvUserName.setText(cachedBusinessName);
-//                            tvUserEmail.setText(cachedEmail != null ? cachedEmail : "");
+//                // Name Priority: BusinessName → Name → Email
+//                if (businessName != null && !businessName.isEmpty()) {
+//                    tvUserName.setText(businessName);
+//                } else if (name != null && !name.isEmpty()) {
+//                    tvUserName.setText(name);
+//                } else {
+//                    tvUserName.setText("MyKhata User");
+//                }
 //
-//                            if (cachedLogoUrl != null && !cachedLogoUrl.isEmpty()) {
-//                                loadProfileImage(cachedLogoUrl);
-//                            }
-//                        } else {
-//                            tvUserName.setText("Error loading profile");
-//                            tvUserEmail.setText("");
-//                        }
-//                    }
-//                });
+//                // SAVE to PrefManager cache
+//                if (businessName != null) prefManager.saveBusinessName(businessName);
+//                if (logoUrl != null) prefManager.saveLogoUrl(logoUrl);
+//
+//                // Load profile picture
+//                if (logoUrl != null && !logoUrl.isEmpty()) {
+//                    Glide.with(MainActivity.this)
+//                            .load(logoUrl)
+//                            .placeholder(R.drawable.ic_person)
+//                            .error(R.drawable.ic_person)
+//                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                            .circleCrop()
+//                            .into(ivUserPhoto);
+//
+//                } else {
+//                    ivUserPhoto.setImageResource(R.drawable.ic_person);
+//                }
 //            }
-//        } else {
-//            // No user logged in
-//            tvUserName.setText("Guest");
-//            tvUserEmail.setText("Please login");
-//        }
-//    }
 //
-//    private void updateDrawerHeader(String businessName, String email, String logoUrl, String name) {
-//        // Priority: Business Name > Name > Email
-//        if (businessName != null && !businessName.isEmpty()) {
-//            tvUserName.setText(businessName);
-//        } else if (name != null && !name.isEmpty()) {
-//            tvUserName.setText(name);
-//        } else {
-//            tvUserName.setText("MyKhata User");
-//        }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                // On error → load cached image
+//                String cachedLogo = prefManager.getLogoUrl();
 //
-//        // Set email
-//        if (email != null && !email.isEmpty()) {
-//            tvUserEmail.setText(email);
-//            tvUserEmail.setVisibility(View.VISIBLE);
-//        } else {
-//            tvUserEmail.setVisibility(View.GONE);
-//        }
-//
-//        // Load profile image with Glide
-//        if (logoUrl != null && !logoUrl.isEmpty()) {
-//            loadProfileImage(logoUrl);
-//        }
-//    }
-//
-//    private void loadProfileImage(String imageUrl) {
-//        Glide.with(this)
-//                .load(imageUrl)
-//                .placeholder(R.drawable.ic_person)
-//                .error(R.drawable.ic_person)
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .circleCrop()
-//                .into(ivUserPhoto);
+//                if (cachedLogo != null && !cachedLogo.isEmpty()) {
+//                    Glide.with(MainActivity.this)
+//                            .load(cachedLogo)
+//                            .circleCrop()
+//                            .placeholder(R.drawable.ic_person)
+//                            .into(ivUserPhoto);
+//                }
+//            }
+//        });
 //    }
 //
 //    private void setupBottomNav() {
 //        bottomNav.setOnItemSelectedListener(item -> {
+//
 //            int id = item.getItemId();
+//
 //            if (id == R.id.nav_dashboard) {
 //                loadFragmentSafe(new DashboardFragment(), TAG_DASHBOARD);
+//
 //            } else if (id == R.id.nav_customers) {
 //                loadFragmentSafe(new CustomersFragment(), TAG_CUSTOMERS);
+//
 //            } else if (id == R.id.nav_reports) {
 //                loadFragmentSafe(new ReportsFragment(), TAG_REPORTS);
+//
 //            } else if (id == R.id.nav_settings) {
 //                loadFragmentSafe(new SettingsFragment(), TAG_SETTINGS);
-//            } else if (id == R.id.placeholder) {
-//                // Ignore placeholder click
-//                return false;
 //            }
+//
+//            updateToolbarTitle(); // Refresh title
 //            navigationView.setCheckedItem(id);
+//
 //            return true;
 //        });
 //    }
 //
 //    private void setupFAB() {
-//        fabAddTransaction.setOnClickListener(v -> {
-//            // TODO: Create and navigate to AddTransactionActivity
-//             Intent intent = new Intent(MainActivity.this, AddTransactionActivity.class);
-//             startActivity(intent);
-//
-//            // Temporary: Show Toast until AddTransactionActivity is created
-////            Toast.makeText(this, "Add Transaction - Coming Soon!", Toast.LENGTH_SHORT).show();
-//        });
+//        fabAddTransaction.setOnClickListener(v ->
+//                startActivity(new Intent(MainActivity.this, AddTransactionActivity.class))
+//        );
 //    }
+//
 //
 //    @Override
 //    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//
 //        int id = item.getItemId();
 //
 //        if (id == R.id.nav_dashboard) {
 //            loadFragmentSafe(new DashboardFragment(), TAG_DASHBOARD);
 //            bottomNav.setSelectedItemId(id);
+//
 //        } else if (id == R.id.nav_customers) {
 //            loadFragmentSafe(new CustomersFragment(), TAG_CUSTOMERS);
 //            bottomNav.setSelectedItemId(id);
@@ -271,137 +305,78 @@
 //        } else if (id == R.id.nav_reports) {
 //            loadFragmentSafe(new ReportsFragment(), TAG_REPORTS);
 //            bottomNav.setSelectedItemId(id);
+//
 //        } else if (id == R.id.nav_settings) {
 //            loadFragmentSafe(new SettingsFragment(), TAG_SETTINGS);
 //            bottomNav.setSelectedItemId(id);
+//
 //        }
-//        // Drawer-only items
+//        // ------------------------
+//        // ⭐ OPEN PROFILE FRAGMENT
+//        // ------------------------
 //        else if (id == R.id.nav_profile) {
-//            loadFragmentSafe(new ProfileFragment(), TAG_PROFILE);
+//            loadFragmentSafe(new ProfileFragment(), "profile");
 //        }
-////        else if (id == R.id.nav_share) {
-////            shareApp();
-////        } else if (id == R.id.nav_rate) {
-////            rateApp();
-////        }
+//        // ------------------------
+//        // ⭐ OPEN ABOUT ACTIVITY
+//        // ------------------------
 //        else if (id == R.id.nav_about) {
-//            // loadFragmentSafe(new AboutFragment(), TAG_ABOUT);
+//            startActivity(new Intent(MainActivity.this, AboutAppActivity.class));
+//        }
+//
+//        else if (id == R.id.nav_switchshop) {
+//            startActivity(new Intent(MainActivity.this, SwitchShopActivity.class));
+//
 //        } else if (id == R.id.nav_logout) {
 //            showLogoutDialog();
 //        }
 //
 //        drawerLayout.closeDrawer(GravityCompat.START);
+//        updateToolbarTitle();
 //        return true;
 //    }
 //
 //    private void loadFragmentSafe(Fragment fragment, String tag) {
-//        Fragment existing = getSupportFragmentManager().findFragmentByTag(tag);
-//        if (existing == null) existing = fragment;
-//
 //        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-//        tx.replace(R.id.fragment_container, existing, tag);
+//        tx.replace(R.id.fragment_container, fragment, tag);
 //        tx.commit();
 //
-//        setToolbarTitle(tag);
-//    }
-//
-//    private void setToolbarTitle(String tag) {
-//        if (getSupportActionBar() != null) {
-//            switch (tag) {
-//                case TAG_DASHBOARD:
-//                    getSupportActionBar().setTitle("Dashboard");
-//                    break;
-//                case TAG_CUSTOMERS:
-//                    getSupportActionBar().setTitle("Customers");
-//                    break;
-//                case TAG_REPORTS:
-//                    getSupportActionBar().setTitle("Reports");
-//                    break;
-//                case TAG_SETTINGS:
-//                    getSupportActionBar().setTitle("Settings");
-//                    break;
-//                case TAG_PROFILE:
-//                    getSupportActionBar().setTitle("Profile");
-//                    break;
-//                case TAG_ABOUT:
-//                    getSupportActionBar().setTitle("About");
-//                    break;
-//                default:
-//                    getSupportActionBar().setTitle("MyKhata Pro");
-//                    break;
-//            }
-//        }
-//    }
-//
-//    private void shareApp() {
-//        Intent intent = new Intent(Intent.ACTION_SEND);
-//        intent.setType("text/plain");
-//        intent.putExtra(Intent.EXTRA_TEXT, "Download MyKhata Pro: https://play.google.com/store/apps/details?id=" + getPackageName());
-//        startActivity(Intent.createChooser(intent, "Share via"));
-//    }
-//
-//    private void rateApp() {
-//        String appId = getPackageName();
-//        Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appId));
-//        try {
-//            startActivity(rateIntent);
-//        } catch (Exception e) {
-//            // If Play Store not available, open in browser
-//            startActivity(new Intent(Intent.ACTION_VIEW,
-//                    Uri.parse("https://play.google.com/store/apps/details?id=" + appId)));
-//        }
+//        updateToolbarTitle(); // Always update title after fragment change
 //    }
 //
 //    private void showLogoutDialog() {
 //        new AlertDialog.Builder(this)
 //                .setTitle("Logout")
-//                .setMessage("Are you sure you want to logout?")
+//                .setMessage("Are you sure?")
 //                .setPositiveButton("Yes", (dialog, which) -> performLogout())
-//                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-//                .setCancelable(true)
+//                .setNegativeButton("Cancel", null)
 //                .show();
 //    }
 //
 //    private void performLogout() {
-//        // Sign out from Firebase
 //        mAuth.signOut();
+//        prefManager.clearAll();
 //
-//        // Clear all saved data from PrefManager
-//        prefManager.clear();
-//
-//        // Show logout message
-//        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-//
-//        // Navigate to LoginActivity
-//        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        startActivity(intent);
+//        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(i);
 //        finish();
 //    }
 //
 //    @Override
 //    public void onBackPressed() {
+//
 //        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
 //            drawerLayout.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
+//            return;
 //        }
-//    }
 //
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        // Remove Firebase listener to prevent memory leaks
-//        if (databaseReference != null) {
-//            databaseReference.removeEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {}
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {}
-//            });
-//        }
+//        super.onBackPressed();
 //    }
 //}
+//
+
+
 
 
 package com.sandhyasofttechh.mykhatapro;
@@ -427,14 +402,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttechh.mykhatapro.activities.AboutAppActivity;
-import com.sandhyasofttechh.mykhatapro.activities.AboutUsActivity;
 import com.sandhyasofttechh.mykhatapro.activities.AddTransactionActivity;
 import com.sandhyasofttechh.mykhatapro.fragments.*;
 import com.sandhyasofttechh.mykhatapro.register.LoginActivity;
@@ -477,12 +450,10 @@ public class MainActivity extends AppCompatActivity
         setupDrawer();
         setupBottomNav();
         setupFAB();
-        setupDrawerHeader();
+        setupDrawerHeader(); // This now includes click listener
         loadUserProfile();
         checkIfShopStillExists();
         updateToolbarTitle();
-
-        updateToolbarTitle(); // set at startup
 
         if (savedInstanceState == null) {
             loadFragmentSafe(new DashboardFragment(), TAG_DASHBOARD);
@@ -498,7 +469,6 @@ public class MainActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         fabAddTransaction = findViewById(R.id.fab_add_transaction);
     }
-
 
     private void checkIfShopStillExists() {
         String shopId = prefManager.getCurrentShopId();
@@ -516,12 +486,10 @@ public class MainActivity extends AppCompatActivity
         shopRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                // ❗ If shop node does NOT exist → clear saved shop
                 if (!snapshot.exists()) {
                     prefManager.setCurrentShopId("");
                     prefManager.setCurrentShopName("");
-                    updateToolbarTitle(); // refresh toolbar
+                    updateToolbarTitle();
                 }
             }
 
@@ -530,28 +498,18 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-
     private void setupToolbar() {
         setSupportActionBar(toolbar);
     }
 
     private void updateToolbarTitle() {
         String shopName = prefManager.getCurrentShopName();
-
-        if (shopName == null || shopName.trim().isEmpty()) {
-            setToolbarTitle("Dashboard");
-        } else {
-            setToolbarTitle(shopName);
-        }
+        setToolbarTitle(shopName != null && !shopName.trim().isEmpty() ? shopName : "Dashboard");
     }
 
     public void setToolbarTitle(String title) {
         if (getSupportActionBar() != null) {
-            if (title == null || title.trim().isEmpty()) {
-                getSupportActionBar().setTitle("Dashboard");
-            } else {
-                getSupportActionBar().setTitle(title);
-            }
+            getSupportActionBar().setTitle(title != null && !title.trim().isEmpty() ? title : "Dashboard");
         }
     }
 
@@ -561,13 +519,12 @@ public class MainActivity extends AppCompatActivity
                 R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close
         );
-
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    // UPDATED: Now includes click on profile image
     private void setupDrawerHeader() {
         View header = navigationView.getHeaderView(0);
 
@@ -577,6 +534,20 @@ public class MainActivity extends AppCompatActivity
 
         tvUserName.setText("Loading...");
         tvUserEmail.setText("");
+
+        // CLICK ON PROFILE IMAGE → OPEN PROFILE FRAGMENT
+        ivUserPhoto.setOnClickListener(v -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            loadFragmentSafe(new ProfileFragment(), "profile");
+            navigationView.setCheckedItem(R.id.nav_profile);
+        });
+
+        // Optional: Also make the whole header clickable
+        header.setOnClickListener(v -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            loadFragmentSafe(new ProfileFragment(), "profile");
+            navigationView.setCheckedItem(R.id.nav_profile);
+        });
     }
 
     private void loadUserProfile() {
@@ -588,15 +559,11 @@ public class MainActivity extends AppCompatActivity
 
         tvUserEmail.setText(email);
 
-        // Convert email to Firebase key
         String emailKey = email.replace(".", ",");
-
-        // SHOP LOGIC
         String shopId = prefManager.getCurrentShopId();
         DatabaseReference ref;
 
         if (shopId != null && !shopId.isEmpty()) {
-            // 🔥 Load SHOP profile
             ref = FirebaseDatabase.getInstance()
                     .getReference("Khatabook")
                     .child(emailKey)
@@ -604,7 +571,6 @@ public class MainActivity extends AppCompatActivity
                     .child(shopId)
                     .child("profile");
         } else {
-            // 🔥 Load ROOT profile
             ref = FirebaseDatabase.getInstance()
                     .getReference("Khatabook")
                     .child(emailKey)
@@ -614,12 +580,10 @@ public class MainActivity extends AppCompatActivity
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                 String businessName = snapshot.child("businessName").getValue(String.class);
                 String name = snapshot.child("name").getValue(String.class);
                 String logoUrl = snapshot.child("logoUrl").getValue(String.class);
 
-                // Name Priority: BusinessName → Name → Email
                 if (businessName != null && !businessName.isEmpty()) {
                     tvUserName.setText(businessName);
                 } else if (name != null && !name.isEmpty()) {
@@ -628,11 +592,9 @@ public class MainActivity extends AppCompatActivity
                     tvUserName.setText("MyKhata User");
                 }
 
-                // SAVE to PrefManager cache
                 if (businessName != null) prefManager.saveBusinessName(businessName);
                 if (logoUrl != null) prefManager.saveLogoUrl(logoUrl);
 
-                // Load profile picture
                 if (logoUrl != null && !logoUrl.isEmpty()) {
                     Glide.with(MainActivity.this)
                             .load(logoUrl)
@@ -641,7 +603,6 @@ public class MainActivity extends AppCompatActivity
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .circleCrop()
                             .into(ivUserPhoto);
-
                 } else {
                     ivUserPhoto.setImageResource(R.drawable.ic_person);
                 }
@@ -649,9 +610,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // On error → load cached image
                 String cachedLogo = prefManager.getLogoUrl();
-
                 if (cachedLogo != null && !cachedLogo.isEmpty()) {
                     Glide.with(MainActivity.this)
                             .load(cachedLogo)
@@ -665,25 +624,20 @@ public class MainActivity extends AppCompatActivity
 
     private void setupBottomNav() {
         bottomNav.setOnItemSelectedListener(item -> {
-
             int id = item.getItemId();
 
             if (id == R.id.nav_dashboard) {
                 loadFragmentSafe(new DashboardFragment(), TAG_DASHBOARD);
-
             } else if (id == R.id.nav_customers) {
                 loadFragmentSafe(new CustomersFragment(), TAG_CUSTOMERS);
-
             } else if (id == R.id.nav_reports) {
                 loadFragmentSafe(new ReportsFragment(), TAG_REPORTS);
-
             } else if (id == R.id.nav_settings) {
                 loadFragmentSafe(new SettingsFragment(), TAG_SETTINGS);
             }
 
-            updateToolbarTitle(); // Refresh title
+            updateToolbarTitle();
             navigationView.setCheckedItem(id);
-
             return true;
         });
     }
@@ -694,45 +648,28 @@ public class MainActivity extends AppCompatActivity
         );
     }
 
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
         int id = item.getItemId();
 
         if (id == R.id.nav_dashboard) {
             loadFragmentSafe(new DashboardFragment(), TAG_DASHBOARD);
             bottomNav.setSelectedItemId(id);
-
         } else if (id == R.id.nav_customers) {
             loadFragmentSafe(new CustomersFragment(), TAG_CUSTOMERS);
             bottomNav.setSelectedItemId(id);
-
         } else if (id == R.id.nav_reports) {
             loadFragmentSafe(new ReportsFragment(), TAG_REPORTS);
             bottomNav.setSelectedItemId(id);
-
         } else if (id == R.id.nav_settings) {
             loadFragmentSafe(new SettingsFragment(), TAG_SETTINGS);
             bottomNav.setSelectedItemId(id);
-
-        }
-        // ------------------------
-        // ⭐ OPEN PROFILE FRAGMENT
-        // ------------------------
-        else if (id == R.id.nav_profile) {
+        } else if (id == R.id.nav_profile) {
             loadFragmentSafe(new ProfileFragment(), "profile");
-        }
-        // ------------------------
-        // ⭐ OPEN ABOUT ACTIVITY
-        // ------------------------
-        else if (id == R.id.nav_about) {
-            startActivity(new Intent(MainActivity.this, AboutAppActivity.class));
-        }
-
-        else if (id == R.id.nav_switchshop) {
-            startActivity(new Intent(MainActivity.this, SwitchShopActivity.class));
-
+        } else if (id == R.id.nav_about) {
+            startActivity(new Intent(this, AboutAppActivity.class));
+        } else if (id == R.id.nav_switchshop) {
+            startActivity(new Intent(this, SwitchShopActivity.class));
         } else if (id == R.id.nav_logout) {
             showLogoutDialog();
         }
@@ -746,8 +683,7 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.replace(R.id.fragment_container, fragment, tag);
         tx.commit();
-
-        updateToolbarTitle(); // Always update title after fragment change
+        updateToolbarTitle();
     }
 
     private void showLogoutDialog() {
@@ -762,8 +698,7 @@ public class MainActivity extends AppCompatActivity
     private void performLogout() {
         mAuth.signOut();
         prefManager.clearAll();
-
-        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        Intent i = new Intent(this, LoginActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
@@ -771,13 +706,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-            return;
+        } else {
+            super.onBackPressed();
         }
-
-        super.onBackPressed();
     }
 }
-

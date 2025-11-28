@@ -101,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Share This Card"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:icon="@android:drawable/ic_menu_share"
