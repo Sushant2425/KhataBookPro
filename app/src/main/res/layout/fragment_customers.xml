@@ -87,6 +87,6 @@
                 app:fabSize="normal"
                 app:layout_anchor="@id/recycler_customers"
                 app:layout_anchorGravity="bottom|end"
-                android:layout_margin="16dp" />
+                android:layout_marginBottom="125dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

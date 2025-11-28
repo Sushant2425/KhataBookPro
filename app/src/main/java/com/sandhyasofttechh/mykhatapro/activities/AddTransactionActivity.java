@@ -1601,7 +1601,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 }
 
 
-        } else if (requestCode == PICK_IMAGE_REQUEST_CODE) {
+            } else if (requestCode == PICK_IMAGE_REQUEST_CODE) {
                 // handle camera response if needed
             } else if (requestCode == PICK_FILE_REQUEST_CODE) {
                 // handle gallery file pick if needed
