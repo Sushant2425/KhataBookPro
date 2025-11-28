@@ -255,6 +255,7 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.sandhyasofttechh.mykhatapro.activities.CollectionActivity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -290,7 +291,7 @@ public class SettingsFragment extends Fragment {
 
     // Options
     private LinearLayout optChangePassword, optSmsSettings, optRecycleBin;
-    private LinearLayout optAppLock, optHelpSupport, optAboutApp, optAboutUs;
+    private LinearLayout optAppLock, optHelpSupport, optAboutApp, optAboutUs,collection;
 
     // Firebase
     private DatabaseReference profileRef;
@@ -343,8 +344,13 @@ public class SettingsFragment extends Fragment {
         optHelpSupport = view.findViewById(R.id.opt_help_support);
         optAboutApp = view.findViewById(R.id.opt_about_app);
         optAboutUs = view.findViewById(R.id.opt_about_us);
+        collection = view.findViewById(R.id.collection);
+
 
         imgLogoBig.setOnClickListener(v -> openFullScreenImage());
+
+     collection.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), CollectionActivity.class)));
     }
 
     // Collapsing toolbar animation

@@ -25,6 +25,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyKhataPro">
         <activity
+            android:name=".activities.CollectionActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.FullScreenImageActivity"
             android:exported="false" />
         <activity
