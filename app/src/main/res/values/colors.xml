@@ -80,4 +80,29 @@
     <color name="red_100">#FFCDD2</color>
     <color name="green_700">#388E3C</color>
     <color name="green_100">#C8E6C9</color>
+
+
+
+        <color name="background_white">#FFFFFF</color>
+
+        <color name="text_hint">#BDBDBD</color>
+
+        <!-- Status Colors -->
+        <color name="required_red">#D32F2F</color>
+        <color name="success_green">#4CAF50</color>
+        <color name="warning_orange">#FF9800</color>
+
+        <!-- Error Colors -->
+        <color name="error_light">#FFEBEE</color>
+        <color name="error_dark">#C62828</color>
+
+        <!-- Image Placeholder -->
+        <color name="image_placeholder_bg">#E3F2FD</color>
+
+        <!-- Card Colors -->
+        <color name="card_background">#FFFFFF</color>
+        <color name="card_stroke">#E0E0E0</color>
+
+        <!-- Transparent -->
+
 </resources>
