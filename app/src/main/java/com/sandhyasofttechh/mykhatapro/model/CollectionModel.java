@@ -35,11 +35,7 @@ public class CollectionModel implements Serializable {
         return new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(new Date(dueDate));
     }
 
-
     public void setDueDate(long dueDate) {
         this.dueDate = dueDate;
-    }
-    public void setPendingAmount(double pendingAmount) {
-        this.pendingAmount = pendingAmount;
     }
 }

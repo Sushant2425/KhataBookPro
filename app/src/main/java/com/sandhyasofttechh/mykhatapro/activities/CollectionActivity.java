@@ -7,7 +7,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -47,29 +46,22 @@ import java.util.Locale;
 public class CollectionActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_PERMISSION_CODE = 1001;
-    private static final String PREF_REMINDER_SCHEDULED = "reminder_scheduled_";
-    private static final String PREF_LAST_UPDATE = "collection_last_update";
 
     TextView txtTotalDue, txtEmptyState, txtShopTitle;
     ProgressBar progressBar;
     TabLayout tabLayout;
     ViewPager2 viewPager;
 
-    // **FIXED: Public lists for fragment updates**
-    public ArrayList<CollectionModel> duePaymentsList = new ArrayList<>();
-    public ArrayList<CollectionModel> todayList = new ArrayList<>();
-    public ArrayList<CollectionModel> incomingList = new ArrayList<>();
+    ArrayList<CollectionModel> duePaymentsList = new ArrayList<>();
+    ArrayList<CollectionModel> todayList = new ArrayList<>();
+    ArrayList<CollectionModel> incomingList = new ArrayList<>();
 
     PrefManager prefManager;
-    SharedPreferences reminderPrefs;
     DatabaseReference rootRef;
     String userEmailPath = "", shopId = "", shopName = "";
 
     private int totalCustomers = 0;
     private int processedCount = 0;
-    private long lastDataUpdate = 0;
-
-    private CollectionPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +98,6 @@ public class CollectionActivity extends AppCompatActivity {
 
     private void initData() {
         prefManager = new PrefManager(this);
-        reminderPrefs = getSharedPreferences("collection_reminders", MODE_PRIVATE);
         userEmailPath = prefManager.getUserEmail().replace(".", ",");
         shopId = prefManager.getCurrentShopId();
         shopName = prefManager.getCurrentShopName();
@@ -118,12 +109,10 @@ public class CollectionActivity extends AppCompatActivity {
         }
 
         rootRef = FirebaseDatabase.getInstance().getReference();
-        lastDataUpdate = reminderPrefs.getLong(PREF_LAST_UPDATE + shopId, 0);
     }
 
     private void setupTabs() {
-        pagerAdapter = new CollectionPagerAdapter();
-        viewPager.setAdapter(pagerAdapter);
+        viewPager.setAdapter(new CollectionPagerAdapter());
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0: tab.setText("Due Payments"); break;
@@ -196,9 +185,6 @@ public class CollectionActivity extends AppCompatActivity {
             return;
         }
 
-        // **DEBUG LOG**
-        Toast.makeText(this, "Processing " + totalCustomers + " customers...", Toast.LENGTH_SHORT).show();
-
         for (String phone : phones) {
             processCustomerTransactions(phone, names.get(phone));
         }
@@ -236,19 +222,12 @@ public class CollectionActivity extends AppCompatActivity {
 
                 double pending = gave[0] - got[0];
                 if (pending > 0) {
-                    // **PREVENT DUPLICATES**
-                    if (findCustomerByPhone(phone) == null) {
-                        categorizeCustomer(name, phone, pending, earliestDue[0]);
-                    }
+                    categorizeCustomer(name, phone, pending, earliestDue[0]);
                 }
 
                 processedCount++;
                 if (processedCount >= totalCustomers) {
-                    runOnUiThread(() -> {
-                        updateUIAndScheduleReminders();
-                        // **CRITICAL FIX: Force refresh ALL fragments**
-                        refreshAllFragments();
-                    });
+                    runOnUiThread(() -> updateUIAndScheduleReminders());
                 }
             }
 
@@ -268,23 +247,10 @@ public class CollectionActivity extends AppCompatActivity {
         ref.addListenerForSingleValueEvent(listener);
     }
 
-    // **IMPROVED: Check ALL lists for duplicates**
-    private CollectionModel findCustomerByPhone(String phone) {
-        for (CollectionModel model : duePaymentsList) {
-            if (model.getPhone().equals(phone)) return model;
-        }
-        for (CollectionModel model : todayList) {
-            if (model.getPhone().equals(phone)) return model;
-        }
-        for (CollectionModel model : incomingList) {
-            if (model.getPhone().equals(phone)) return model;
-        }
-        return null;
-    }
-
     private void categorizeCustomer(String name, String phone, double pending, long dueDate) {
         long todayStart = getTodayStart();
         long tomorrowStart = todayStart + 86400000L;
+
         CollectionModel model = new CollectionModel(name, phone, pending, dueDate);
 
         if (dueDate == 0 || dueDate < todayStart) {
@@ -294,18 +260,6 @@ public class CollectionActivity extends AppCompatActivity {
         } else {
             incomingList.add(model);
         }
-    }
-
-    // **CRITICAL FIX: Force refresh ALL fragments**
-    private void refreshAllFragments() {
-        if (pagerAdapter != null) {
-            // **CRITICAL: This now works properly with getItemId() override**
-            pagerAdapter.notifyDataSetChanged();
-        }
-        // Switch to first tab to trigger immediate refresh
-        viewPager.setCurrentItem(0, false);
-        viewPager.setVisibility(View.VISIBLE);
-        tabLayout.setVisibility(View.VISIBLE);
     }
 
     private long getTodayStart() {
@@ -325,100 +279,50 @@ public class CollectionActivity extends AppCompatActivity {
 
     private void updateUIAndScheduleReminders() {
         showProgress(false);
-        lastDataUpdate = System.currentTimeMillis();
-        reminderPrefs.edit().putLong(PREF_LAST_UPDATE + shopId, lastDataUpdate).apply();
 
-        recalculateTotalDue();
-
-        // **SHOW ALL COUNTS**
-        String countMsg = String.format("Due:%d Today:%d Incoming:%d Total:₹%.2f",
-                duePaymentsList.size(), todayList.size(), incomingList.size(), getTotalDueAmount());
-        Toast.makeText(this, countMsg, Toast.LENGTH_LONG).show();
-
-        if (duePaymentsList.isEmpty() && todayList.isEmpty() && incomingList.isEmpty()) {
-            showEmptyState("No pending collections");
-        } else {
-            refreshAllFragments();
-            txtEmptyState.setVisibility(View.GONE);
-        }
-
-        scheduleSmartReminders();
-    }
-
-    // **INSTANT UPDATE METHOD**
-    public void updateDueAmountInstantly(String customerPhone, double paymentAmount) {
-        boolean found = updateCustomerInList(duePaymentsList, customerPhone, paymentAmount) ||
-                updateCustomerInList(todayList, customerPhone, paymentAmount) ||
-                updateCustomerInList(incomingList, customerPhone, paymentAmount);
-
-        if (found) {
-            recalculateTotalDue();
-            refreshAllFragments();
-            Toast.makeText(this, "Payment updated instantly!", Toast.LENGTH_SHORT).show();
-        } else {
-            loadCollectionData();
-        }
-    }
-
-    private boolean updateCustomerInList(ArrayList<CollectionModel> list, String phone, double paymentAmount) {
-        for (int i = 0; i < list.size(); i++) {
-            CollectionModel model = list.get(i);
-            if (model.getPhone().equals(phone)) {
-                double newPending = Math.max(0, model.getPendingAmount() - paymentAmount);
-                model.setPendingAmount(newPending);
-                if (newPending <= 0) {
-                    list.remove(i);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void recalculateTotalDue() {
-        double total = getTotalDueAmount();
-        txtTotalDue.setText(String.format(Locale.getDefault(), "Total Due: ₹%.2f", total));
-    }
-
-    private double getTotalDueAmount() {
         double total = 0;
         for (CollectionModel m : duePaymentsList) total += m.getPendingAmount();
         for (CollectionModel m : todayList) total += m.getPendingAmount();
         for (CollectionModel m : incomingList) total += m.getPendingAmount();
-        return total;
-    }
 
-    // **REMINDER METHODS (unchanged)**
-    private void scheduleSmartReminders() {
-        long now = System.currentTimeMillis();
-        if (now - lastDataUpdate > 3600000) {
-            clearAllReminders();
+        txtTotalDue.setText(String.format(Locale.getDefault(), "Total Due: ₹%.2f", total));
+
+        if (duePaymentsList.isEmpty() && todayList.isEmpty() && incomingList.isEmpty()) {
+            showEmptyState("No pending collections");
+        } else {
+            viewPager.getAdapter().notifyDataSetChanged();
+            viewPager.setVisibility(View.VISIBLE);
+            tabLayout.setVisibility(View.VISIBLE);
+            txtEmptyState.setVisibility(View.GONE);
         }
 
+        scheduleRemindersForTodayAndFuture();
+    }
+
+    private void scheduleRemindersForTodayAndFuture() {
+        // TODAY WALE CUSTOMERS → NEXT 2 MINUTE MEIN NOTIFICATION
         for (CollectionModel m : todayList) {
-            String key = PREF_REMINDER_SCHEDULED + "today_" + m.getPhone();
-            if (!reminderPrefs.getBoolean(key, false)) {
-                long triggerTime = getNext10AM();
-                scheduleSingleReminder(m, triggerTime, "today");
-                reminderPrefs.edit().putBoolean(key, true).apply();
-            }
+            long testTrigger = System.currentTimeMillis() + 2 * 60 * 1000; // +2 minute
+            scheduleSingleReminder(m, testTrigger);
         }
 
+        // INCOMING WALE CUSTOMERS → NEXT 4 MINUTE MEIN NOTIFICATION
         for (CollectionModel m : incomingList) {
-            String key = PREF_REMINDER_SCHEDULED + "incoming_" + m.getPhone();
-            if (!reminderPrefs.getBoolean(key, false)) {
-                long triggerTime = getDayBeforeDueAt9AM(m.getDueDate());
-                if (triggerTime > now) {
-                    scheduleSingleReminder(m, triggerTime, "incoming");
-                    reminderPrefs.edit().putBoolean(key, true).apply();
-                }
-            }
+            long testTrigger = System.currentTimeMillis() + 4 * 60 * 1000; // +4 minute
+            scheduleSingleReminder(m, testTrigger);
         }
-    }
 
-    private long getNext10AM() {
+        // OPTIONAL: Due Payments wale bhi test karna chahe to +6 minute
+        // for (CollectionModel m : duePaymentsList) {
+        //     long testTrigger = System.currentTimeMillis() + 6 * 60 * 1000;
+        //     scheduleSingleReminder(m, testTrigger);
+        // }
+
+        Toast.makeText(this, "TESTING MODE: Notifications 2-4 minute mein aayengi!", Toast.LENGTH_LONG).show();
+    }
+    private long getNext9AM() {
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 10);
+        c.set(Calendar.HOUR_OF_DAY, 9);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
@@ -428,24 +332,8 @@ public class CollectionActivity extends AppCompatActivity {
         return c.getTimeInMillis();
     }
 
-    private long getDayBeforeDueAt9AM(long dueDate) {
-        Calendar reminderCal = Calendar.getInstance();
-        reminderCal.setTimeInMillis(dueDate);
-        reminderCal.add(Calendar.DAY_OF_YEAR, -1);
-        reminderCal.set(Calendar.HOUR_OF_DAY, 9);
-        reminderCal.set(Calendar.MINUTE, 0);
-        reminderCal.set(Calendar.SECOND, 0);
-        reminderCal.set(Calendar.MILLISECOND, 0);
-        return reminderCal.getTimeInMillis();
-    }
-
-    private void clearAllReminders() {
-        reminderPrefs.edit().clear().apply();
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if (nm != null) nm.cancelAll();
-    }
-
-    private void scheduleSingleReminder(CollectionModel model, long triggerAt, String category) {
+    // 100% CRASH-FREE EXACT ALARM (Android 12+ ke liye safe)
+    private void scheduleSingleReminder(CollectionModel model, long triggerAt) {
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (am == null) return;
 
@@ -453,19 +341,21 @@ public class CollectionActivity extends AppCompatActivity {
         intent.putExtra("name", model.getName());
         intent.putExtra("amount", model.getPendingAmount());
         intent.putExtra("phone", model.getPhone());
-        intent.putExtra("category", category);
 
-        int requestCode = (category + "_" + model.getPhone()).hashCode();
+        int requestCode = ("remind_" + model.getPhone()).hashCode();
+
         PendingIntent pi = PendingIntent.getBroadcast(this, requestCode, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+
             if (am.canScheduleExactAlarms()) {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
             } else {
+                // Permission nahi → user se maang lo
                 Intent i = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
                 i.setData(Uri.parse("package:" + getPackageName()));
                 startActivity(i);
+                // Fallback: Inexact alarm
                 am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
             }
         } else {
@@ -493,6 +383,7 @@ public class CollectionActivity extends AppCompatActivity {
         txtTotalDue.setText("Total Due: ₹0.00");
     }
 
+    // Date picker from adapter
     public void showDatePicker(CollectionModel model) {
         Calendar cal = Calendar.getInstance();
         if (model.getDueDate() > 0) {
@@ -505,30 +396,59 @@ public class CollectionActivity extends AppCompatActivity {
             long dueDateMillis = selected.getTimeInMillis();
 
             updateAllGaveTransactions(model.getPhone(), dueDateMillis);
-            Toast.makeText(this, "Due date updated for " + model.getName(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Due date set for " + model.getName(), Toast.LENGTH_LONG).show();
             loadCollectionData();
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     private void updateAllGaveTransactions(String phone, long dueDate) {
-        // Implementation same as before...
+        DatabaseReference rootTxnRef = rootRef.child("Khatabook").child(userEmailPath)
+                .child("transactions").child(phone);
+
+        rootTxnRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot txn : snapshot.getChildren()) {
+                        String type = txn.child("type").getValue(String.class);
+                        if ("gave".equals(type)) {
+                            txn.getRef().child("dueDate").setValue(dueDate);
+                        }
+                    }
+                }
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
+
+        if (!shopId.isEmpty()) {
+            DatabaseReference shopTxnRef = rootRef.child("Khatabook").child(userEmailPath)
+                    .child("shops").child(shopId).child("transactions").child(phone);
+
+            shopTxnRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot txn : snapshot.getChildren()) {
+                            String type = txn.child("type").getValue(String.class);
+                            if ("gave".equals(type)) {
+                                txn.getRef().child("dueDate").setValue(dueDate);
+                            }
+                        }
+                    }
+                }
+                @Override public void onCancelled(@NonNull DatabaseError error) {}
+            });
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         loadCollectionData();
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (nm != null) nm.cancelAll();
     }
 
     private class CollectionPagerAdapter extends FragmentStateAdapter {
-
         public CollectionPagerAdapter() {
             super(CollectionActivity.this);
         }
@@ -536,16 +456,15 @@ public class CollectionActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            // **IMPROVED: Pass CURRENT data lists with fresh copies to prevent reference issues**
             switch (position) {
                 case 0:
-                    return CollectionFragment.newInstance(new ArrayList<>(duePaymentsList));
+                    return CollectionFragment.newInstance(duePaymentsList);
                 case 1:
-                    return CollectionFragment.newInstance(new ArrayList<>(todayList));
+                    return CollectionFragment.newInstance(todayList);
                 case 2:
-                    return CollectionFragment.newInstance(new ArrayList<>(incomingList));
+                    return CollectionFragment.newInstance(incomingList);
                 default:
-                    return CollectionFragment.newInstance(new ArrayList<>());
+                    return CollectionFragment.newInstance(duePaymentsList);
             }
         }
 
@@ -553,20 +472,7 @@ public class CollectionActivity extends AppCompatActivity {
         public int getItemCount() {
             return 3;
         }
+    }}
 
-        // **CRITICAL FIX #1: Override getItemId() for proper fragment recreation**
-        @Override
-        public long getItemId(int position) {
-            // Generate unique ID based on position + timestamp for data refresh
-            return position * 1000 + System.currentTimeMillis() % 1000;
-        }
 
-        // **CRITICAL FIX #2: Override containsItem() for FragmentStateAdapter refresh support**
-        @Override
-        public boolean containsItem(long itemId) {
-            // Always return true for valid positions to allow recreation
-            long position = itemId / 1000;
-            return position >= 0 && position < getItemCount();
-        }
-    }
-}
+
