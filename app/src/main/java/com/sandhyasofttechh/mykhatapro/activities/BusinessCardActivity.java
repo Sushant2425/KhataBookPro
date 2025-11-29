@@ -88,6 +88,9 @@ public class BusinessCardActivity extends AppCompatActivity {
         btnShareCard = findViewById(R.id.btn_share_card); // ← Initialize Share Button
         btnDownloadCard = findViewById(R.id.btn_download_card);
 
+        vpTopCards.setOffscreenPageLimit(TOTAL_CARDS);
+        vpSteps.setOffscreenPageLimit(5);
+
     }
 
     private void initializeCards() {
@@ -123,7 +126,7 @@ public class BusinessCardActivity extends AppCompatActivity {
     private void setupViewPagers() {
         topCardAdapter = new TopCardAdapter(cards);
         vpTopCards.setAdapter(topCardAdapter);
-        vpTopCards.setOffscreenPageLimit(3);
+//        vpTopCards.setOffscreenPageLimit(3);
         stepsPagerAdapter = new StepsPagerAdapter();
         vpSteps.setAdapter(stepsPagerAdapter);
         vpSteps.setUserInputEnabled(false); // Disable swipe, use buttons only
@@ -133,22 +136,28 @@ public class BusinessCardActivity extends AppCompatActivity {
         vpTopCards.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int pos) {
-                // FIRST: Save current tempModel data to the OLD card (before switching)
-                cards.set(selectedCardIndex, new BusinessCardModel(tempModel));
-
-                // NOW: Switch to new card
                 selectedCardIndex = pos;
 
-                // LOAD: The saved data of the NEW card into tempModel
-                tempModel = new BusinessCardModel(cards.get(pos));
+                // 🔥 Current card चा data सर्व cards मध्ये copy करा
+                for (int i = 0; i < TOTAL_CARDS; i++) {
+                    cards.get(i).businessName = tempModel.businessName;
+                    cards.get(i).ownerName = tempModel.ownerName;
+                    cards.get(i).street = tempModel.street;
+                    cards.get(i).city = tempModel.city;
+                    cards.get(i).pin = tempModel.pin;
+                    cards.get(i).businessType = tempModel.businessType;
+                    cards.get(i).businessCategory = tempModel.businessCategory;
+                }
 
-                // Refresh all input fields + live preview
+                // tempModel update + Refresh
+                tempModel = new BusinessCardModel(cards.get(pos));
+                topCardAdapter.notifyDataSetChanged();
                 stepsPagerAdapter.refreshAllViews();
-                topCardAdapter.notifyItemChanged(selectedCardIndex);
 
                 updateIndex();
             }
         });
+
 
         // ← SHARE BUTTON: Set listener once
         btnShareCard.setOnClickListener(v -> shareCurrentCardAsImage());
@@ -193,9 +202,31 @@ public class BusinessCardActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // Save current tempModel before leaving
-        cards.set(selectedCardIndex, new BusinessCardModel(tempModel));
+        // 🔥 सर्व cards update before exit
+        for (int i = 0; i < TOTAL_CARDS; i++) {
+            cards.get(i).businessName = tempModel.businessName;
+            cards.get(i).ownerName = tempModel.ownerName;
+            cards.get(i).street = tempModel.street;
+            cards.get(i).city = tempModel.city;
+            cards.get(i).pin = tempModel.pin;
+            cards.get(i).businessType = tempModel.businessType;
+            cards.get(i).businessCategory = tempModel.businessCategory;
+        }
+        syncAllCards();
     }
+    private void syncAllCards() {
+        for (int i = 0; i < TOTAL_CARDS; i++) {
+            cards.get(i).businessName = tempModel.businessName;
+            cards.get(i).ownerName = tempModel.ownerName;
+            cards.get(i).street = tempModel.street;
+            cards.get(i).city = tempModel.city;
+            cards.get(i).pin = tempModel.pin;
+            cards.get(i).businessType = tempModel.businessType;
+            cards.get(i).businessCategory = tempModel.businessCategory;
+        }
+        topCardAdapter.notifyDataSetChanged();
+    }
+
 
     private void updateNavigationButtons(int position) {
         btnPrev.setEnabled(position > 0);
@@ -211,10 +242,21 @@ public class BusinessCardActivity extends AppCompatActivity {
     }
 
     private void updateCardLive() {
-        // This saves data to the actual card immediately
-        cards.set(selectedCardIndex, new BusinessCardModel(tempModel));
-        topCardAdapter.notifyItemChanged(selectedCardIndex);
+        // 🔥 सर्व 10 cards मध्ये SAME data copy करा!
+        for (int i = 0; i < TOTAL_CARDS; i++) {
+            cards.get(i).businessName = tempModel.businessName;
+            cards.get(i).ownerName = tempModel.ownerName;
+            cards.get(i).street = tempModel.street;
+            cards.get(i).city = tempModel.city;
+            cards.get(i).pin = tempModel.pin;
+            cards.get(i).businessType = tempModel.businessType;
+            cards.get(i).businessCategory = tempModel.businessCategory;
+        }
+
+        topCardAdapter.notifyDataSetChanged();  // सर्व cards refresh!
     }
+
+
 
     private void saveToSelectedCard() {
         // This is now almost useless – data is already saved live
