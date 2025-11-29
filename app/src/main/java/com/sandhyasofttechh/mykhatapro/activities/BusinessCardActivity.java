@@ -2,6 +2,8 @@ package com.sandhyasofttechh.mykhatapro.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,6 +13,8 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -35,6 +39,7 @@ import com.sandhyasofttechh.mykhatapro.R;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 
 public class BusinessCardActivity extends AppCompatActivity {
@@ -42,7 +47,7 @@ public class BusinessCardActivity extends AppCompatActivity {
     private static final String TAG = "BusinessCardActivity";
     private ViewPager2 vpTopCards, vpSteps;
     private TextView tvCardIndex;
-    private Button btnPrev, btnNext, btnShareCard; // ← ADDED: Share Button
+    private Button btnPrev, btnNext, btnShareCard,btnDownloadCard; // ← ADDED: Share Button
     private TopCardAdapter topCardAdapter;
     private StepsPagerAdapter stepsPagerAdapter;
     private final int TOTAL_CARDS = 10;
@@ -51,6 +56,10 @@ public class BusinessCardActivity extends AppCompatActivity {
     private int selectedCardIndex = 0;
     private FusedLocationProviderClient fusedLocationClient;
     private ActivityResultLauncher<String> locationPermissionRequest;
+
+    private ActivityResultLauncher<String> storagePermissionRequest; // ← ADD THIS NEW LINE
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +86,8 @@ public class BusinessCardActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btn_prev_step);
         btnNext = findViewById(R.id.btn_next_step);
         btnShareCard = findViewById(R.id.btn_share_card); // ← Initialize Share Button
+        btnDownloadCard = findViewById(R.id.btn_download_card);
+
     }
 
     private void initializeCards() {
@@ -98,6 +109,15 @@ public class BusinessCardActivity extends AppCompatActivity {
                         Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
                     }
                 });
+        storagePermissionRequest = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                granted -> {
+                    if (granted) {
+                        downloadCurrentCardAsImage();
+                    } else {
+                        Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void setupViewPagers() {
@@ -107,13 +127,25 @@ public class BusinessCardActivity extends AppCompatActivity {
         stepsPagerAdapter = new StepsPagerAdapter();
         vpSteps.setAdapter(stepsPagerAdapter);
         vpSteps.setUserInputEnabled(false); // Disable swipe, use buttons only
+        btnDownloadCard.setOnClickListener(v -> checkStoragePermissionAndDownload());
+
 
         vpTopCards.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int pos) {
+                // FIRST: Save current tempModel data to the OLD card (before switching)
+                cards.set(selectedCardIndex, new BusinessCardModel(tempModel));
+
+                // NOW: Switch to new card
                 selectedCardIndex = pos;
+
+                // LOAD: The saved data of the NEW card into tempModel
                 tempModel = new BusinessCardModel(cards.get(pos));
+
+                // Refresh all input fields + live preview
                 stepsPagerAdapter.refreshAllViews();
+                topCardAdapter.notifyItemChanged(selectedCardIndex);
+
                 updateIndex();
             }
         });
@@ -127,10 +159,13 @@ public class BusinessCardActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 updateNavigationButtons(position);
 
-                if (position == 4) { // Last page
+// NEW CODE:
+                if (position == 4) {
                     btnShareCard.setVisibility(View.VISIBLE);
+                    btnDownloadCard.setVisibility(View.VISIBLE); // ← ADD
                 } else {
                     btnShareCard.setVisibility(View.GONE);
+                    btnDownloadCard.setVisibility(View.GONE); // ← ADD
                 }
             }
         });
@@ -149,10 +184,17 @@ public class BusinessCardActivity extends AppCompatActivity {
             if (currentItem < stepsPagerAdapter.getItemCount() - 1) {
                 vpSteps.setCurrentItem(currentItem + 1, true);
             } else {
-                saveToSelectedCard();
-                Toast.makeText(this, "Business Card Saved Successfully!", Toast.LENGTH_SHORT).show();
+                // Data is already saved live → just show toast
+                saveToSelectedCard(); // optional
+                Toast.makeText(this, "Business Card Saved Successfully!", Toast.LENGTH_LONG).show();
             }
         });
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Save current tempModel before leaving
+        cards.set(selectedCardIndex, new BusinessCardModel(tempModel));
     }
 
     private void updateNavigationButtons(int position) {
@@ -169,13 +211,41 @@ public class BusinessCardActivity extends AppCompatActivity {
     }
 
     private void updateCardLive() {
+        // This saves data to the actual card immediately
         cards.set(selectedCardIndex, new BusinessCardModel(tempModel));
         topCardAdapter.notifyItemChanged(selectedCardIndex);
     }
 
     private void saveToSelectedCard() {
+        // This is now almost useless – data is already saved live
+        // But we keep it for the toast
         cards.set(selectedCardIndex, new BusinessCardModel(tempModel));
         topCardAdapter.notifyItemChanged(selectedCardIndex);
+    }
+
+    private Bitmap generateHighQualityCardBitmap() {
+        View cardView = null;
+        RecyclerView recyclerView = (RecyclerView) vpTopCards.getChildAt(0);
+        if (recyclerView != null) {
+            RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(selectedCardIndex);
+            if (holder != null) {
+                cardView = holder.itemView;
+            }
+        }
+
+        if (cardView == null) return null;
+
+        int width = cardView.getWidth();
+        int height = cardView.getHeight();
+        int scaledWidth = width * 2;
+        int scaledHeight = height * 2;
+
+        Bitmap bitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.scale(2f, 2f);
+        cardView.draw(canvas);
+
+        return bitmap;
     }
 
     // ← FULL SHARE FUNCTION (100% Working)
@@ -324,6 +394,97 @@ public class BusinessCardActivity extends AppCompatActivity {
                     tvLoc.setAlpha(0.5f);
                 }
             }
+        }
+
+
+    }
+
+    private void checkStoragePermissionAndDownload() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // No permission needed on Android 10+ for MediaStore
+            downloadCurrentCardAsImage();
+        } else {
+            // Below Android 10: need WRITE_EXTERNAL_STORAGE
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                storagePermissionRequest.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            } else {
+                downloadCurrentCardAsImage();
+            }
+        }
+    }
+
+    private void downloadCurrentCardAsImage() {
+        Bitmap bitmap = generateHighQualityCardBitmap();
+        if (bitmap == null) {
+            Toast.makeText(this, "Card is loading, please wait...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String fileName = "BusinessCard_" +
+                (tempModel.businessName.isEmpty() ? "MyCard" : tempModel.businessName.replaceAll("[^a-zA-Z0-9]", "_"))
+                + "_" + System.currentTimeMillis() + ".png";
+
+        boolean success = false;
+        Uri imageUri = null;
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/MyKhataPro/BusinessCards");
+                values.put(MediaStore.Images.Media.IS_PENDING, 1); // Important: Keeps file locked until we set to 0
+
+                ContentResolver resolver = getContentResolver();
+                imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                if (imageUri == null) {
+                    Toast.makeText(this, "Failed to create file location", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                try (OutputStream out = resolver.openOutputStream(imageUri)) {
+                    if (out != null) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                        out.flush();
+                        success = true;
+                    }
+                }
+
+                // Mark as complete
+                values.clear();
+                values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                resolver.update(imageUri, values, null, null);
+
+            } else {
+                // Legacy storage (Android 9 and below)
+                File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                File appDir = new File(picturesDir, "MyKhataPro/BusinessCards");
+                if (!appDir.exists()) appDir.mkdirs();
+
+                File imageFile = new File(appDir, fileName);
+                try (FileOutputStream out = new FileOutputStream(imageFile)) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    out.flush();
+                    success = true;
+                    imageUri = Uri.fromFile(imageFile);
+                }
+
+                // Notify gallery
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, imageUri));
+            }
+
+            if (success) {
+                Toast.makeText(this,
+                        "Card saved successfully!\nLocation: Pictures/MyKhataPro/BusinessCards",
+                        Toast.LENGTH_LONG).show();
+                Log.d(TAG, "Card saved: " + fileName);
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Download failed", e);
+            Toast.makeText(this, "Failed to save card: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

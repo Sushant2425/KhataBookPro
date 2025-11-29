@@ -58,7 +58,7 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Navigation Buttons + Share Button -->
+        <!-- Navigation and Action Buttons Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,11 +67,12 @@
             android:background="@android:color/white"
             android:elevation="4dp">
 
-            <!-- Previous & Next Buttons -->
+            <!-- Previous & Next Navigation Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center">
 
                 <Button
                     android:id="@+id/btn_prev_step"
@@ -81,7 +82,7 @@
                     android:layout_marginEnd="8dp"
                     android:text="Previous"
                     android:textAllCaps="false"
-                    />
+                    android:backgroundTint="?attr/colorPrimary" />
 
                 <Button
                     android:id="@+id/btn_next_step"
@@ -90,23 +91,58 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:text="Next"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    android:backgroundTint="?attr/colorPrimary" />
 
             </LinearLayout>
 
-            <!-- Share Card Button - ONLY VISIBLE ON LAST PAGE -->
-            <Button
-                android:id="@+id/btn_share_card"
+            <!-- Share & Download Buttons (Visible only on Review page) -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Share This Card"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                android:textColor="@android:color/white"
-                android:icon="@android:drawable/ic_menu_share"
-                android:elevation="6dp" />
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_share_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:text="Share Card"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:textColor="@android:color/white"
+                    android:drawableLeft="@android:drawable/ic_menu_share"
+                    android:drawablePadding="8dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:backgroundTint="#4CAF50"
+                    android:elevation="3dp"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btn_download_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="Download"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:textColor="@android:color/white"
+                    android:drawableLeft="@android:drawable/stat_sys_download"
+                    android:drawablePadding="8dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:backgroundTint="#2196F3"
+                    android:elevation="3dp"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
