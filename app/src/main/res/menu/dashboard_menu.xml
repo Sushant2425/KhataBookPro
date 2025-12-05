@@ -5,6 +5,6 @@
     <item
         android:id="@+id/menu_switch_account"
         android:title="Switch Account"
-        android:icon="@drawable/img_2"
+        android:icon="@drawable/ic_logout"
         app:showAsAction="always" />
 </menu>
