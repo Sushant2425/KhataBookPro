@@ -47,8 +47,6 @@ public class CollectionActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_PERMISSION_CODE = 1001;
 
-
-
     TextView txtTotalDue, txtEmptyState, txtShopTitle;
     ProgressBar progressBar;
     TabLayout tabLayout;
@@ -332,10 +330,10 @@ public class CollectionActivity extends AppCompatActivity {
         }
 
         // OPTIONAL: Due Payments wale bhi test karna chahe to +6 minute
-        for (CollectionModel m : duePaymentsList) {
-            long testTrigger = System.currentTimeMillis() + 6 * 60 * 1000;
-            scheduleSingleReminder(m, testTrigger);
-        }
+         for (CollectionModel m : duePaymentsList) {
+             long testTrigger = System.currentTimeMillis() + 6 * 60 * 1000;
+             scheduleSingleReminder(m, testTrigger);
+         }
 
 //        Toast.makeText(this, "TESTING MODE: Notifications 2-4 minute mein aayengi!", Toast.LENGTH_LONG).show();
     }
@@ -484,7 +482,7 @@ public class CollectionActivity extends AppCompatActivity {
                 case 2:
                     return CollectionFragment.newInstance(incomingList);
                 default:
-                      return CollectionFragment.newInstance(duePaymentsList);
+                    return CollectionFragment.newInstance(duePaymentsList);
             }
         }
 
@@ -492,5 +490,7 @@ public class CollectionActivity extends AppCompatActivity {
         public int getItemCount() {
             return 3;
         }
-    }
-}
+    }}
+
+
+
