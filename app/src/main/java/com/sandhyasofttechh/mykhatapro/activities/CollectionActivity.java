@@ -47,6 +47,8 @@ public class CollectionActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_PERMISSION_CODE = 1001;
 
+
+
     TextView txtTotalDue, txtEmptyState, txtShopTitle;
     ProgressBar progressBar;
     TabLayout tabLayout;
@@ -226,12 +228,16 @@ public class CollectionActivity extends AppCompatActivity {
                 }
 
                 processedCount++;
-                if (processedCount >= totalCustomers) {
+
+                // **FIXED: Check if ALL customers processed + UI ready**
+                if (processedCount >= totalCustomers &&
+                        (!duePaymentsList.isEmpty() || !todayList.isEmpty() || !incomingList.isEmpty())) {
                     runOnUiThread(() -> updateUIAndScheduleReminders());
                 }
             }
 
-            @Override public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
                 processedCount++;
                 if (processedCount >= totalCustomers) {
                     runOnUiThread(() -> updateUIAndScheduleReminders());
@@ -317,26 +323,44 @@ public class CollectionActivity extends AppCompatActivity {
     }
 
     private void scheduleRemindersForTodayAndFuture() {
-        // TODAY WALE CUSTOMERS → NEXT 2 MINUTE MEIN NOTIFICATION
+        long now = System.currentTimeMillis();
+
+        // TODAY: +2 minutes (test)
         for (CollectionModel m : todayList) {
-            long testTrigger = System.currentTimeMillis() + 2 * 60 * 1000; // +2 minute
-            scheduleSingleReminder(m, testTrigger);
+            long trigger = now + 2 * 60 * 1000;
+            scheduleSingleReminder(m, trigger);
         }
 
-        // INCOMING WALE CUSTOMERS → NEXT 4 MINUTE MEIN NOTIFICATION
+        // INCOMING: On their actual due date at 9 AM (not today!)
         for (CollectionModel m : incomingList) {
-            long testTrigger = System.currentTimeMillis() + 4 * 60 * 1000; // +4 minute
-            scheduleSingleReminder(m, testTrigger);
+            long due9AM = get9AMOfDueDate(m.getDueDate());
+            if (due9AM > now) { // Only future dates
+                scheduleSingleReminder(m, due9AM);
+            }
         }
 
-        // OPTIONAL: Due Payments wale bhi test karna chahe to +6 minute
-         for (CollectionModel m : duePaymentsList) {
-             long testTrigger = System.currentTimeMillis() + 6 * 60 * 1000;
-             scheduleSingleReminder(m, testTrigger);
-         }
-
-//        Toast.makeText(this, "TESTING MODE: Notifications 2-4 minute mein aayengi!", Toast.LENGTH_LONG).show();
+        // DUE PAYMENTS: +6 minutes (test only)
+        for (CollectionModel m : duePaymentsList) {
+            long trigger = now + 6 * 60 * 1000;
+            scheduleSingleReminder(m, trigger);
+        }
     }
+
+    // **NEW METHOD** - Get 9 AM of specific date
+    private long get9AMOfDueDate(long dueDateMillis) {
+        Calendar cal = Calendar.getInstance();
+        if (dueDateMillis > 0) {
+            cal.setTimeInMillis(dueDateMillis);
+        } else {
+            cal.setTimeInMillis(getTodayStart());
+        }
+        cal.set(Calendar.HOUR_OF_DAY, 9);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
+
     private long getNext9AM() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 9);
@@ -350,35 +374,70 @@ public class CollectionActivity extends AppCompatActivity {
     }
 
     // 100% CRASH-FREE EXACT ALARM (Android 12+ ke liye safe)
+//    private void scheduleSingleReminder(CollectionModel model, long triggerAt) {
+//        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+//        if (am == null) return;
+//
+//        Intent intent = new Intent(this, CollectionReminderReceiver.class);
+//        intent.putExtra("name", model.getName());
+//        intent.putExtra("amount", model.getPendingAmount());
+//        intent.putExtra("phone", model.getPhone());
+//
+//        int requestCode = ("remind_" + model.getPhone()).hashCode();
+//
+//        PendingIntent pi = PendingIntent.getBroadcast(this, requestCode, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+
+//            if (am.canScheduleExactAlarms()) {
+//                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+//            } else {
+//                // Permission nahi → user se maang lo
+//                Intent i = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+//                i.setData(Uri.parse("package:" + getPackageName()));
+//                startActivity(i);
+//                // Fallback: Inexact alarm
+//                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+//            }
+//        } else {
+//            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+//        }
+//    }
+
     private void scheduleSingleReminder(CollectionModel model, long triggerAt) {
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (am == null) return;
 
+        // **CRITICAL: Cancel existing alarm first**
+        Intent cancelIntent = new Intent(this, CollectionReminderReceiver.class);
+        cancelIntent.putExtra("name", model.getName());
+        cancelIntent.putExtra("amount", model.getPendingAmount());
+        cancelIntent.putExtra("phone", model.getPhone());
+        int requestCode = ("remind_" + model.getPhone()).hashCode();
+        PendingIntent pi = PendingIntent.getBroadcast(this, requestCode, cancelIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        am.cancel(pi); // Cancel first!
+
+        // Now create new intent
         Intent intent = new Intent(this, CollectionReminderReceiver.class);
         intent.putExtra("name", model.getName());
         intent.putExtra("amount", model.getPendingAmount());
         intent.putExtra("phone", model.getPhone());
 
-        int requestCode = ("remind_" + model.getPhone()).hashCode();
-
-        PendingIntent pi = PendingIntent.getBroadcast(this, requestCode, intent,
+        pi = PendingIntent.getBroadcast(this, requestCode, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (am.canScheduleExactAlarms()) {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
             } else {
-                // Permission nahi → user se maang lo
-                Intent i = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                i.setData(Uri.parse("package:" + getPackageName()));
-                startActivity(i);
-                // Fallback: Inexact alarm
                 am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
             }
         } else {
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
         }
     }
+
 
     public void showProgress(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -482,7 +541,7 @@ public class CollectionActivity extends AppCompatActivity {
                 case 2:
                     return CollectionFragment.newInstance(incomingList);
                 default:
-                    return CollectionFragment.newInstance(duePaymentsList);
+                      return CollectionFragment.newInstance(duePaymentsList);
             }
         }
 
@@ -490,7 +549,5 @@ public class CollectionActivity extends AppCompatActivity {
         public int getItemCount() {
             return 3;
         }
-    }}
-
-
-
+    }
+}
