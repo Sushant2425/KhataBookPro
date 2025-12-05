@@ -251,6 +251,8 @@ public class CollectionActivity extends AppCompatActivity {
         long todayStart = getTodayStart();
         long tomorrowStart = todayStart + 86400000L;
 
+        if (isAlreadyAdded(phone)) return;
+
         CollectionModel model = new CollectionModel(name, phone, pending, dueDate);
 
         if (dueDate == 0 || dueDate < todayStart) {
@@ -260,7 +262,22 @@ public class CollectionActivity extends AppCompatActivity {
         } else {
             incomingList.add(model);
         }
+
     }
+
+    private boolean isAlreadyAdded(String phone) {
+        for (CollectionModel m : duePaymentsList) {
+            if (m.getPhone().equals(phone)) return true;
+        }
+        for (CollectionModel m : todayList) {
+            if (m.getPhone().equals(phone)) return true;
+        }
+        for (CollectionModel m : incomingList) {
+            if (m.getPhone().equals(phone)) return true;
+        }
+        return false;
+    }
+
 
     private long getTodayStart() {
         Calendar c = Calendar.getInstance();
@@ -313,12 +330,12 @@ public class CollectionActivity extends AppCompatActivity {
         }
 
         // OPTIONAL: Due Payments wale bhi test karna chahe to +6 minute
-        // for (CollectionModel m : duePaymentsList) {
-        //     long testTrigger = System.currentTimeMillis() + 6 * 60 * 1000;
-        //     scheduleSingleReminder(m, testTrigger);
-        // }
+         for (CollectionModel m : duePaymentsList) {
+             long testTrigger = System.currentTimeMillis() + 6 * 60 * 1000;
+             scheduleSingleReminder(m, testTrigger);
+         }
 
-        Toast.makeText(this, "TESTING MODE: Notifications 2-4 minute mein aayengi!", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "TESTING MODE: Notifications 2-4 minute mein aayengi!", Toast.LENGTH_LONG).show();
     }
     private long getNext9AM() {
         Calendar c = Calendar.getInstance();
