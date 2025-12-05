@@ -484,7 +484,7 @@ public class CollectionActivity extends AppCompatActivity {
                 case 2:
                     return CollectionFragment.newInstance(incomingList);
                 default:
-                    return CollectionFragment.newInstance(duePaymentsList);
+                      return CollectionFragment.newInstance(duePaymentsList);
             }
         }
 
@@ -492,7 +492,5 @@ public class CollectionActivity extends AppCompatActivity {
         public int getItemCount() {
             return 3;
         }
-    }}
-
-
-
+    }
+}
