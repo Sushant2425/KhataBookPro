@@ -465,6 +465,7 @@ public class CollectionActivity extends AppCompatActivity {
         if (nm != null) nm.cancelAll();
     }
 
+
     private class CollectionPagerAdapter extends FragmentStateAdapter {
         public CollectionPagerAdapter() {
             super(CollectionActivity.this);
