@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@color/white">
+
+    <!-- Illustration Container -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="0dp"
+        android:background="@color/white"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp">
+
+        <ImageView
+            android:id="@+id/img_no_internet"
+            android:layout_width="380dp"
+            android:layout_height="280dp"
+            android:src="@drawable/img_3"
+            android:scaleType="fitCenter"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Message Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginTop="32dp"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Internet Connection"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1A1A1A"
+            android:letterSpacing="-0.01"
+            android:fontFamily="sans-serif-medium"/>
+
+        <TextView
+            android:id="@+id/tv_sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please check your connection and try again"
+            android:textSize="15sp"
+            android:textColor="#6B7280"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif"/>
+
+    </LinearLayout>
+
+    <!-- Button Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp"
+        android:paddingHorizontal="8dp">
+
+
+
+            <Button
+                android:id="@+id/btn_retry"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Try Again"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:letterSpacing="0"
+                android:backgroundTint="#3F51B5"
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-medium"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+
+
+
+
+            <Button
+                android:id="@+id/btn_open_settings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Open Settings"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:letterSpacing="0"
+                android:backgroundTint="#F3F4F6"
+                android:textColor="#374151"
+                android:fontFamily="sans-serif-medium"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>

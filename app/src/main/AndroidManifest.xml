@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
@@ -112,6 +112,9 @@
             android:exported="false" />
         <activity
             android:name=".activities.EntryDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".register.NoInternetActivity"
             android:exported="false" />
         <activity
             android:name=".register.SwitchShopActivity"
