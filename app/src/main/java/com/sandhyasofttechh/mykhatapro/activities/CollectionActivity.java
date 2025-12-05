@@ -47,6 +47,8 @@ public class CollectionActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_PERMISSION_CODE = 1001;
 
+
+
     TextView txtTotalDue, txtEmptyState, txtShopTitle;
     ProgressBar progressBar;
     TabLayout tabLayout;

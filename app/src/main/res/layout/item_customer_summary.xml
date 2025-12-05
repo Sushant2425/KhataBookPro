@@ -102,11 +102,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Reminder"
-                android:textColor="@color/red"
+                android:textColor="@color/blue"
                 android:textSize="10sp"
                 android:paddingVertical="6dp"
+                android:background="@drawable/background_balance_give"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/bg_clickable"
                 android:layout_gravity="end"
                 android:layout_marginEnd="20dp"
                />

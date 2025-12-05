@@ -128,7 +128,7 @@ public class CustomerSummaryAdapter extends RecyclerView.Adapter<CustomerSummary
             holder.balanceContainer.setBackgroundResource(R.drawable.background_balance_give);  // your red bg
 
             holder.tvReminderText.setVisibility(View.VISIBLE);
-            holder.tvReminderText.setText("Reminder");
+            holder.tvReminderText.setText("REMIND");
             holder.tvReminderText.setOnClickListener(v -> showReminderBottomSheet(context, summary));
         }
 
