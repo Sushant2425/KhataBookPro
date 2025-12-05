@@ -317,57 +317,26 @@ public class CollectionActivity extends AppCompatActivity {
     }
 
     private void scheduleRemindersForTodayAndFuture() {
-
-        long todayStart = getTodayStart();
-        long tomorrowStart = todayStart + 86400000L;
-
-        for (CollectionModel m : duePaymentsList) {
-            scheduleExactDueDateAlarm(m, todayStart);  // आज due → आजच alarm
-        }
-
+        // TODAY WALE CUSTOMERS → NEXT 2 MINUTE MEIN NOTIFICATION
         for (CollectionModel m : todayList) {
-            scheduleExactDueDateAlarm(m, todayStart);  // आजच due → आजच alarm
+            long testTrigger = System.currentTimeMillis() + 2 * 60 * 1000; // +2 minute
+            scheduleSingleReminder(m, testTrigger);
         }
 
+        // INCOMING WALE CUSTOMERS → NEXT 4 MINUTE MEIN NOTIFICATION
         for (CollectionModel m : incomingList) {
-            scheduleExactDueDateAlarm(m, m.getDueDate());  // future date → त्या दिवशीच alarm
+            long testTrigger = System.currentTimeMillis() + 4 * 60 * 1000; // +4 minute
+            scheduleSingleReminder(m, testTrigger);
         }
+
+        // OPTIONAL: Due Payments wale bhi test karna chahe to +6 minute
+        for (CollectionModel m : duePaymentsList) {
+            long testTrigger = System.currentTimeMillis() + 6 * 60 * 1000;
+            scheduleSingleReminder(m, testTrigger);
+        }
+
+//        Toast.makeText(this, "TESTING MODE: Notifications 2-4 minute mein aayengi!", Toast.LENGTH_LONG).show();
     }
-    private void scheduleExactDueDateAlarm(CollectionModel model, long dueDateMillis) {
-
-        // त्या दिवसाच्या सकाळी 9:00 AM ला notification
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(dueDateMillis);
-        c.set(Calendar.HOUR_OF_DAY, 9);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        long triggerTime = c.getTimeInMillis();
-
-        // Past time असेल → notification नको
-        if (triggerTime < System.currentTimeMillis()) return;
-
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        if (am == null) return;
-
-        Intent intent = new Intent(this, CollectionReminderReceiver.class);
-        intent.putExtra("name", model.getName());
-        intent.putExtra("amount", model.getPendingAmount());
-        intent.putExtra("phone", model.getPhone());
-
-        int requestCode = ("alarm_" + model.getPhone() + "_" + triggerTime).hashCode();
-
-        PendingIntent pi = PendingIntent.getBroadcast(
-                this,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pi);
-    }
-
     private long getNext9AM() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 9);
