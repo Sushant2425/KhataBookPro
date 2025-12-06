@@ -47,7 +47,12 @@
 
         <receiver android:name=".receiver.CollectionReminderReceiver"
             android:exported="false"/>
-
+        <activity
+            android:name=".activities.ProductDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddProductActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.BusinessCardActivity"
             android:exported="false" />
@@ -79,7 +84,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
+        <activity
+            android:name=".activities.AddStockActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.AppLockActivity"
             android:exported="false" />
