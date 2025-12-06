@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -61,7 +62,9 @@ public class CollectionActivity extends AppCompatActivity {
     PrefManager prefManager;
     DatabaseReference rootRef;
     String userEmailPath = "", shopId = "", shopName = "";
-
+    private CollectionFragment dueFragment;
+    private CollectionFragment todayFragment;
+    private CollectionFragment incomingFragment;
     private int totalCustomers = 0;
     private int processedCount = 0;
 
@@ -223,9 +226,16 @@ public class CollectionActivity extends AppCompatActivity {
                 }
 
                 double pending = gave[0] - got[0];
+                Log.d("COLL_DEBUG", "Phone=" + phone + " name=" + name +
+                        " gave=" + gave[0] + " got=" + got[0] +
+                        " pending=" + pending + " earliestDue=" + earliestDue[0]);
+
                 if (pending > 0) {
                     categorizeCustomer(name, phone, pending, earliestDue[0]);
+                } else {
+                    Log.d("COLL_DEBUG", "Skipping user, pending <= 0");
                 }
+
 
                 processedCount++;
 
@@ -256,6 +266,7 @@ public class CollectionActivity extends AppCompatActivity {
     private void categorizeCustomer(String name, String phone, double pending, long dueDate) {
         long todayStart = getTodayStart();
         long tomorrowStart = todayStart + 86400000L;
+        Log.d("COLL_CAT", "Adding: " + name + " (" + phone + "), pending=" + pending + ", dueDate=" + dueDate);
 
         if (isAlreadyAdded(phone)) return;
 
@@ -318,6 +329,11 @@ public class CollectionActivity extends AppCompatActivity {
             tabLayout.setVisibility(View.VISIBLE);
             txtEmptyState.setVisibility(View.GONE);
         }
+        if (dueFragment != null)      dueFragment.updateData(duePaymentsList);
+        if (todayFragment != null)    todayFragment.updateData(todayList);
+        if (incomingFragment != null) incomingFragment.updateData(incomingList);
+
+// viewPager.getAdapter().notifyDataSetChanged();  // ye optional ho sakta hai
 
         scheduleRemindersForTodayAndFuture();
     }
@@ -325,26 +341,17 @@ public class CollectionActivity extends AppCompatActivity {
     private void scheduleRemindersForTodayAndFuture() {
         long now = System.currentTimeMillis();
 
-        // TODAY: +2 minutes (test)
+        // **SIRF TODAY LIST KE CUSTOMERS KO NOTIFICATION** (+2 minutes test ke liye)
         for (CollectionModel m : todayList) {
-            long trigger = now + 2 * 60 * 1000;
+            long trigger = now + 2 * 60 * 1000; // 2 minutes baad
             scheduleSingleReminder(m, trigger);
+            Log.d("REMINDER", "Scheduled for TODAY: " + m.getName() + " (" + m.getPhone() + ")");
         }
 
-        // INCOMING: On their actual due date at 9 AM (not today!)
-        for (CollectionModel m : incomingList) {
-            long due9AM = get9AMOfDueDate(m.getDueDate());
-            if (due9AM > now) { // Only future dates
-                scheduleSingleReminder(m, due9AM);
-            }
-        }
-
-        // DUE PAYMENTS: +6 minutes (test only)
-        for (CollectionModel m : duePaymentsList) {
-            long trigger = now + 6 * 60 * 1000;
-            scheduleSingleReminder(m, trigger);
-        }
+        // DUE PAYMENTS aur INCOMING ko NO NOTIFICATION
+        // (kal aane wale Incoming kal automatically Today ban jayenge)
     }
+
 
     // **NEW METHOD** - Get 9 AM of specific date
     private long get9AMOfDueDate(long dueDateMillis) {
@@ -525,6 +532,7 @@ public class CollectionActivity extends AppCompatActivity {
     }
 
 
+
     private class CollectionPagerAdapter extends FragmentStateAdapter {
         public CollectionPagerAdapter() {
             super(CollectionActivity.this);
@@ -535,13 +543,19 @@ public class CollectionActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             switch (position) {
                 case 0:
-                    return CollectionFragment.newInstance(duePaymentsList);
+                    if (dueFragment == null)
+                        dueFragment = CollectionFragment.newInstance(duePaymentsList);
+                    return dueFragment;
                 case 1:
-                    return CollectionFragment.newInstance(todayList);
+                    if (todayFragment == null)
+                        todayFragment = CollectionFragment.newInstance(todayList);
+                    return todayFragment;
                 case 2:
-                    return CollectionFragment.newInstance(incomingList);
+                    if (incomingFragment == null)
+                        incomingFragment = CollectionFragment.newInstance(incomingList);
+                    return incomingFragment;
                 default:
-                      return CollectionFragment.newInstance(duePaymentsList);
+                    return CollectionFragment.newInstance(duePaymentsList);
             }
         }
 
@@ -549,5 +563,4 @@ public class CollectionActivity extends AppCompatActivity {
         public int getItemCount() {
             return 3;
         }
-    }
-}
+    }}

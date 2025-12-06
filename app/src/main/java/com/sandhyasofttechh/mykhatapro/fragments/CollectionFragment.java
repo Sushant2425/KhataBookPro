@@ -14,26 +14,31 @@ import com.sandhyasofttechh.mykhatapro.adapter.CollectionAdapter;
 import com.sandhyasofttechh.mykhatapro.model.CollectionModel;
 
 import java.util.ArrayList;
-
 public class CollectionFragment extends Fragment {
 
     private static final String ARG_LIST = "list";
-    private ArrayList<CollectionModel> list;
+    private ArrayList<CollectionModel> list = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private CollectionAdapter adapter;
 
     public static CollectionFragment newInstance(ArrayList<CollectionModel> list) {
         CollectionFragment fragment = new CollectionFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(ARG_LIST, list);
+        bundle.putSerializable(ARG_LIST, list); // initial load only
         fragment.setArguments(bundle);
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            list = (ArrayList<CollectionModel>) getArguments().getSerializable(ARG_LIST);
+            ArrayList<CollectionModel> argList =
+                    (ArrayList<CollectionModel>) getArguments().getSerializable(ARG_LIST);
+            if (argList != null) {
+                list.clear();
+                list.addAll(argList);
+            }
         }
     }
 
@@ -41,13 +46,18 @@ public class CollectionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_collection_list, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-
-        if (list != null) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerView.setAdapter(new CollectionAdapter(getContext(), list));
-        }
-
+        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new CollectionAdapter(getContext(), list);
+        recyclerView.setAdapter(adapter);
         return view;
+    }
+
+    // NEW: activity se call karne ke liye
+    public void updateData(ArrayList<CollectionModel> newList) {
+        if (list == null) list = new ArrayList<>();
+        list.clear();
+        if (newList != null) list.addAll(newList);
+        if (adapter != null) adapter.notifyDataSetChanged();
     }
 }
