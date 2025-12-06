@@ -15,6 +15,9 @@ public class Product implements Serializable {
     private String gst;
     private String dateAdded;
     private String imageUrl;
+    private String hsnCode;
+    private String gstRate;
+
 
     public Product() {
         // required by Firebase
@@ -28,6 +31,23 @@ public class Product implements Serializable {
 
     public String getUnit() { return unit != null ? unit : ""; }
     public void setUnit(String unit) { this.unit = unit; }
+
+    public String getHsnCode() {
+        return hsnCode;
+    }
+
+    public void setHsnCode(String hsnCode) {
+        this.hsnCode = hsnCode;
+    }
+
+    public String getGstRate() {
+        return gstRate;
+    }
+
+    public void setGstRate(String gstRate) {
+        this.gstRate = gstRate;
+    }
+
 
     public String getSalePrice() { return salePrice != null ? salePrice : "0"; }
     public void setSalePrice(String salePrice) { this.salePrice = salePrice; }
