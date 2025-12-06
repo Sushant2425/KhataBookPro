@@ -49,7 +49,6 @@ public class CollectionActivity extends AppCompatActivity {
     private static final int NOTIFICATION_PERMISSION_CODE = 1001;
 
 
-
     TextView txtTotalDue, txtEmptyState, txtShopTitle;
     ProgressBar progressBar;
     TabLayout tabLayout;
@@ -120,9 +119,15 @@ public class CollectionActivity extends AppCompatActivity {
         viewPager.setAdapter(new CollectionPagerAdapter());
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
-                case 0: tab.setText("Due Payments"); break;
-                case 1: tab.setText("Today"); break;
-                case 2: tab.setText("Incoming"); break;
+                case 0:
+                    tab.setText("Due Payments");
+                    break;
+                case 1:
+                    tab.setText("Today");
+                    break;
+                case 2:
+                    tab.setText("Incoming");
+                    break;
             }
         }).attach();
     }
@@ -152,7 +157,11 @@ public class CollectionActivity extends AppCompatActivity {
                     processCustomerList(snap);
                 }
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) { loadRootCustomers(); }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                loadRootCustomers();
+            }
         });
     }
 
@@ -167,7 +176,9 @@ public class CollectionActivity extends AppCompatActivity {
                             processCustomerList(snap);
                         }
                     }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
                         showError("Failed to load data");
                     }
                 });
@@ -329,8 +340,8 @@ public class CollectionActivity extends AppCompatActivity {
             tabLayout.setVisibility(View.VISIBLE);
             txtEmptyState.setVisibility(View.GONE);
         }
-        if (dueFragment != null)      dueFragment.updateData(duePaymentsList);
-        if (todayFragment != null)    todayFragment.updateData(todayList);
+        if (dueFragment != null) dueFragment.updateData(duePaymentsList);
+        if (todayFragment != null) todayFragment.updateData(todayList);
         if (incomingFragment != null) incomingFragment.updateData(incomingList);
 
 // viewPager.getAdapter().notifyDataSetChanged();  // ye optional ho sakta hai
@@ -489,7 +500,8 @@ public class CollectionActivity extends AppCompatActivity {
                 .child("transactions").child(phone);
 
         rootTxnRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot txn : snapshot.getChildren()) {
                         String type = txn.child("type").getValue(String.class);
@@ -499,7 +511,10 @@ public class CollectionActivity extends AppCompatActivity {
                     }
                 }
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
 
         if (!shopId.isEmpty()) {
@@ -507,7 +522,8 @@ public class CollectionActivity extends AppCompatActivity {
                     .child("shops").child(shopId).child("transactions").child(phone);
 
             shopTxnRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         for (DataSnapshot txn : snapshot.getChildren()) {
                             String type = txn.child("type").getValue(String.class);
@@ -517,7 +533,10 @@ public class CollectionActivity extends AppCompatActivity {
                         }
                     }
                 }
-                @Override public void onCancelled(@NonNull DatabaseError error) {}
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
             });
         }
     }
@@ -530,7 +549,6 @@ public class CollectionActivity extends AppCompatActivity {
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (nm != null) nm.cancelAll();
     }
-
 
 
     private class CollectionPagerAdapter extends FragmentStateAdapter {
@@ -563,4 +581,5 @@ public class CollectionActivity extends AppCompatActivity {
         public int getItemCount() {
             return 3;
         }
-    }}
+    }
+}
