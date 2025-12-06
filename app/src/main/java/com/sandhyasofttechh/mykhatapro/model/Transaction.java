@@ -14,6 +14,8 @@ public class Transaction implements Serializable {
     private String date;
     private long timestamp;
     private long deletedAt; // timestamp in milliseconds
+    private String imageUrl; // ADD THIS FIELD
+
 
 
     public Transaction() {}
@@ -42,6 +44,13 @@ public class Transaction implements Serializable {
 
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public long getDeletedAt() { return deletedAt; }
     public void setDeletedAt(long deletedAt) { this.deletedAt = deletedAt; }
