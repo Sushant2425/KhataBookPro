@@ -1,5 +1,6 @@
 package com.sandhyasofttechh.mykhatapro.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import android.widget.TextView;
@@ -28,7 +29,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
     DatabaseReference historyRef;
 
     TextView tvName, tvSalePrice, tvPurchasePrice, tvStock, tvUnit,
-            tvStockValue, tvLowStock, tvHSN, tvGST, tvLossAmount, tvStockAdded;
+            tvStockValue, tvLowStock, tvHSN, tvGST, tvLossAmount, tvStockAdded, tvEditProduct;
 
     ImageView btnBack;
     RecyclerView rvHistory;
@@ -66,12 +67,24 @@ public class ProductDetailsActivity extends AppCompatActivity {
         tvGST = findViewById(R.id.tvGST);
         tvLossAmount = findViewById(R.id.tvLossAmount);
         tvStockAdded = findViewById(R.id.tvStockAdded);
+        tvEditProduct = findViewById(R.id.tvEditProduct);
 
         btnBack.setOnClickListener(v -> finish());
+
+        tvEditProduct.setOnClickListener(v -> openEditProduct());
 
         rvHistory.setLayoutManager(new LinearLayoutManager(this));
         adapter = new StockHistoryAdapter(this, list);
         rvHistory.setAdapter(adapter);
+    }
+
+
+    private void openEditProduct() {
+        Intent intent = new Intent(ProductDetailsActivity.this, AddProductActivity.class);
+        intent.putExtra("IS_EDIT_MODE", "YES");
+        intent.putExtra("PRODUCT_ID", product.getProductId());
+        intent.putExtra("PRODUCT_DATA_FULL", product);
+        startActivity(intent);
     }
 
 
@@ -91,7 +104,6 @@ public class ProductDetailsActivity extends AppCompatActivity {
         tvHSN.setText(product.getHsn());
         tvGST.setText(product.getGst() + "%");
 
-        // Load image
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
             CircleImageView img = findViewById(R.id.imgProduct);
             Glide.with(this).load(product.getImageUrl()).into(img);
