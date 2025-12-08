@@ -1113,49 +1113,114 @@ public class AddProductActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        String id = productRef.push().getKey();
-        if (id == null) {
-            id = String.valueOf(System.currentTimeMillis());
+        PrefManager pref = new PrefManager(this);
+
+        String emailNode = pref.getUserEmail().replace(".", ",");
+        String shopId = pref.getCurrentShopId();
+
+        // Base path always → shops → shopId
+        DatabaseReference baseRef = FirebaseDatabase.getInstance()
+                .getReference("Khatabook")
+                .child(emailNode)
+                .child("shops");
+
+        // Default shop handling
+        if (shopId == null || shopId.trim().isEmpty()) {
+            shopId = "defaultShop";
         }
+
+        DatabaseReference productRef = baseRef.child(shopId).child("products");
+
+        String id = productRef.push().getKey();
+        if (id == null) id = "" + System.currentTimeMillis();
+
+        String dateStr = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        String timeStr = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
+        long timestamp = System.currentTimeMillis();
 
         HashMap<String, Object> productMap = new HashMap<>();
         productMap.put("productId", id);
         productMap.put("name", name);
         productMap.put("unit", unit);
-        productMap.put("salePrice", salePrice);
+        productMap.put("salePrice", salePrice.isEmpty() ? "0" : salePrice);
         productMap.put("purchasePrice", purchasePrice.isEmpty() ? "0" : purchasePrice);
         productMap.put("openingStock", openingStock.isEmpty() ? "0" : openingStock);
         productMap.put("currentStock", openingStock.isEmpty() ? "0" : openingStock);
         productMap.put("lowStockAlert", lowStock.isEmpty() ? "0" : lowStock);
         productMap.put("hsn", hsn);
         productMap.put("gst", gst.isEmpty() ? "0" : gst);
+        productMap.put("timeAdded", timeStr);
+        productMap.put("dateAdded", dateStr);
+        productMap.put("timestamp", timestamp);
 
-        // Add image URL
-        productMap.put("imageUrl", uploadedImageUrl != null ? uploadedImageUrl : "");
+        productMap.put("imageUrl", uploadedImageUrl == null ? "" : uploadedImageUrl);
 
-        // Add timestamp and date
-        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        productMap.put("dateAdded", date);
-        productMap.put("timestamp", System.currentTimeMillis());
+        String finalId = id;
+        String finalShopId = shopId;
 
         productRef.child(id).setValue(productMap)
                 .addOnSuccessListener(unused -> {
-                    if (progressDialog != null && progressDialog.isShowing()) {
-                        progressDialog.dismiss();
-                    }
 
+                    saveOpeningStockHistory(finalId, name, openingStock, unit, finalShopId);
+
+                    progressDialog.dismiss();
                     Toast.makeText(this, "Product saved successfully!", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    if (progressDialog != null && progressDialog.isShowing()) {
-                        progressDialog.dismiss();
-                    }
-
+                    progressDialog.dismiss();
                     Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.e("SaveProduct", "Error", e);
                 });
     }
+
+    private void saveOpeningStockHistory(String productId, String productName,
+                                         String openingStock, String unit, String shopId) {
+
+        if (openingStock == null || openingStock.isEmpty() || openingStock.equals("0"))
+            return;
+
+        PrefManager pref = new PrefManager(this);
+        String emailKey = pref.getUserEmail().replace(".", ",");
+
+        // ALWAYS ensure correct shopId assigned
+        if (shopId == null || shopId.trim().isEmpty()) {
+            shopId = "defaultShop";
+        }
+
+        DatabaseReference historyRef = FirebaseDatabase.getInstance()
+                .getReference("Khatabook")
+                .child(emailKey)
+                .child("shops")        // ✔ correct
+                .child(shopId)         // ✔ correct
+                .child("history")      // ✔ correct
+                .child(productId);     // ✔ correct
+
+        String historyId = historyRef.push().getKey();
+
+        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        String time = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("historyId", historyId);
+        map.put("productId", productId);
+        map.put("productName", productName);
+        map.put("type", "IN");
+        map.put("quantity", openingStock);
+        map.put("price", "0");
+        map.put("oldStock", "0");
+        map.put("newStock", openingStock);
+        map.put("unit", unit);
+        map.put("note", "Opening Stock Added");
+        map.put("date", date);
+        map.put("time", time);
+        map.put("timestamp", System.currentTimeMillis());
+
+        historyRef.child(historyId).setValue(map);
+    }
+
+
+
+
 
     @Override
     protected void onDestroy() {

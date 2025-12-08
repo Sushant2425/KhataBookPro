@@ -4,39 +4,27 @@ import java.io.Serializable;
 
 public class StockHistory implements Serializable {
 
-    private String historyId;
-    private String productId;
-    private String productName;
-    private String type; // "IN" or "OUT"
-    private String quantity;
-    private String price;
-    private String date;
-    private String time;
-    private String note;
-    private String oldStock;
-    private String newStock;
-    private long timestamp;
+    String historyId;
+    String productId;
+    String productName;
+    String type;
+    String quantity;
+    String price;
+    String date;
+    String time;
+    String note;
+    String oldStock;
+    String newStock;
+    long timestamp;
+    String unit;
+    String timeAdded;
+    String hsn;
+    String gst;
 
     public StockHistory() {}
 
-    public StockHistory(String historyId, String productId, String productName, String type,
-                        String quantity, String price, String date, String time, String note,
-                        String oldStock, String newStock, long timestamp) {
-        this.historyId = historyId;
-        this.productId = productId;
-        this.productName = productName;
-        this.type = type;
-        this.quantity = quantity;
-        this.price = price;
-        this.date = date;
-        this.time = time;
-        this.note = note;
-        this.oldStock = oldStock;
-        this.newStock = newStock;
-        this.timestamp = timestamp;
-    }
+    // ================= GETTERS ====================
 
-    // Getters
     public String getHistoryId() {
         return historyId;
     }
@@ -85,7 +73,25 @@ public class StockHistory implements Serializable {
         return timestamp;
     }
 
-    // Setters
+    public String getUnit() {
+        return unit;
+    }
+
+    public String getTimeAdded() {
+        return timeAdded;
+    }
+
+    public String getHsn() {
+        return hsn;
+    }
+
+    public String getGst() {
+        return gst;
+    }
+
+
+    // ================= SETTERS ====================
+
     public void setHistoryId(String historyId) {
         this.historyId = historyId;
     }
@@ -134,59 +140,41 @@ public class StockHistory implements Serializable {
         this.timestamp = timestamp;
     }
 
-    // Helper methods to get double values
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public void setTimeAdded(String timeAdded) {
+        this.timeAdded = timeAdded;
+    }
+
+    public void setHsn(String hsn) {
+        this.hsn = hsn;
+    }
+
+    public void setGst(String gst) {
+        this.gst = gst;
+    }
+
+
+    // ========== Helper Calculations Optional ==========
     public double getQuantityDouble() {
         try {
-            return quantity != null && !quantity.isEmpty() ? Double.parseDouble(quantity) : 0.0;
-        } catch (NumberFormatException e) {
-            return 0.0;
+            return Double.parseDouble(quantity);
+        } catch (Exception e) {
+            return 0;
         }
     }
 
     public double getPriceDouble() {
         try {
-            return price != null && !price.isEmpty() ? Double.parseDouble(price) : 0.0;
-        } catch (NumberFormatException e) {
-            return 0.0;
+            return Double.parseDouble(price);
+        } catch (Exception e) {
+            return 0;
         }
     }
 
-    public double getOldStockDouble() {
-        try {
-            return oldStock != null && !oldStock.isEmpty() ? Double.parseDouble(oldStock) : 0.0;
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
-
-    public double getNewStockDouble() {
-        try {
-            return newStock != null && !newStock.isEmpty() ? Double.parseDouble(newStock) : 0.0;
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
-
-    // Calculate total amount
     public double getTotalAmount() {
         return getQuantityDouble() * getPriceDouble();
-    }
-
-    @Override
-    public String toString() {
-        return "StockHistory{" +
-                "historyId='" + historyId + '\'' +
-                ", productId='" + productId + '\'' +
-                ", productName='" + productName + '\'' +
-                ", type='" + type + '\'' +
-                ", quantity='" + quantity + '\'' +
-                ", price='" + price + '\'' +
-                ", date='" + date + '\'' +
-                ", time='" + time + '\'' +
-                ", note='" + note + '\'' +
-                ", oldStock='" + oldStock + '\'' +
-                ", newStock='" + newStock + '\'' +
-                ", timestamp=" + timestamp +
-                '}';
     }
 }

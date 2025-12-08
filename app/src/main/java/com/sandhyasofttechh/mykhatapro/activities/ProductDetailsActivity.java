@@ -1,7 +1,10 @@
 package com.sandhyasofttechh.mykhatapro.activities;
 
 import android.os.Bundle;
-import android.widget.*;
+import android.widget.Toast;
+import android.widget.TextView;
+import android.widget.ImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,12 +27,15 @@ public class ProductDetailsActivity extends AppCompatActivity {
     Product product;
     DatabaseReference historyRef;
 
-    TextView tvName,tvSalePrice,tvPurchasePrice,tvStock,tvUnit,tvStockValue,tvLowStock,tvHSN,tvGST,tvLossAmount,tvStockAdded;
+    TextView tvName, tvSalePrice, tvPurchasePrice, tvStock, tvUnit,
+            tvStockValue, tvLowStock, tvHSN, tvGST, tvLossAmount, tvStockAdded;
+
     ImageView btnBack;
     RecyclerView rvHistory;
 
     List<StockHistory> list = new ArrayList<>();
     StockHistoryAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +46,9 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         initViews();
         setDetails();
-        fetchHistory();
+        fetchHistory(); // MAIN CALL
     }
+
 
     private void initViews() {
 
@@ -67,58 +74,68 @@ public class ProductDetailsActivity extends AppCompatActivity {
         rvHistory.setAdapter(adapter);
     }
 
+
     private void setDetails() {
 
         tvName.setText(product.getName());
-        tvSalePrice.setText("Sale: ₹" + product.getSalePrice());
-        tvPurchasePrice.setText("Purchase: ₹" + product.getPurchasePrice());
-        tvStock.setText("Qty: " + product.getOpeningStock());
-        tvUnit.setText("Unit: " + product.getUnit());
-        tvLowStock.setText("Low Stock: " + product.getLowStockAlert());
+        tvSalePrice.setText("₹" + product.getSalePrice());
+        tvPurchasePrice.setText("₹" + product.getPurchasePrice());
 
-        double stockValue = product.getOpeningStockDouble() * product.getPurchasePriceDouble();
-        tvStockValue.setText("Stock Value: ₹" + stockValue);
+        tvStock.setText(product.getCurrentStock());
+        tvUnit.setText(product.getUnit());
+        tvLowStock.setText(product.getLowStockAlert());
 
-        tvHSN.setText("HSN: " + product.getHsnCode());
-        tvGST.setText("GST: " + product.getGstRate());
+        double stockValue = product.getCurrentStockDouble() * product.getPurchasePriceDouble();
+        tvStockValue.setText("₹" + String.format("%.2f", stockValue));
 
-        tvLossAmount.setText("Total Loss: ₹0");
-        tvStockAdded.setText("Added: 0");
+        tvHSN.setText(product.getHsn());
+        tvGST.setText(product.getGst() + "%");
 
-        if(product.getImageUrl()!=null && !product.getImageUrl().isEmpty()){
+        // Load image
+        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
             CircleImageView img = findViewById(R.id.imgProduct);
-
-            Glide.with(this)
-                    .load(product.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
-                    .into(img);
+            Glide.with(this).load(product.getImageUrl()).into(img);
         }
     }
+
 
     private void fetchHistory() {
 
         PrefManager pref = new PrefManager(this);
-        String emailKey = pref.getUserEmail().replace(".", ",");
+
+        String emailNode = pref.getUserEmail().replace(".", ",");
+        String shopId = pref.getCurrentShopId();
+
+        if (shopId == null || shopId.trim().isEmpty()) {
+            shopId = "defaultShop";
+        }
 
         historyRef = FirebaseDatabase.getInstance()
                 .getReference("Khatabook")
-                .child(emailKey)
+                .child(emailNode)
+                .child("shops")
+                .child(shopId)
                 .child("history")
-                .child(product.getProductId());
+                .child(product.getProductId()); // IMPORTANT
 
         historyRef.addValueEventListener(new ValueEventListener() {
-            @Override public void onDataChange(DataSnapshot snapshot) {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
                 list.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     StockHistory sh = ds.getValue(StockHistory.class);
-                    if(sh!=null) list.add(sh);
+                    if (sh != null) list.add(0, sh);
                 }
+
                 adapter.notifyDataSetChanged();
             }
-            @Override public void onCancelled(DatabaseError error) {}
-        });
 
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Toast.makeText(ProductDetailsActivity.this,
+                        error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

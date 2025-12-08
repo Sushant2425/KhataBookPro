@@ -1,12 +1,18 @@
 package com.sandhyasofttechh.mykhatapro.adapter;
 
 import android.content.Context;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.sandhyasofttechh.mykhatapro.R;
 import com.sandhyasofttechh.mykhatapro.model.StockHistory;
+
 import java.util.List;
 
 public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapter.VH> {
@@ -21,35 +27,127 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
 
     @NonNull
     @Override
-    public VH onCreateViewHolder(@NonNull ViewGroup parent, int v) {
-        View view = LayoutInflater.from(context)
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context)
                 .inflate(R.layout.item_stock_history, parent, false);
-        return new VH(view);
+        return new VH(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
+
         StockHistory sh = list.get(pos);
 
-        h.tvType.setText(sh.getType());
-        h.tvQty.setText("" + sh.getQuantity());
-        h.tvBalance.setText("" + sh.getPrice());
-        h.tvDate.setText(sh.getDate());
-        h.tvTime.setText(sh.getTime());
+        // GET VALUES SAFELY
+        String date = sh.getDate() != null ? sh.getDate() : "";
+        String time = sh.getTime() != null ? sh.getTime() : "";
+        String qty  = sh.getQuantity() != null ? sh.getQuantity() : "0";
+        String price = sh.getPrice() != null ? sh.getPrice() : "0";
+        String note = sh.getNote() != null ? sh.getNote() : "";
+        String unit = sh.getUnit() != null ? sh.getUnit() : "pcs";
+        String type = sh.getType() != null ? sh.getType().toLowerCase() : "";
+
+        // ====================================
+        // LEFT SIDE ALWAYS DISPLAY
+        // ====================================
+        h.tv_left_date.setText(date);
+        h.tv_left_time.setText(time);
+
+        h.tv_left_balance.setText("₹" + price);
+
+        if (!note.trim().isEmpty()) {
+            h.tv_left_note.setVisibility(View.VISIBLE);
+            h.tv_left_note.setText(note);
+        } else {
+            h.tv_left_note.setVisibility(View.GONE);
+        }
+
+        // ====================================
+        // STOCK OUT Conditions
+        // ====================================
+        boolean isStockOut =
+                type.contains("out") ||
+                        type.contains("sale") ||
+                        type.contains("damage") ||
+                        type.contains("loss");
+
+        if (isStockOut) {
+            // Show OUT Section
+            h.layout_stock_out.setVisibility(View.VISIBLE);
+            h.layout_stock_in.setVisibility(View.INVISIBLE);
+
+            h.tv_out_qty.setText(qty);
+            h.tv_out_unit.setText(unit);
+            h.tv_out_amount.setText("₹" + price);
+
+            h.tv_out_amount.setTextColor(context.getColor(R.color.error));
+
+        } else {
+            // Show IN Section
+            h.layout_stock_out.setVisibility(View.INVISIBLE);
+            h.layout_stock_in.setVisibility(View.VISIBLE);
+
+            h.tv_in_qty.setText(qty);
+            h.tv_in_unit.setText(unit);
+            h.tv_in_amount.setText("₹" + price);
+
+            h.tv_in_amount.setTextColor(context.getColor(R.color.green));
+        }
+
+        // ====================================
+        // DATE HEADER GROUPING
+        // ====================================
+        if (pos == 0) {
+            h.tv_top_header.setVisibility(View.VISIBLE);
+            h.tv_top_header.setText(date);
+        } else {
+            String previous = list.get(pos - 1).getDate();
+            if (previous != null && previous.equals(date)) {
+                h.tv_top_header.setVisibility(View.GONE);
+            } else {
+                h.tv_top_header.setVisibility(View.VISIBLE);
+                h.tv_top_header.setText(date);
+            }
+        }
     }
 
     @Override
-    public int getItemCount() { return list.size(); }
+    public int getItemCount() {
+        return list.size();
+    }
 
+    // ====================================
+    // VIEW HOLDER
+    // ====================================
     static class VH extends RecyclerView.ViewHolder {
-        TextView tvType, tvQty, tvBalance, tvDate, tvTime;
+
+        TextView tv_top_header,
+                tv_left_date, tv_left_time, tv_left_balance, tv_left_note;
+
+        LinearLayout layout_stock_out, layout_stock_in;
+
+        TextView tv_out_qty, tv_out_unit, tv_out_amount;
+        TextView tv_in_qty, tv_in_unit, tv_in_amount;
+
         public VH(@NonNull View v) {
             super(v);
-            tvType = v.findViewById(R.id.tvType);
-            tvQty = v.findViewById(R.id.tvQty);
-            tvBalance = v.findViewById(R.id.tvBalance);
-            tvDate = v.findViewById(R.id.tvDate);
-            tvTime = v.findViewById(R.id.tvTime);
+
+            tv_top_header = v.findViewById(R.id.tv_top_header);
+
+            tv_left_date = v.findViewById(R.id.tv_left_date);
+            tv_left_time = v.findViewById(R.id.tv_left_time);
+            tv_left_balance = v.findViewById(R.id.tv_left_balance);
+            tv_left_note = v.findViewById(R.id.tv_left_note);
+
+            layout_stock_out = v.findViewById(R.id.layout_stock_out);
+            tv_out_qty = v.findViewById(R.id.tv_out_qty);
+            tv_out_unit = v.findViewById(R.id.tv_out_unit);
+            tv_out_amount = v.findViewById(R.id.tv_out_amount);
+
+            layout_stock_in = v.findViewById(R.id.layout_stock_in);
+            tv_in_qty = v.findViewById(R.id.tv_in_qty);
+            tv_in_unit = v.findViewById(R.id.tv_in_unit);
+            tv_in_amount = v.findViewById(R.id.tv_in_amount);
         }
     }
 }

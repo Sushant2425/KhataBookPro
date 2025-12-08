@@ -3,127 +3,168 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="#FAFAFA">
 
-    <!-- Collapsing Top Section (Everything that should hide on scroll) -->
+    <!-- Fixed Top Bar - Always visible, never scrolls -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        app:contentInsetStart="8dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:src="@drawable/ic_arrow_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                app:tint="#212121"/>
+
+            <TextView
+                android:text="Product Details"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/btnBack"
+                android:layout_marginStart="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/tvEditProduct"
+                android:text="Edit"
+                android:textColor="@color/purple_700"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="16dp"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- AppBar with collapsing content -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF">
+        android:layout_marginTop="56dp"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="#FFFFFF"
-            app:expandedTitleMarginStart="48dp"
-            app:title="Product Details">
+            app:contentScrim="@android:color/transparent"
+            app:titleEnabled="false">
 
-            <!-- Fixed Top Bar (Back + Title + Edit) - Stays pinned -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="#FFFFFF"
-                app:layout_collapseMode="pin">
-
-                <ImageView
-                    android:id="@+id/btnBack"
-                    android:src="@drawable/ic_arrow_back"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:tint="#212121"/>
-
-                <TextView
-                    android:text="Product Details"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121"
-                    android:layout_marginStart="12dp"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/tvEditProduct"
-                    android:text="Edit"
-                    android:textColor="@color/purple_700"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <!-- All your original collapsible content (Product Info + Pricing + Stock Details + Tax + Summary) -->
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7">
+                app:layout_collapseParallaxMultiplier="0.5">
 
-                <!-- Product Info Card (Exact copy from your code) -->
+                <!-- Product Info Card - Compact Design -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="12dp"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardElevation="1dp"
+                    app:cardCornerRadius="12dp"
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="14dp"
                         android:background="#FFFFFF"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <!-- Product Name + Image -->
+                        <!-- Product Name + Image - Compact -->
                         <LinearLayout
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
 
-                            <TextView
-                                android:id="@+id/tvName"
-                                android:text="Product Name"
-                                android:textColor="#212121"
-                                android:textStyle="bold"
-                                android:textSize="20sp"
+                            <LinearLayout
+                                android:orientation="vertical"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/tvName"
+                                    android:text="Product Name"
+                                    android:textColor="#1A1A1A"
+                                    android:textStyle="bold"
+                                    android:textSize="18sp"
+                                    android:maxLines="2"
+                                    android:ellipsize="end"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+
+                                <TextView
+                                    android:id="@+id/tvCategory"
+                                    android:text="Category • SKU"
+                                    android:textSize="11sp"
+                                    android:textColor="#757575"
+                                    android:layout_marginTop="2dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+                            </LinearLayout>
 
                             <de.hdodenhof.circleimageview.CircleImageView
                                 android:id="@+id/imgProduct"
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
-                                android:src="@drawable/ic_launcher_background"/>
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
+                                android:layout_marginStart="12dp"
+                                android:src="@drawable/ic_launcher_background"
+                                android:scaleType="centerCrop"
+                                app:civ_border_width="1dp"
+                                app:civ_border_color="#E0E0E0"/>
                         </LinearLayout>
 
+                        <!-- Divider -->
                         <View
-                            android:background="#EEEEEE"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp"
+                            android:background="#F0F0F0"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"/>
 
-                        <!-- PRICING -->
+                        <!-- PRICING - Compact Grid -->
                         <TextView
                             android:text="PRICING"
-                            android:textSize="12sp"
+                            android:textSize="10sp"
                             android:textStyle="bold"
-                            android:textColor="#757575"
-                            android:letterSpacing="0.05"
+                            android:textColor="#9E9E9E"
+                            android:letterSpacing="0.12"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
 
                         <LinearLayout
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="10dp"
                             android:orientation="horizontal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
@@ -136,7 +177,7 @@
 
                                 <TextView
                                     android:text="Sale Price"
-                                    android:textSize="12sp"
+                                    android:textSize="10sp"
                                     android:textColor="#757575"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -144,9 +185,9 @@
                                 <TextView
                                     android:id="@+id/tvSalePrice"
                                     android:text="₹0"
-                                    android:textSize="18sp"
+                                    android:textSize="16sp"
                                     android:textStyle="bold"
-                                    android:textColor="#4CAF50"
+                                    android:textColor="#43A047"
                                     android:layout_marginTop="4dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -159,8 +200,8 @@
                                 android:layout_height="wrap_content">
 
                                 <TextView
-                                    android:text="Purchase Price"
-                                    android:textSize="12sp"
+                                    android:text="Purchase"
+                                    android:textSize="10sp"
                                     android:textColor="#757575"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -168,9 +209,9 @@
                                 <TextView
                                     android:id="@+id/tvPurchasePrice"
                                     android:text="₹0"
-                                    android:textSize="18sp"
+                                    android:textSize="16sp"
                                     android:textStyle="bold"
-                                    android:textColor="#FF9800"
+                                    android:textColor="#FB8C00"
                                     android:layout_marginTop="4dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -184,7 +225,7 @@
 
                                 <TextView
                                     android:text="Stock"
-                                    android:textSize="12sp"
+                                    android:textSize="10sp"
                                     android:textColor="#757575"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -192,7 +233,7 @@
                                 <TextView
                                     android:id="@+id/tvStock"
                                     android:text="0"
-                                    android:textSize="18sp"
+                                    android:textSize="16sp"
                                     android:textStyle="bold"
                                     android:textColor="@color/purple_700"
                                     android:layout_marginTop="4dp"
@@ -201,25 +242,26 @@
                             </LinearLayout>
                         </LinearLayout>
 
+                        <!-- Divider -->
                         <View
-                            android:background="#EEEEEE"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp"
+                            android:background="#F0F0F0"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"/>
 
-                        <!-- STOCK DETAILS -->
+                        <!-- STOCK DETAILS - Compact -->
                         <TextView
                             android:text="STOCK DETAILS"
-                            android:textSize="12sp"
+                            android:textSize="10sp"
                             android:textStyle="bold"
-                            android:textColor="#757575"
-                            android:letterSpacing="0.05"
+                            android:textColor="#9E9E9E"
+                            android:letterSpacing="0.12"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
 
                         <LinearLayout
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="10dp"
                             android:orientation="horizontal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
@@ -232,7 +274,7 @@
 
                                 <TextView
                                     android:text="Stock Value"
-                                    android:textSize="12sp"
+                                    android:textSize="10sp"
                                     android:textColor="#757575"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -240,9 +282,9 @@
                                 <TextView
                                     android:id="@+id/tvStockValue"
                                     android:text="₹0"
-                                    android:textSize="16sp"
+                                    android:textSize="15sp"
                                     android:textStyle="bold"
-                                    android:textColor="#212121"
+                                    android:textColor="#1A1A1A"
                                     android:layout_marginTop="4dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -256,7 +298,7 @@
 
                                 <TextView
                                     android:text="Unit"
-                                    android:textSize="12sp"
+                                    android:textSize="10sp"
                                     android:textColor="#757575"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -264,9 +306,9 @@
                                 <TextView
                                     android:id="@+id/tvUnit"
                                     android:text="---"
-                                    android:textSize="16sp"
+                                    android:textSize="15sp"
                                     android:textStyle="bold"
-                                    android:textColor="#212121"
+                                    android:textColor="#1A1A1A"
                                     android:layout_marginTop="4dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -279,8 +321,8 @@
                                 android:layout_height="wrap_content">
 
                                 <TextView
-                                    android:text="Low Stock Alert"
-                                    android:textSize="12sp"
+                                    android:text="Low Stock"
+                                    android:textSize="10sp"
                                     android:textColor="#757575"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -288,9 +330,9 @@
                                 <TextView
                                     android:id="@+id/tvLowStock"
                                     android:text="0"
-                                    android:textSize="16sp"
+                                    android:textSize="15sp"
                                     android:textStyle="bold"
-                                    android:textColor="#F44336"
+                                    android:textColor="#E53935"
                                     android:layout_marginTop="4dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
@@ -299,179 +341,187 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Tax Information Card -->
+                <!-- Tax & Summary Combined Card - Compact -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginBottom="12dp"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardElevation="1dp"
+                    app:cardCornerRadius="12dp"
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:orientation="vertical"
-                        android:padding="16dp"
                         android:background="#FFFFFF"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <TextView
-                            android:text="TAX INFORMATION"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:textColor="#757575"
-                            android:letterSpacing="0.05"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
+                        <!-- Tax Information Section -->
                         <LinearLayout
-                            android:layout_marginTop="8dp"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
+                            android:padding="14dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content">
-
-                                <TextView
-                                    android:text="HSN Code"
-                                    android:textSize="12sp"
-                                    android:textColor="#757575"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                                <TextView
-                                    android:id="@+id/tvHSN"
-                                    android:text="--"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#212121"
-                                    android:layout_marginTop="4dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-                            </LinearLayout>
+                            <TextView
+                                android:text="TAX INFORMATION"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:textColor="#9E9E9E"
+                                android:letterSpacing="0.12"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
 
                             <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
+                                android:layout_marginTop="10dp"
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 
-                                <TextView
-                                    android:text="GST Rate"
-                                    android:textSize="12sp"
-                                    android:textColor="#757575"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content">
 
-                                <TextView
-                                    android:id="@+id/tvGST"
-                                    android:text="--"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#212121"
-                                    android:layout_marginTop="4dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
+                                    <TextView
+                                        android:text="HSN Code"
+                                        android:textSize="10sp"
+                                        android:textColor="#757575"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+
+                                    <TextView
+                                        android:id="@+id/tvHSN"
+                                        android:text="--"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#1A1A1A"
+                                        android:layout_marginTop="4dp"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:text="GST Rate"
+                                        android:textSize="10sp"
+                                        android:textColor="#757575"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+
+                                    <TextView
+                                        android:id="@+id/tvGST"
+                                        android:text="--"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#1A1A1A"
+                                        android:layout_marginTop="4dp"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+                                </LinearLayout>
                             </LinearLayout>
                         </LinearLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
 
-                <!-- Summary Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginBottom="12dp"
-                    app:cardElevation="2dp"
-                    app:cardCornerRadius="12dp">
+                        <!-- Divider -->
+                        <View
+                            android:background="#F0F0F0"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="14dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"/>
 
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:background="#FFFFFF"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:text="SUMMARY"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:textColor="#757575"
-                            android:letterSpacing="0.05"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
+                        <!-- Summary Section -->
                         <LinearLayout
-                            android:layout_marginTop="8dp"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
+                            android:padding="14dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
 
-                            <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content">
-
-                                <TextView
-                                    android:text="Total Loss"
-                                    android:textSize="12sp"
-                                    android:textColor="#757575"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                                <TextView
-                                    android:id="@+id/tvLossAmount"
-                                    android:text="₹0"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#F44336"
-                                    android:layout_marginTop="4dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-                            </LinearLayout>
+                            <TextView
+                                android:text="SUMMARY"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:textColor="#9E9E9E"
+                                android:letterSpacing="0.12"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
 
                             <LinearLayout
-                                android:orientation="vertical"
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
+                                android:layout_marginTop="10dp"
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 
-                                <TextView
-                                    android:text="Stock Added"
-                                    android:textSize="12sp"
-                                    android:textColor="#757575"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content">
 
-                                <TextView
-                                    android:id="@+id/tvStockAdded"
-                                    android:text="0"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#4CAF50"
-                                    android:layout_marginTop="4dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
+                                    <TextView
+                                        android:text="Total Loss"
+                                        android:textSize="10sp"
+                                        android:textColor="#757575"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+
+                                    <TextView
+                                        android:id="@+id/tvLossAmount"
+                                        android:text="₹0"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#E53935"
+                                        android:layout_marginTop="4dp"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:orientation="vertical"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:text="Stock Added"
+                                        android:textSize="10sp"
+                                        android:textColor="#757575"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+
+                                    <TextView
+                                        android:id="@+id/tvStockAdded"
+                                        android:text="0"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#43A047"
+                                        android:layout_marginTop="4dp"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"/>
+                                </LinearLayout>
                             </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvViewMore"
+                                android:text="View Detailed Report →"
+                                android:textColor="@color/purple_700"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:layout_marginTop="12dp"
+                                android:background="?attr/selectableItemBackground"
+                                android:padding="4dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tvViewMore"
-                            android:text="View Detailed Report →"
-                            android:textColor="@color/purple_700"
-                            android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:layout_marginTop="12dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -480,87 +530,104 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- This is your Transaction History - Now sticks to top when scrolled -->
-    <com.google.android.material.card.MaterialCardView
+    <!-- Transaction History - Compact -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:background="#FFFFFF"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:text="TRANSACTION HISTORY"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="#757575"
-                android:letterSpacing="0.05"
-                android:padding="16dp"
-                android:paddingBottom="8dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="12dp"
+            android:background="@color/white"
+            app:cardElevation="1dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
-                android:orientation="horizontal"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:text="Date"
-                    android:textSize="12sp"
+                    android:text="TRANSACTION HISTORY"
+                    android:textSize="10sp"
                     android:textStyle="bold"
-                    android:textColor="#757575"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:textColor="#9E9E9E"
+                    android:letterSpacing="0.12"
+                    android:padding="14dp"
+                    android:paddingBottom="10dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:text="Stock Out"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="#757575"
-                    android:gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"/>
+                <!-- Table Header -->
+                <LinearLayout
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="8dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:text="Stock In"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="#757575"
-                    android:gravity="end"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        android:text="Stocks"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#616161"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="STOCK OUT"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#616161"
+                        android:gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="STOCK IN"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#616161"
+                        android:gravity="end"
+                        android:layout_marginEnd="15dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:background="#F0F0F0"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"/>
+
+                <!-- RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvHistory"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="14dp"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:clipToPadding="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"/>
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-            <View
-                android:background="#EEEEEE"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvHistory"
-                android:paddingTop="8dp"
-                android:paddingBottom="80dp"
-                android:clipToPadding="false"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:nestedScrollingEnabled="false"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

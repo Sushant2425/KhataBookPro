@@ -150,7 +150,6 @@
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
-                        app:startIconDrawable="@android:drawable/ic_menu_edit"
                         app:startIconTint="#757575"
                         android:hint="Item Name">
 
@@ -172,7 +171,6 @@
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
-                        app:startIconDrawable="@android:drawable/ic_menu_sort_by_size"
                         app:startIconTint="#757575"
                         app:endIconMode="dropdown_menu"
                         android:hint="Unit"
@@ -215,7 +213,6 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#212121"
-                        android:drawableStart="@android:drawable/ic_menu_sort_alphabetically"
                         android:drawableTint="#4CAF50"
                         android:drawablePadding="8dp" />
 
@@ -301,7 +298,6 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#212121"
-                        android:drawableStart="@android:drawable/ic_menu_view"
                         android:drawableTint="#FF9800"
                         android:drawablePadding="8dp" />
 
@@ -385,7 +381,6 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#212121"
-                        android:drawableStart="@android:drawable/ic_menu_agenda"
                         android:drawableTint="#9C27B0"
                         android:drawablePadding="8dp" />
 
