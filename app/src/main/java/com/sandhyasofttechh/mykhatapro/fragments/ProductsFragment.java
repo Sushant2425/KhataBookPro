@@ -1,5 +1,6 @@
 package com.sandhyasofttechh.mykhatapro.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.database.*;
 
 import com.sandhyasofttechh.mykhatapro.R;
+import com.sandhyasofttechh.mykhatapro.activities.ProductReportActivity;
 import com.sandhyasofttechh.mykhatapro.adapter.ProductAdapter;
 import com.sandhyasofttechh.mykhatapro.model.Product;
 import com.sandhyasofttechh.mykhatapro.model.StockHistory;
@@ -153,9 +155,14 @@ public class ProductsFragment extends Fragment {
             }
         });
 
-        btnFilter.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "Filter options coming soon", Toast.LENGTH_SHORT).show()
-        );
+
+
+
+            cardLowStock.setOnClickListener(v ->
+                    toggleGroupFilter.check(R.id.btnLowStock)
+            );
+
+
     }
 
     private void initFilterButtons() {
@@ -173,9 +180,10 @@ public class ProductsFragment extends Fragment {
     }
 
     private void initHeaderActions() {
-        cardViewReport.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "Stock report coming soon", Toast.LENGTH_SHORT).show()
-        );
+        cardViewReport.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ProductReportActivity.class);
+            startActivity(intent);
+        });
 
         cardLowStock.setOnClickListener(v ->
                 toggleGroupFilter.check(R.id.btnLowStock)
