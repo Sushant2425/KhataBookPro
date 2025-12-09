@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp"
+    android:background="#F8FAFC">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Service"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1E293B"
+            android:layout_marginBottom="32dp"/>
+
+        <!-- Service Image Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="28dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/imgEditService"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                <ImageView
+                    android:id="@+id/image_service_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_camera"
+                android:contentDescription="Service image"/>
+            </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Service Name -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="#3B82F6"
+            app:hintTextColor="#64748B"
+            app:startIconTint="#6B7280">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEditName"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="Service Name"
+                android:textSize="16sp"
+                android:inputType="text"
+                android:maxLines="1"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Price -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="#10B981"
+            app:hintTextColor="#64748B"
+            app:startIconTint="#6B7280"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEditPrice"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="Price (₹)"
+                android:textSize="16sp"
+                android:inputType="numberDecimal"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Unit -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="#F59E0B"
+            app:hintTextColor="#64748B"
+            app:startIconTint="#6B7280">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEditUnit"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="Unit (e.g., Hour, Day, Piece)"
+                android:textSize="16sp"
+                android:inputType="text"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- GST -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="#EF4444"
+            app:hintTextColor="#64748B"
+            app:startIconTint="#6B7280">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEditGst"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="GST % (e.g., 18)"
+                android:textSize="16sp"
+                android:inputType="number"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- SAC Code -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="#8B5CF6"
+            app:hintTextColor="#64748B"
+            app:startIconTint="#6B7280">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEditSac"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="SAC Code"
+                android:textSize="16sp"
+                android:inputType="number"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="24dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpdateService"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Update Service"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                android:layout_marginBottom="12dp"
+                app:icon="@drawable/ic_save"
+                app:iconTint="#FFFFFF"
+                app:iconPadding="12dp"
+                app:iconGravity="start"
+                style="@style/Widget.MaterialComponents.Button"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:backgroundTint="#3B82F6"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeleteService"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Delete Service"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_delete"
+                app:iconTint="#FFFFFF"
+                app:iconPadding="12dp"
+                app:iconGravity="start"
+                style="@style/Widget.MaterialComponents.Button"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:backgroundTint="#EF4444"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

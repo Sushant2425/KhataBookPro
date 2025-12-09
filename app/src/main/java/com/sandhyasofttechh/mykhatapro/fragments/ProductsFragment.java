@@ -104,22 +104,28 @@ public class ProductsFragment extends Fragment {
     private void initFirebase() {
         PrefManager pref = new PrefManager(requireContext());
         String email = pref.getUserEmail();
-        String shop = pref.getCurrentShopId();
+        String shopId = pref.getCurrentShopId();
 
-        emailKey = email.replace(".", ",");
+        email = email == null ? "" : email;
+        String emailKey = email.replace(".", ",");
 
-        if (shop == null || shop.trim().isEmpty()) {
-            shop = "defaultShop";
-        }
-
-        DatabaseReference base = FirebaseDatabase.getInstance()
+        DatabaseReference rootRef = FirebaseDatabase.getInstance()
                 .getReference("Khatabook")
-                .child(emailKey)
-                .child("shops")
-                .child(shop);
+                .child(emailKey);
 
-        productsRef = base.child("products");
-        historyRef = base.child("history");
+        // 👉 If shop selected → fetch from shop node
+        if (shopId != null && !shopId.trim().isEmpty()) {
+            productsRef = rootRef.child("shops")
+                    .child(shopId)
+                    .child("products");
+            historyRef = rootRef.child("shops")
+                    .child(shopId)
+                    .child("history");
+        } else {
+            // 👉 If no shop → fetch directly from root
+            productsRef = rootRef.child("products");
+            historyRef = rootRef.child("history");
+        }
     }
 
     private void initRecycler() {

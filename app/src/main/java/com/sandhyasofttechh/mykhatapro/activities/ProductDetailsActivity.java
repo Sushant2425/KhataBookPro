@@ -118,17 +118,22 @@ public class ProductDetailsActivity extends AppCompatActivity {
         String emailNode = pref.getUserEmail().replace(".", ",");
         String shopId = pref.getCurrentShopId();
 
-        if (shopId == null || shopId.trim().isEmpty()) {
-            shopId = "defaultShop";
-        }
-
-        historyRef = FirebaseDatabase.getInstance()
+        DatabaseReference baseRef = FirebaseDatabase.getInstance()
                 .getReference("Khatabook")
-                .child(emailNode)
-                .child("shops")
-                .child(shopId)
-                .child("history")
-                .child(product.getProductId()); // IMPORTANT
+                .child(emailNode);
+
+        // ✔ If shop exists → get under shop
+        if (shopId != null && !shopId.trim().isEmpty()) {
+            historyRef = baseRef.child("shops")
+                    .child(shopId)
+                    .child("history")
+                    .child(product.getProductId());
+        }
+        // ✔ If no shop exists → get direct history
+        else {
+            historyRef = baseRef.child("history")
+                    .child(product.getProductId());
+        }
 
         historyRef.addValueEventListener(new ValueEventListener() {
             @Override
