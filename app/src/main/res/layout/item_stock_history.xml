@@ -64,6 +64,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp" />
+            <!-- Add after tv_left_note -->
+            <TextView
+                android:id="@+id/tv_hsn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HSN: 1234"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:layout_marginTop="2dp" />
+
+            <TextView
+                android:id="@+id/tv_gst"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GST: 18%"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:textColor="@color/primary"
+                android:layout_marginTop="2dp" />
+
 
             <TextView
                 android:id="@+id/tv_left_note"

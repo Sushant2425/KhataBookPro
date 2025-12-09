@@ -6,6 +6,7 @@ import android.view.*;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.sandhyasofttechh.mykhatapro.activities.AddStockActivity;
 import com.sandhyasofttechh.mykhatapro.activities.BusinessCardActivity;
 import com.sandhyasofttechh.mykhatapro.activities.CollectionActivity;
@@ -43,8 +44,9 @@ public class SettingsFragment extends Fragment {
     private AppBarLayout appBarLayout;
 
     // Options
-    private LinearLayout optChangePassword, optSmsSettings, optRecycleBin;
-    private LinearLayout optAppLock, optHelpSupport, optAboutApp, optAboutUs,collection,optbusinesscard,stock;
+    private MaterialCardView optChangePassword, optSmsSettings, optRecycleBin;
+    private MaterialCardView optAppLock, optHelpSupport, optAboutApp, optAboutUs;
+    private MaterialCardView collection, optbusinesscard, stock;
 
     // Firebase
     private DatabaseReference profileRef;
@@ -103,6 +105,7 @@ public class SettingsFragment extends Fragment {
 
 
 
+
         imgLogoBig.setOnClickListener(v -> openFullScreenImage());
 
      collection.setOnClickListener(v ->
@@ -124,28 +127,25 @@ public class SettingsFragment extends Fragment {
     private void setupClickListeners() {
         optChangePassword.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), ChangePasswordActivity.class)));
-
         optSmsSettings.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), SmsSettingsActivity.class)));
-
         optRecycleBin.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), RecycleBinActivity.class)));
-
         optAppLock.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AppLockActivity.class)));
-
         optHelpSupport.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), HelpAndSupportActivity.class)));
-
         optAboutApp.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AboutAppActivity.class)));
-
         optAboutUs.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AboutUsActivity.class)));
         optbusinesscard.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), BusinessCardActivity.class)));
+        collection.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), CollectionActivity.class)));
         stock.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AddStockActivity.class)));
+
     }
 
     // -----------------------------------------------------------

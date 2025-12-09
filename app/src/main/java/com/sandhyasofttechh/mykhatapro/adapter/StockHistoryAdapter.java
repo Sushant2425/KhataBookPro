@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sandhyasofttechh.mykhatapro.R;
+import com.sandhyasofttechh.mykhatapro.model.Product;
 import com.sandhyasofttechh.mykhatapro.model.StockHistory;
 
 import java.util.List;
@@ -19,10 +20,12 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
 
     Context context;
     List<StockHistory> list;
+    Product product; // ✅ NEW: For HSN/GST fallback
 
-    public StockHistoryAdapter(Context context, List<StockHistory> list) {
+    public StockHistoryAdapter(Context context, List<StockHistory> list, Product product) {
         this.context = context;
         this.list = list;
+        this.product = product;
     }
 
     @NonNull
@@ -35,10 +38,9 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
-
         StockHistory sh = list.get(pos);
 
-        // GET VALUES SAFELY
+        // ✅ COMPLETE SAFE VALUE HANDLING
         String date = sh.getDate() != null ? sh.getDate() : "";
         String time = sh.getTime() != null ? sh.getTime() : "";
         String qty  = sh.getQuantity() != null ? sh.getQuantity() : "0";
@@ -47,12 +49,17 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
         String unit = sh.getUnit() != null ? sh.getUnit() : "pcs";
         String type = sh.getType() != null ? sh.getType().toLowerCase() : "";
 
+        // ✅ FIXED HSN/GST WITH FALLBACK
+        String hsn = sh.getHsn() != null && !sh.getHsn().trim().isEmpty() ?
+                sh.getHsn() : (product != null ? product.getHsn() : "N/A");
+        String gst = sh.getGst() != null && !sh.getGst().trim().isEmpty() ?
+                sh.getGst() : (product != null ? product.getGst() : "0");
+
         // ====================================
         // LEFT SIDE ALWAYS DISPLAY
         // ====================================
         h.tv_left_date.setText(date);
         h.tv_left_time.setText(time);
-
         h.tv_left_balance.setText("₹" + price);
 
         if (!note.trim().isEmpty()) {
@@ -61,6 +68,10 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
         } else {
             h.tv_left_note.setVisibility(View.GONE);
         }
+
+        // ✅ NEW: HSN/GST DISPLAY
+        h.tv_hsn.setText("HSN: " + hsn);
+        h.tv_gst.setText("GST: " + gst + "%");
 
         // ====================================
         // STOCK OUT Conditions
@@ -79,7 +90,6 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
             h.tv_out_qty.setText(qty);
             h.tv_out_unit.setText(unit);
             h.tv_out_amount.setText("₹" + price);
-
             h.tv_out_amount.setTextColor(context.getColor(R.color.error));
 
         } else {
@@ -90,7 +100,6 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
             h.tv_in_qty.setText(qty);
             h.tv_in_unit.setText(unit);
             h.tv_in_amount.setText("₹" + price);
-
             h.tv_in_amount.setTextColor(context.getColor(R.color.green));
         }
 
@@ -117,12 +126,11 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
     }
 
     // ====================================
-    // VIEW HOLDER
+    // VIEW HOLDER - COMPLETE WITH HSN/GST
     // ====================================
     static class VH extends RecyclerView.ViewHolder {
-
-        TextView tv_top_header,
-                tv_left_date, tv_left_time, tv_left_balance, tv_left_note;
+        TextView tv_top_header, tv_left_date, tv_left_time, tv_left_balance, tv_left_note;
+        TextView tv_hsn, tv_gst; // ✅ NEW: HSN/GST Views
 
         LinearLayout layout_stock_out, layout_stock_in;
 
@@ -133,11 +141,14 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
             super(v);
 
             tv_top_header = v.findViewById(R.id.tv_top_header);
-
             tv_left_date = v.findViewById(R.id.tv_left_date);
             tv_left_time = v.findViewById(R.id.tv_left_time);
             tv_left_balance = v.findViewById(R.id.tv_left_balance);
             tv_left_note = v.findViewById(R.id.tv_left_note);
+
+            // ✅ NEW: HSN/GST Views
+            tv_hsn = v.findViewById(R.id.tv_hsn);
+            tv_gst = v.findViewById(R.id.tv_gst);
 
             layout_stock_out = v.findViewById(R.id.layout_stock_out);
             tv_out_qty = v.findViewById(R.id.tv_out_qty);

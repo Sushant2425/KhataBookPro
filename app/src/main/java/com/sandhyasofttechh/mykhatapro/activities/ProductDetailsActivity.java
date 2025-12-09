@@ -37,7 +37,6 @@ public class ProductDetailsActivity extends AppCompatActivity {
     List<StockHistory> list = new ArrayList<>();
     StockHistoryAdapter adapter;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +49,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         fetchHistory(); // MAIN CALL
     }
 
-
     private void initViews() {
-
         btnBack = findViewById(R.id.btnBack);
         rvHistory = findViewById(R.id.rvHistory);
 
@@ -74,10 +71,9 @@ public class ProductDetailsActivity extends AppCompatActivity {
         tvEditProduct.setOnClickListener(v -> openEditProduct());
 
         rvHistory.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new StockHistoryAdapter(this, list);
+        adapter = new StockHistoryAdapter(this, list, product); // ✅ PASS PRODUCT FOR HSN/GST FALLBACK
         rvHistory.setAdapter(adapter);
     }
-
 
     private void openEditProduct() {
         Intent intent = new Intent(ProductDetailsActivity.this, AddProductActivity.class);
@@ -87,9 +83,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     private void setDetails() {
-
         tvName.setText(product.getName());
         tvSalePrice.setText("₹" + product.getSalePrice());
         tvPurchasePrice.setText("₹" + product.getPurchasePrice());
@@ -101,8 +95,9 @@ public class ProductDetailsActivity extends AppCompatActivity {
         double stockValue = product.getCurrentStockDouble() * product.getPurchasePriceDouble();
         tvStockValue.setText("₹" + String.format("%.2f", stockValue));
 
-        tvHSN.setText(product.getHsn());
-        tvGST.setText(product.getGst() + "%");
+        // ✅ PROPER HSN/GST DISPLAY
+        tvHSN.setText(product.getHsn() != null ? product.getHsn() : "N/A");
+        tvGST.setText((product.getGst() != null ? product.getGst() : "0") + "%");
 
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
             CircleImageView img = findViewById(R.id.imgProduct);
@@ -110,9 +105,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         }
     }
 
-
     private void fetchHistory() {
-
         PrefManager pref = new PrefManager(this);
 
         String emailNode = pref.getUserEmail().replace(".", ",");
@@ -141,9 +134,17 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 list.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     StockHistory sh = ds.getValue(StockHistory.class);
-                    if (sh != null) list.add(0, sh);
+                    if (sh != null) {
+                        // ✅ CRITICAL FIX: Populate HSN/GST from Product if missing in history
+                        if (sh.getHsn() == null || sh.getHsn().trim().isEmpty()) {
+                            sh.setHsn(product.getHsn());
+                        }
+                        if (sh.getGst() == null || sh.getGst().trim().isEmpty()) {
+                            sh.setGst(product.getGst());
+                        }
+                        list.add(0, sh);
+                    }
                 }
-
                 adapter.notifyDataSetChanged();
             }
 
@@ -154,5 +155,4 @@ public class ProductDetailsActivity extends AppCompatActivity {
             }
         });
     }
-
 }
