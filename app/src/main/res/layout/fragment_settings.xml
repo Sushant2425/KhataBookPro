@@ -146,10 +146,10 @@
                         android:background="?android:attr/selectableItemBackground">
 
                         <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/stock"
-                            app:tint="?attr/colorPrimary" />
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:src="@drawable/img_5"
+                           />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -184,10 +184,10 @@
                         android:background="?android:attr/selectableItemBackground">
 
                         <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@android:drawable/ic_menu_view"
-                            app:tint="?attr/colorPrimary" />
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:src="@drawable/img_6"
+                            />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -222,10 +222,10 @@
                         android:background="?android:attr/selectableItemBackground">
 
                         <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@android:drawable/ic_menu_myplaces"
-                            app:tint="?attr/colorPrimary" />
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:src="@drawable/img_7"
+                            />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -272,10 +272,10 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@android:drawable/ic_menu_delete"
-                        app:tint="?attr/colorPrimary"/>
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/recyckle"
+                       />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -307,10 +307,10 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@android:drawable/ic_lock_lock"
-                        app:tint="?attr/colorPrimary" />
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/img_13"
+                         />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -342,10 +342,10 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@android:drawable/ic_dialog_email"
-                        app:tint="?attr/colorPrimary" />
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/img_10"
+                       />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -391,8 +391,8 @@
                     <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@android:drawable/ic_secure"
-                        app:tint="?attr/colorPrimary" />
+                        android:src="@drawable/img_9"
+                       />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -424,10 +424,10 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@android:drawable/ic_menu_help"
-                        app:tint="?attr/colorPrimary" />
+                        android:layout_width="22dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/img_12"
+                        />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -459,10 +459,10 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@android:drawable/ic_menu_info_details"
-                        app:tint="?attr/colorPrimary" />
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/img_11"
+                        />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -494,10 +494,10 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@android:drawable/ic_menu_view"
-                        app:tint="?attr/colorPrimary" />
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/img_8"
+                        />
 
                     <TextView
                         android:layout_width="wrap_content"

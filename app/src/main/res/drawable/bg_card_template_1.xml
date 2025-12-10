@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:angle="135"
-        android:startColor="#667eea"
-        android:endColor="#764ba2"
-        android:type="linear" />
-    <corners android:radius="12dp" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- base light background -->
+    <item>
+        <shape>
+            <solid android:color="#FAFAFA" />
+            rners android:radius="16dp" />
+        </shape>
+    </item>
+
+    <!-- colored stripe on left -->
+    <item
+        android:left="0dp"
+        android:right="240dp">
+        <shape>
+            <ners
+                android:topLeftRadius="16dp"
+                android:bottomLeftRadius="16dp" />
+            <gradient
+                android:angle="90"
+                android:startColor="#2193b0"
+                android:endColor="#6dd5ed" />
+        </shape>
+    </item>
+
+</layer-list>
