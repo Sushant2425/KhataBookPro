@@ -31,6 +31,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public interface StockActionListener {
         void onStockIn(Product product);
         void onStockOut(Product product);
+        void onItemOptions(Product product, int position); // long-press options
     }
 
     private StockActionListener actionListener;
@@ -89,6 +90,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             Intent i = new Intent(context, ProductDetailsActivity.class);
             i.putExtra("PRODUCT_DATA", (Serializable) p);
             context.startActivity(i);
+        });
+
+        // Item Long Click → show options (Edit / Delete)
+        h.cardView.setOnLongClickListener(v -> {
+            if (actionListener != null) {
+                int adapterPos = h.getAdapterPosition();
+                if (adapterPos != RecyclerView.NO_POSITION) {
+                    actionListener.onItemOptions(p, adapterPos);
+                }
+            }
+            return true;
         });
 
         // Stock Actions
