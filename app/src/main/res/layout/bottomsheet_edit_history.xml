@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitleEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit stock entry"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+        <!-- Small subtitle -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Update quantity, price or note and save."
+            android:textSize="13sp"
+            android:textColor="#808080" />
+
+        <!-- Quantity -->
+        <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Quantity"
+        app:boxStrokeColor="@color/purple_500">
+
+            <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etQty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Price -->
+        <com.google.android.material.textfield.TextInputLayout
+    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:hint="Price">
+
+            <com.google.android.material.textfield.TextInputEditText
+    android:id="@+id/etPrice"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:inputType="numberDecimal" />
+</com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Note -->
+<com.google.android.material.textfield.TextInputLayout
+    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:hint="Note (optional)">
+
+<com.google.android.material.textfield.TextInputEditText
+    android:id="@+id/etNote"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:inputType="textCapSentences|textMultiLine"
+    android:minLines="1"
+    android:maxLines="3" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Save button -->
+<com.google.android.material.button.MaterialButton
+    android:id="@+id/btnSaveEdit"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="18dp"
+    android:text="Save changes"
+    android:textAllCaps="false"
+    android:textStyle="bold"
+    app:cornerRadius="12dp"
+    app:backgroundTint="@color/purple_500" />
+
+    </LinearLayout>
+    </ScrollView>
