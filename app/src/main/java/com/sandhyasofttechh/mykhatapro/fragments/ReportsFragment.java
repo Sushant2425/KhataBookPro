@@ -462,10 +462,12 @@ public class ReportsFragment extends Fragment {
                         if (monthYear == null) continue;
 
                         if (type.equalsIgnoreCase("gave")) {
-                            monthlyGave.put(monthYear, monthlyGave.get(monthYear) + amount);
+                            float current = monthlyGave.getOrDefault(monthYear, 0f);
+                            monthlyGave.put(monthYear, current + amount);
                             totalGave += amount;
                         } else if (type.equalsIgnoreCase("got")) {
-                            monthlyGot.put(monthYear, monthlyGot.get(monthYear) + amount);
+                            float current = monthlyGot.getOrDefault(monthYear, 0f);
+                            monthlyGot.put(monthYear, current + amount);
                             totalGot += amount;
                         }
                     }
@@ -530,8 +532,8 @@ public class ReportsFragment extends Fragment {
 
         for (int i = 0; i < months.length; i++) {
             String key = months[i] + " " + year;
-            gaveList.add(new BarEntry(i, monthlyGave.get(key)));
-            gotList.add(new BarEntry(i, monthlyGot.get(key)));
+            gaveList.add(new BarEntry(i, monthlyGave.getOrDefault(key, 0f)));
+            gotList.add(new BarEntry(i, monthlyGot.getOrDefault(key, 0f)));
             labels.add(months[i]);
         }
 
@@ -567,8 +569,9 @@ public class ReportsFragment extends Fragment {
 
         for (int i = 0; i < months.length; i++) {
             String key = months[i] + " " + year;
-            float net = monthlyGot.get(key) - monthlyGave.get(key);
-            netEntries.add(new Entry(i, net));
+            float gave = monthlyGave.getOrDefault(key, 0f);
+            float got = monthlyGot.getOrDefault(key, 0f);
+            float net = got - gave;            netEntries.add(new Entry(i, net));
             labels.add(months[i]);
         }
 
